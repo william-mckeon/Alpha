@@ -34,4 +34,6 @@ Suggested shape:
 
 - [0000-mod-core-port.md](0000-mod-core-port.md) — the MoD core (architecture-agnostic)
 - [0004-mode-foundation.md](0004-mode-foundation.md) — the from-scratch MoDE foundation model
+- [0005-scale-and-training.md](0005-scale-and-training.md) — scale presets (grow-params 4→8→10), batched dispatch, 128k context, the production trainer
+- [0006-distillation-student.md](0006-distillation-student.md) — Arcus as openagent-code's from-scratch distillation student (the downstream purpose)
 - _archived (Qwen path, in `../legacy/specs/`): 0001-mode-qwen-wrapper · 0002-coexistence · 0003-dense-mod_

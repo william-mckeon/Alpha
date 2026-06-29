@@ -5,7 +5,7 @@
 > BoeNet's validated mechanism — for **efficiency**: foundation-model quality at a
 > fraction of the compute, on hardware you actually have.
 
-**Maintainer:** William McKeon · **Status:** v0.1 — model built & validated (tiny preset); cloud runs ahead · Apache 2.0 License © 2026 William McKeon
+**Maintainer:** William McKeon · **Status:** v0.2 — grow-params bench (0.5b/0.9b/1b) built & running on the 5080; cloud runs ahead · Apache 2.0 License © 2026 William McKeon
 
 ---
 
@@ -46,12 +46,12 @@ pure MoE). Full design: [docs/ARCUS_MODEL_DESIGN.md](docs/ARCUS_MODEL_DESIGN.md)
 arcus/
   tokenizer.py     tiktoken cl100k_base (default; o200k optional)
   backbone.py      RoPE / RMSNorm / GQA+QK-norm / SwiGLU (dense attention)
-  moe.py           the E — 4 experts, top-1, grow-params, Switch lb-loss
+  moe.py           the E — top-1, grow-params (4→8→10 experts), batched bmm dispatch, Switch lb-loss
   mod_core.py      the D — fixed-K causal selection + straight-through gate
   model.py         the assembled MoDE model + scale dispatch
-  model_config.py  Alpha presets: tiny / alpha-0.1 / 0.5 / 1.0
-  train.py · optim.py · eval.py · data.py · config.py
-scripts/train_arcus.py   from-scratch training driver (+ --dense baseline)
+  model_config.py  presets: tiny / 0.5b / 0.9b / 1b (bench) / alpha-0.1 / 0.5 / 1.0 (cloud)
+  train.py · optim.py · eval.py · data.py · config.py · hf_upload.py
+scripts/train_arcus.py · scripts/memcheck.py   training driver (+ --dense) · VRAM fit check
 docs/ · specs/ · tests/ · legacy/ (archived Qwen path)
 ```
 
@@ -64,7 +64,7 @@ python -m venv .venv; .\.venv\Scripts\Activate.ps1
 pip install torch --index-url https://download.pytorch.org/whl/cu128
 pip install -e .
 
-python -m pytest -q                                  # 27 tests (model, MoE, MoD, tokenizer, trainer)
+python -m pytest -q                                  # 29 tests (model, MoE, MoD, tokenizer, trainer)
 python scripts/train_arcus.py --preset tiny --max_tokens 2000000   # pipeline run on the 5080
 ```
 
@@ -81,22 +81,30 @@ from-scratch and run on **cloud** — see the ladder below.
 | Preset | Size | Where | Role |
 |---|---|---|---|
 | `tiny` | few M | 5080 / CPU | pipeline validation |
+| `0.5b` / `0.9b` / `1b` | 512M / 889M / 1078M | 5080 bench | grow-params (4/8/10 experts); real-size architecture + trainer — *not* a quality rung |
 | `alpha-0.1` | ~1.3B | cloud | first real quality finding |
 | `alpha-0.5` | ~7–13B | cloud | "this competes" |
 | `alpha-1.0` | ~70–86B | cluster | optional far end — *not* the goal |
 
-The point isn't the big rungs — it's **quality-per-compute**. MoDE's efficiency lets the
-small, accessible rungs punch above their weight; the cluster sizes are optional.
+The point isn't the big rungs — it's **quality-per-compute**. **Start at 1B and climb**:
+small rungs are cheap and yield the scaling curve (params × tokens couple at ~20 tok/param —
+see [ROADMAP.md](ROADMAP.md)). Real pretraining is cloud; the 5080 is the validation bench.
+How-to: [docs/TRAINING.md](docs/TRAINING.md).
 
 ---
 
 ## Status & honest gaps
 
-- Tiny preset **built and runtime-validated** (27 tests: lossless@cap=1, causal,
-  gradient to both routers + every expert, end-to-end training).
+- Tiny preset **built and runtime-validated** (29 tests: lossless@cap=1, causal,
+  gradient to both routers + every expert, end-to-end training); grow-params bench
+  (`0.5b`/`0.9b`/`1b`) builds and trains on the 5080 (1B with a shared-RAM spill).
 - Quality is **unproven** — that needs the cloud runs on the alpha dataset.
 - Win condition (boenet): MoDE **matches** dense at lower compute, not beats — read
   every run against the `--dense` matched baseline.
+
+**Downstream purpose:** Arcus is the from-scratch *student* for openagent-code's distillation
+flywheel (teacher: gpt-oss-120b) — pretrain to fluency, then SFT/distil. See
+[specs/0006-distillation-student.md](specs/0006-distillation-student.md).
 
 ---
 

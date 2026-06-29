@@ -32,9 +32,12 @@ MoDE is **+9.6%** perplexity over dense at ~half the FFN compute.
 **Read (honest):**
 - **Not a quality result.** Both are deeply undertrained — ppl ~1270–1390 on ~30–39M
   models after 1 epoch on 1M tokens. This is "machine works + harness is valid," not a verdict.
-- **The +9.6% is the data-starvation tax.** MoDE's 4 experts each see ~⅛ of the data the
-  dense FFN does (capacity 0.5 × top-1 of 4), so it has *more* params (39M vs 30M) yet is
-  *worse* at this token budget. The exact regime boenet's 120 GB corpus exists to escape.
+- **The +9.6% is one under-trained snapshot, NOT a fixed "tax."** Earlier framing called this
+  a permanent data-starvation penalty — that was wrong, and boenet's own checkpoints disprove
+  it: the MoDE-vs-dense gap **closes with more training** (small +3.4%, medium MoDE *edged*
+  dense, large +8.3% at 10 epochs → +3.6% at 20 — the gap halved), and MoDE's best epoch is
+  always at/near the last (still improving). A single 1-epoch run on 1M tokens says nothing
+  about the converged gap; MoDE improves *relative* to dense with more epochs, not data alone.
 - **Reproduces boenet's shape.** boenet's char-small MoDE was +13% over dense; this is
   +9.6% at an even tinier/shorter run — faithful behavior, different tokenizer/data/scale.
 - **MoD is healthy:** compute fraction ~0.49, content-based (not pinned/positional).
@@ -42,6 +45,17 @@ MoDE is **+9.6%** perplexity over dense at ~half the FFN compute.
 **Established:** a valid, reproducible (seeded) matched MoDE-vs-dense harness on real data.
 **NOT established:** any quality claim · whether the gap closes with more data/scale ·
 capacity 0.25 · multi-epoch / multi-seed.
+
+---
+
+## Scale-bench runs (0.9b / 1b) — in progress
+
+The grow-params bench rungs (`0.9b` 8×2560 ≈889M, `1b` 10×2560 ≈1078M, 128k context) build
+and train on the 5080 with a shared-RAM spill. These prove the **architecture + trainer at
+real size** — they are **not quality results** (50M-token, under-trained; a 1B wants ~20–100B
+tokens). `val_ppl` per epoch lands in `runs/<name>/epochs.csv`; converged figures will be
+logged here once a real (cloud-scale) run exists. See
+[ROADMAP.md](../ROADMAP.md) scaling strategy and [TRAINING.md](TRAINING.md).
 
 ---
 

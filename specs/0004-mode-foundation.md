@@ -7,7 +7,7 @@ backbone, from scratch, with a tiktoken tokenizer — and validate the pipeline 
 ## Goal
 
 A from-scratch model: `token embed → MoDE blocks → tied head`. Each block is dense
-GQA/RoPE attention + a MoD-gated MoE FFN (boenet: MoD cap 0.5, MoE 4-experts/top-1,
+GQA/RoPE attention + a MoD-gated MoE FFN (boenet: MoD cap 0.5, MoE top-1, grow-params —
 Switch lb-loss). Trains end-to-end (no freeze). The `tiny` preset runs on the 5080 /
 CPU and is the test gate; `alpha-0.1`+ are cloud.
 
@@ -15,7 +15,7 @@ CPU and is the test gate; `alpha-0.1`+ are cloud.
 
 - **`arcus/tokenizer.py`** — tiktoken `cl100k_base` (default); tied embeddings.
 - **`arcus/backbone.py`** — RMSNorm, RoPE, GQA(+QK-norm), SwiGLU; dense attention.
-- **`arcus/moe.py`** — top-1, 4 experts, grow-params, causal overflow, Switch lb-loss.
+- **`arcus/moe.py`** — top-1, grow-params (4→8→10 experts, batched `bmm` dispatch), causal overflow, Switch lb-loss.
 - **`arcus/model.py`** — assembles MoDE; `last_aux_loss`, `last_compute_fraction`.
 - **matched baseline** — `--dense` (n_experts=1, capacity=1.0) gives a plain dense model.
 
@@ -29,13 +29,15 @@ CPU and is the test gate; `alpha-0.1`+ are cloud.
 - [x] end-to-end trainer moves a non-router weight (whole model trains, not held back).
 - [x] `pack_tokens` aligns next-token windows; shard reader streams `*.jsonl.zst`.
 
-*(All seven validated: 27/27 tests pass on the venv, 2026-06-27.)*
+*(All seven validated: 29 tests pass on the venv. Grow-params scale + trainer: [0005](0005-scale-and-training.md).)*
 
 ## Non-goals (this pass)
 
 - **Quality / the thesis** — needs the real cloud runs on the alpha dataset.
 - **Streaming data loader, distributed training, O(T log T) select** — the cloud scale-up.
-- **Top-2 / other expert counts** — boenet validated top-1 / 4 experts only.
+- **Top-2 routing** — still top-1 (boenet-validated). *Grow-params* expert counts (8/10
+  experts, top-1) and the production trainer are done in [0005](0005-scale-and-training.md);
+  the downstream distillation purpose is [0006](0006-distillation-student.md).
 
 ## Notes
 

@@ -17,7 +17,7 @@ token embed (tied with the output head)
    ├─ RMSNorm → GQA attention (RoPE, QK-norm) → + residual        [DENSE — never routed]
    │
    ├─ RMSNorm → MoD router → keep ~capacity of tokens             [the D]
-   │            gather kept → MoE (4 experts, top-1) → scatter    [the E]
+   │            gather kept → MoE (top-1, grow-params 4→8→10) → scatter   [the E]
    │            → gate → + residual                               [skipped tokens bypass]
    │
    × N layers
@@ -34,7 +34,9 @@ RMSNorm → tied head → logits
 | Attention | GQA + QK-norm, **dense** | small KV cache at scale; never routed, so RoPE/GQA untouched by MoD |
 | FFN | SwiGLU experts | standard gated FFN |
 | **D** | MoD router, capacity 0.5 | skip the FFN for easy tokens (boenet-validated) |
-| **E** | 4 experts, top-1, grow-params, Switch lb-loss | specialized capacity (boenet-validated) |
+| **E** | top-1, **grow-params** (4→8→10 experts), Switch lb-loss | specialized capacity (boenet-validated); add wide experts to grow total params at constant active compute |
+| Dispatch | experts stacked as `[E,in,out]`, batched `bmm` (`moe.py: BatchedExperts`) | wall-clock doesn't scale with expert count — a per-expert Python loop made many experts *slower* despite fewer FLOPs |
+| Context | RoPE cache sized by `max_seq_len` (up to 131072), **decoupled** from the trained `seq_len` | declare a 128k window (GPT-OSS-120B parity) for ~67 MB of buffer; train at a small window (attention is O(T²)) |
 
 ## Key properties
 
