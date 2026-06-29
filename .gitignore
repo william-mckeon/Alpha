@@ -1,0 +1,40 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- Virtual envs ---
+.venv/
+venv/
+env/
+
+# --- Local config / secrets ---
+.env
+*.local
+
+# --- Model weights, checkpoints, runs (never committed) ---
+checkpoints/
+runs/
+*.pt
+*.safetensors
+*.bin
+
+# --- Data + HuggingFace / tokenizer caches ---
+data/
+.hf_cache/
+.cache/
+
+# --- Alpha dataset shards (multi-GB; built by DatasetForge, never committed) ---
+alpha dataset/**/*.zst
+alpha dataset/**/*.jsonl
+alpha dataset/.datasetforge_state.json
+
+# --- OS ---
+.DS_Store
+Thumbs.db

@@ -1,0 +1,8 @@
+# Track the large compressed shards with Git LFS on the HuggingFace Hub.
+# Small text files (README.md, manifest.json, checksums.sha256, load_corpus.py)
+# stay as regular files so they render and diff normally.
+*.jsonl.zst filter=lfs diff=lfs merge=lfs -text
+*.jsonl.gz  filter=lfs diff=lfs merge=lfs -text
+*.zst       filter=lfs diff=lfs merge=lfs -text
+*.parquet   filter=lfs diff=lfs merge=lfs -text
+*.arrow     filter=lfs diff=lfs merge=lfs -text

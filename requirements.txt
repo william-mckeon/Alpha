@@ -1,0 +1,20 @@
+# Arcus — runtime dependencies for the from-scratch MoDE foundation model.
+#
+# torch: install the CUDA build that matches your GPU FIRST. The dev box is an
+# RTX 5080 (Blackwell / sm_120) → CUDA 12.8 cu128 wheels (PyTorch >= 2.7):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch>=2.7.0
+
+# Tokenizer + data.
+tiktoken>=0.7.0          # cl100k_base / o200k_base BPE (the tokenizer)
+zstandard>=0.22.0        # read the alpha-dataset *.jsonl.zst shards
+tqdm>=4.65               # training progress bar
+huggingface_hub>=0.20    # per-epoch checkpoint upload (backup / serving)
+safetensors>=0.4.0       # checkpoint format
+
+numpy>=1.26
+pytest>=8.0
+
+# The archived Qwen-wrapper path under legacy/ additionally needs:
+#   transformers>=5.0.0  accelerate  datasets  tokenizers  safetensors
+# (install via:  pip install -e ".[legacy]")

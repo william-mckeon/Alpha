@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/willi/OneDrive/Desktop/open source/OpenAgent-os\" 2>/dev/null && echo \"=== OpenAgent-os exists ===\" && find . -maxdepth 2 -type d -not -path '*/.git/*' -not -path '*/node_modules/*' | sort | head -60 || echo \"OpenAgent-os NOT FOUND\")",
+      "Read(//c/Users/willi/OneDrive/Desktop/open source/OpenAgent-os/**)",
+      "Bash(cd \"C:\\\\Users\\\\willi\\\\OneDrive\\\\Desktop\\\\OpenCode\" && find . -path \"./.venv\" -prune -o -type f -name \"*.md\" -print | sort)",
+      "Read(//c/Users/willi/OneDrive/Desktop/OpenCode/**)",
+      "Bash(grep -n \"^---$\" README.md ROADMAP.md docs/DATASHEET.md)"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+# Arcus — one-service GPU compose. Mirrors boenet's docker-compose.
+services:
+  arcus:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: arcus:cuda
+    container_name: arcus
+    gpus: all                      # Docker Compose v2.3+; older: use deploy.resources
+    environment:
+      CUDA_VISIBLE_DEVICES: "0"
+      ARCUS_ENCODING: cl100k_base
+      TIKTOKEN_CACHE_DIR: /app/.cache/tiktoken
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - "../alpha dataset:/app/alpha dataset:ro"   # the shards (read-only)
+      - "../runs:/app/runs"                        # checkpoints + results
+      - "../.cache:/app/.cache"                    # tiktoken cache (persist across runs)
+      - "../arcus:/app/arcus"                      # live source for dev (optional)
+    # Default runs the tests. For training, override:
+    #   docker compose -f docker/docker-compose.yaml run --rm arcus \
+    #     python3 scripts/train_arcus.py --preset boenet-medium --capacity 0.5 ...
+    command: python3 -m pytest -q

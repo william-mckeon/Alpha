@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "created_at": "2026-06-27T05:24:58.134546+00:00",
+  "datasetforge_version": "1.0.0",
+  "config_hash": "57fa1aa3c57695a0",
+  "total_bytes": 166331712955,
+  "total_rows": 21772575,
+  "format": "jsonl",
+  "compression": "zstd",
+  "datasets": [
+    {
+      "identifier": "bigcode/the-stack:data/python",
+      "name": "bigcode/the-stack",
+      "subset": null,
+      "data_dir": "data/python",
+      "text_column": "content",
+      "size_gb": 14,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 17847815267,
+      "rows_written": 1769975
+    },
+    {
+      "identifier": "HuggingFaceTB/finemath:finemath-4plus",
+      "name": "HuggingFaceTB/finemath",
+      "subset": "finemath-4plus",
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 26,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 34212476933,
+      "rows_written": 5479426
+    },
+    {
+      "identifier": "open-web-math/open-web-math",
+      "name": "open-web-math/open-web-math",
+      "subset": null,
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 12,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 15287594288,
+      "rows_written": 1657859
+    },
+    {
+      "identifier": "HuggingFaceTB/finemath:infiwebmath-3plus",
+      "name": "HuggingFaceTB/finemath",
+      "subset": "infiwebmath-3plus",
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 14,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 19799528072,
+      "rows_written": 2706084
+    },
+    {
+      "identifier": "bigcode/the-stack:data/javascript",
+      "name": "bigcode/the-stack",
+      "subset": null,
+      "data_dir": "data/javascript",
+      "text_column": "content",
+      "size_gb": 8,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 9828243272,
+      "rows_written": 673375
+    },
+    {
+      "identifier": "bigcode/the-stack:data/go",
+      "name": "bigcode/the-stack",
+      "subset": null,
+      "data_dir": "data/go",
+      "text_column": "content",
+      "size_gb": 6,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 7819211715,
+      "rows_written": 656824
+    },
+    {
+      "identifier": "bigcode/the-stack:data/rust",
+      "name": "bigcode/the-stack",
+      "subset": null,
+      "data_dir": "data/rust",
+      "text_column": "content",
+      "size_gb": 4,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 4846271691,
+      "rows_written": 322408
+    },
+    {
+      "identifier": "HuggingFaceFW/fineweb-edu:sample-100BT",
+      "name": "HuggingFaceFW/fineweb-edu",
+      "subset": "sample-100BT",
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 22,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 25799715071,
+      "rows_written": 4936244
+    },
+    {
+      "identifier": "HuggingFaceFW/finewiki:en",
+      "name": "HuggingFaceFW/finewiki",
+      "subset": "en",
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 8,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 24097654393,
+      "rows_written": 1423618
+    },
+    {
+      "identifier": "wikimedia/wikipedia:20231101.en",
+      "name": "wikimedia/wikipedia",
+      "subset": "20231101.en",
+      "data_dir": null,
+      "text_column": "text",
+      "size_gb": 6,
+      "category": null,
+      "status": "completed",
+      "bytes_written": 6793202253,
+      "rows_written": 2146762
+    }
+  ]
+}

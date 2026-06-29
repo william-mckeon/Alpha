@@ -1,0 +1,1157 @@
+2026-06-26 03:03:27 | INFO     | datasetforge | Logging initialized: /output/datasetforge.log
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | DatasetForge v1.0.0 starting
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | Configuration loaded: 8 datasets, 120.0 GB total
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | Starting build
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | Total target size: 120.0 GB
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | HuggingFace token detected
+2026-06-26 03:03:27 | INFO     | datasetforge.cli | Output directory: /output
+2026-06-26 03:03:27 | INFO     | datasetforge.main | Initialized new build state: /output/.datasetforge_state.json
+2026-06-26 03:03:27 | INFO     | datasetforge.main | Phase 1: Validating datasets...
+2026-06-26 03:03:30 | INFO     | datasetforge.validator | Validating 8 dataset entries...
+2026-06-26 03:03:42 | INFO     | datasetforge.validator | Validation complete: 8 passed, 0 failed
+2026-06-26 03:03:42 | INFO     | datasetforge.main | Validation passed for all 8 datasets
+2026-06-26 03:03:42 | INFO     | datasetforge.main | Phase 2: Building datasets...
+2026-06-26 03:03:42 | INFO     | datasetforge.main | Processing dataset: bigcode/the-stack:Python
+2026-06-26 03:03:42 | INFO     | datasetforge.main |   Target size: 24.0 GB
+2026-06-26 03:03:42 | INFO     | datasetforge.main |   Text column: content
+2026-06-26 03:03:42 | INFO     | datasetforge.main |   Filter: lang = Python
+2026-06-26 03:03:42 | INFO     | datasetforge.writer | Writing to: /output/bigcode_the-stack_Python
+2026-06-26 03:03:42 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-26 03:03:42 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-26 03:03:42 | INFO     | datasetforge.sampler | Starting sampling: target=24.0 GB, start=0.0 B
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader | Streaming from entry: bigcode/the-stack:Python
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader |   Dataset: bigcode/the-stack
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader |   Filter: lang = Python
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader | Starting stream: bigcode/the-stack
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader |   Filter: lang = Python
+2026-06-26 03:03:42 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-26 23:00:41 | WARNING  | datasetforge.cli | Received signal 15, initiating graceful shutdown...
+2026-06-26 23:00:41 | WARNING  | datasetforge.cli | Press Ctrl+C again to force exit
+2026-06-26 23:39:42 | INFO     | datasetforge | Logging initialized: /output/datasetforge.log
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | DatasetForge v1.0.0 starting
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | Configuration loaded: 10 datasets, 120.0 GB total
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | Starting build
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | Total target size: 120.0 GB
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | HuggingFace token detected
+2026-06-26 23:39:42 | INFO     | datasetforge.cli | Output directory: /output
+2026-06-26 23:39:42 | INFO     | datasetforge.main | Initialized new build state: /output/.datasetforge_state.json
+2026-06-26 23:39:42 | INFO     | datasetforge.main | Phase 1: Validating datasets...
+2026-06-26 23:39:44 | INFO     | datasetforge.validator | Validating 10 dataset entries...
+2026-06-26 23:41:51 | INFO     | datasetforge.validator | Validation complete: 10 passed, 0 failed
+2026-06-26 23:41:51 | INFO     | datasetforge.main | Validation passed for all 10 datasets
+2026-06-26 23:41:51 | INFO     | datasetforge.main | Phase 2: Building datasets...
+2026-06-26 23:41:51 | INFO     | datasetforge.main | Processing dataset: bigcode/the-stack:data/python
+2026-06-26 23:41:51 | INFO     | datasetforge.main |   Target size: 14.0 GB
+2026-06-26 23:41:51 | INFO     | datasetforge.main |   Text column: content
+2026-06-26 23:41:51 | INFO     | datasetforge.main |   Data dir: data/python
+2026-06-26 23:41:51 | INFO     | datasetforge.writer | Writing to: /output/bigcode_the-stack_data_python
+2026-06-26 23:41:51 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-26 23:41:51 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-26 23:41:51 | INFO     | datasetforge.sampler | Starting sampling: target=14.0 GB, start=0.0 B
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader | Streaming from entry: bigcode/the-stack:data/python
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader |   Dataset: bigcode/the-stack
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader |   Data dir: data/python
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader | Starting stream: bigcode/the-stack
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader |   Data dir: data/python
+2026-06-26 23:41:51 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-26 23:42:45 | INFO     | datasetforge.downloader | Streaming: 0 kept / 0 filtered (0.0% kept), 0 rows/s
+2026-06-26 23:42:58 | INFO     | datasetforge.progress | Progress: 2.3 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-26 23:43:17 | INFO     | datasetforge.downloader | Streaming: 30,000 kept / 0 filtered (100.0% kept), 346 rows/s
+2026-06-26 23:43:52 | INFO     | datasetforge.downloader | Streaming: 60,000 kept / 0 filtered (100.0% kept), 493 rows/s
+2026-06-26 23:44:03 | INFO     | datasetforge.progress | Progress: 571.4 MB / 120.0 GB (0.5%) | Speed: 8.0 KB/s | ETA: 182d 4h 4m 15s
+2026-06-26 23:44:24 | INFO     | datasetforge.downloader | Streaming: 102,138 kept / 0 filtered (100.0% kept), 667 rows/s
+2026-06-26 23:45:23 | INFO     | datasetforge.downloader | Streaming: 117,545 kept / 0 filtered (100.0% kept), 553 rows/s
+2026-06-26 23:45:25 | INFO     | datasetforge.progress | Progress: 1.0 GB / 120.0 GB (0.9%) | Speed: 2.3 KB/s | ETA: 636d 21h 27m 43s
+2026-06-26 23:46:06 | INFO     | datasetforge.downloader | Streaming: 136,187 kept / 0 filtered (100.0% kept), 533 rows/s
+2026-06-26 23:46:25 | INFO     | datasetforge.progress | Progress: 1.4 GB / 120.0 GB (1.1%) | Speed: 228.8 MB/s | ETA: 8m 51s
+2026-06-26 23:46:36 | INFO     | datasetforge.downloader | Streaming: 172,311 kept / 1 filtered (100.0% kept), 604 rows/s
+2026-06-26 23:47:06 | INFO     | datasetforge.downloader | Streaming: 214,712 kept / 1 filtered (100.0% kept), 681 rows/s
+2026-06-26 23:48:02 | INFO     | datasetforge.downloader | Streaming: 235,089 kept / 1 filtered (100.0% kept), 633 rows/s
+2026-06-26 23:48:02 | INFO     | datasetforge.progress | Progress: 2.1 GB / 120.0 GB (1.7%) | Speed: 1.4 KB/s | ETA: 1012d 10h 37m 44s
+2026-06-26 23:48:45 | INFO     | datasetforge.downloader | Streaming: 265,089 kept / 1 filtered (100.0% kept), 639 rows/s
+2026-06-26 23:49:04 | INFO     | datasetforge.progress | Progress: 2.5 GB / 120.0 GB (2.1%) | Speed: 55.9 KB/s | ETA: 25d 11h 51m 42s
+2026-06-26 23:49:26 | INFO     | datasetforge.downloader | Streaming: 295,089 kept / 1 filtered (100.0% kept), 648 rows/s
+2026-06-26 23:49:56 | INFO     | datasetforge.downloader | Streaming: 316,955 kept / 1 filtered (100.0% kept), 653 rows/s
+2026-06-26 23:50:11 | INFO     | datasetforge.progress | Progress: 2.9 GB / 120.0 GB (2.4%) | Speed: 7.2 KB/s | ETA: 197d 17h 12m 2s
+2026-06-26 23:51:18 | INFO     | datasetforge.downloader | Streaming: 352,634 kept / 1 filtered (100.0% kept), 622 rows/s
+2026-06-26 23:51:19 | INFO     | datasetforge.progress | Progress: 3.2 GB / 120.0 GB (2.7%) | Speed: 1.1 KB/s | ETA: 1329d 16m 38s
+2026-06-26 23:51:53 | INFO     | datasetforge.downloader | Streaming: 372,634 kept / 1 filtered (100.0% kept), 619 rows/s
+2026-06-26 23:52:24 | INFO     | datasetforge.downloader | Streaming: 392,634 kept / 1 filtered (100.0% kept), 620 rows/s
+2026-06-26 23:52:26 | INFO     | datasetforge.progress | Progress: 3.6 GB / 120.0 GB (3.0%) | Speed: 3.0 KB/s | ETA: 464d 6m 11s
+2026-06-26 23:52:56 | INFO     | datasetforge.downloader | Streaming: 432,634 kept / 1 filtered (100.0% kept), 650 rows/s
+2026-06-26 23:53:45 | INFO     | datasetforge.downloader | Streaming: 470,179 kept / 1 filtered (100.0% kept), 658 rows/s
+2026-06-26 23:53:45 | INFO     | datasetforge.progress | Progress: 4.2 GB / 120.0 GB (3.5%) | Speed: 1.7 KB/s | ETA: 837d 9h 22m 43s
+2026-06-26 23:54:15 | INFO     | datasetforge.downloader | Streaming: 490,179 kept / 1 filtered (100.0% kept), 658 rows/s
+2026-06-26 23:54:48 | INFO     | datasetforge.downloader | Streaming: 520,179 kept / 1 filtered (100.0% kept), 669 rows/s
+2026-06-26 23:54:49 | INFO     | datasetforge.progress | Progress: 4.7 GB / 120.0 GB (3.9%) | Speed: 7.9 KB/s | ETA: 177d 13h 8m 45s
+2026-06-26 23:55:27 | INFO     | datasetforge.downloader | Streaming: 550,179 kept / 1 filtered (100.0% kept), 674 rows/s
+2026-06-26 23:55:49 | INFO     | datasetforge.progress | Progress: 5.3 GB / 120.0 GB (4.4%) | Speed: 27.6 KB/s | ETA: 50d 9h 38m 54s
+2026-06-26 23:56:18 | INFO     | datasetforge.downloader | Streaming: 587,724 kept / 1 filtered (100.0% kept), 678 rows/s
+2026-06-26 23:56:49 | INFO     | datasetforge.downloader | Streaming: 627,723 kept / 2 filtered (100.0% kept), 699 rows/s
+2026-06-26 23:56:51 | INFO     | datasetforge.progress | Progress: 5.7 GB / 120.0 GB (4.8%) | Speed: 15.2 KB/s | ETA: 91d 1h 51m 23s
+2026-06-26 23:57:19 | INFO     | datasetforge.downloader | Streaming: 663,631 kept / 2 filtered (100.0% kept), 715 rows/s
+2026-06-26 23:57:49 | INFO     | datasetforge.downloader | Streaming: 688,135 kept / 2 filtered (100.0% kept), 718 rows/s
+2026-06-26 23:57:51 | INFO     | datasetforge.progress | Progress: 6.3 GB / 120.0 GB (5.3%) | Speed: 41.7 MB/s | ETA: 46m 29s
+2026-06-26 23:58:20 | INFO     | datasetforge.downloader | Streaming: 705,302 kept / 2 filtered (100.0% kept), 713 rows/s
+2026-06-26 23:58:51 | INFO     | datasetforge.downloader | Streaming: 745,268 kept / 2 filtered (100.0% kept), 731 rows/s
+2026-06-26 23:58:51 | INFO     | datasetforge.progress | Progress: 6.8 GB / 120.0 GB (5.7%) | Speed: 45.0 MB/s | ETA: 42m 54s
+2026-06-26 23:59:32 | INFO     | datasetforge.downloader | Streaming: 775,268 kept / 2 filtered (100.0% kept), 731 rows/s
+2026-06-27 00:00:02 | INFO     | datasetforge.downloader | Streaming: 796,987 kept / 2 filtered (100.0% kept), 730 rows/s
+2026-06-27 00:00:02 | INFO     | datasetforge.progress | Progress: 7.2 GB / 120.0 GB (6.0%) | Speed: 6.5 KB/s | ETA: 209d 7h 50m 10s
+2026-06-27 00:00:41 | INFO     | datasetforge.downloader | Streaming: 822,813 kept / 2 filtered (100.0% kept), 728 rows/s
+2026-06-27 00:01:09 | INFO     | datasetforge.progress | Progress: 7.7 GB / 120.0 GB (6.4%) | Speed: 3.6 KB/s | ETA: 376d 23h 10s
+2026-06-27 00:01:11 | INFO     | datasetforge.downloader | Streaming: 848,488 kept / 2 filtered (100.0% kept), 731 rows/s
+2026-06-27 00:01:45 | INFO     | datasetforge.downloader | Streaming: 872,813 kept / 2 filtered (100.0% kept), 731 rows/s
+2026-06-27 00:02:10 | INFO     | datasetforge.progress | Progress: 8.2 GB / 120.0 GB (6.8%) | Speed: 4.7 KB/s | ETA: 288d 14h 39m 13s
+2026-06-27 00:02:19 | INFO     | datasetforge.downloader | Streaming: 902,813 kept / 2 filtered (100.0% kept), 735 rows/s
+2026-06-27 00:03:16 | INFO     | datasetforge.downloader | Streaming: 940,358 kept / 2 filtered (100.0% kept), 731 rows/s
+2026-06-27 00:03:16 | INFO     | datasetforge.progress | Progress: 8.6 GB / 120.0 GB (7.1%) | Speed: 1.9 KB/s | ETA: 726d 12h 54m 5s
+2026-06-27 00:03:47 | INFO     | datasetforge.downloader | Streaming: 971,199 kept / 2 filtered (100.0% kept), 738 rows/s
+2026-06-27 00:04:20 | INFO     | datasetforge.downloader | Streaming: 1,010,358 kept / 2 filtered (100.0% kept), 749 rows/s
+2026-06-27 00:04:20 | INFO     | datasetforge.progress | Progress: 9.2 GB / 120.0 GB (7.7%) | Speed: 9.8 KB/s | ETA: 137d 13h 8m 30s
+2026-06-27 00:05:01 | INFO     | datasetforge.downloader | Streaming: 1,030,358 kept / 2 filtered (100.0% kept), 741 rows/s
+2026-06-27 00:06:00 | INFO     | datasetforge.downloader | Streaming: 1,057,903 kept / 2 filtered (100.0% kept), 730 rows/s
+2026-06-27 00:06:02 | INFO     | datasetforge.progress | Progress: 9.7 GB / 120.0 GB (8.1%) | Speed: 573.0 B/s | ETA: 2391d 4h 46m 5s
+2026-06-27 00:06:33 | INFO     | datasetforge.downloader | Streaming: 1,087,902 kept / 3 filtered (100.0% kept), 734 rows/s
+2026-06-27 00:07:09 | INFO     | datasetforge.downloader | Streaming: 1,117,902 kept / 3 filtered (100.0% kept), 736 rows/s
+2026-06-27 00:07:11 | INFO     | datasetforge.progress | Progress: 10.2 GB / 120.0 GB (8.5%) | Speed: 3.9 KB/s | ETA: 339d 10h 30m 3s
+2026-06-27 00:08:18 | INFO     | datasetforge.downloader | Streaming: 1,127,902 kept / 3 filtered (100.0% kept), 710 rows/s
+2026-06-27 00:08:20 | INFO     | datasetforge.progress | Progress: 10.3 GB / 120.0 GB (8.6%) | Speed: 1.5 KB/s | ETA: 881d 16h 17m 8s
+2026-06-27 00:09:42 | INFO     | datasetforge.downloader | Streaming: 1,137,902 kept / 3 filtered (100.0% kept), 681 rows/s
+2026-06-27 00:09:44 | INFO     | datasetforge.progress | Progress: 10.4 GB / 120.0 GB (8.7%) | Speed: 1.1 KB/s | ETA: 1159d 14h 33m 28s
+2026-06-27 00:10:13 | INFO     | datasetforge.downloader | Streaming: 1,165,470 kept / 3 filtered (100.0% kept), 685 rows/s
+2026-06-27 00:10:46 | INFO     | datasetforge.downloader | Streaming: 1,185,447 kept / 3 filtered (100.0% kept), 683 rows/s
+2026-06-27 00:10:46 | INFO     | datasetforge.progress | Progress: 10.8 GB / 120.0 GB (9.0%) | Speed: 13.7 KB/s | ETA: 96d 20h 48m 58s
+2026-06-27 00:11:16 | INFO     | datasetforge.downloader | Streaming: 1,220,390 kept / 3 filtered (100.0% kept), 691 rows/s
+2026-06-27 00:11:49 | INFO     | datasetforge.downloader | Streaming: 1,255,447 kept / 3 filtered (100.0% kept), 698 rows/s
+2026-06-27 00:11:50 | INFO     | datasetforge.progress | Progress: 11.5 GB / 120.0 GB (9.5%) | Speed: 8.8 KB/s | ETA: 150d 7h 48m 7s
+2026-06-27 00:12:39 | INFO     | datasetforge.downloader | Streaming: 1,292,992 kept / 3 filtered (100.0% kept), 699 rows/s
+2026-06-27 00:12:51 | INFO     | datasetforge.progress | Progress: 11.9 GB / 120.0 GB (9.9%) | Speed: 9.3 KB/s | ETA: 141d 10h 27m 14s
+2026-06-27 00:13:11 | INFO     | datasetforge.downloader | Streaming: 1,332,992 kept / 3 filtered (100.0% kept), 709 rows/s
+2026-06-27 00:13:46 | INFO     | datasetforge.downloader | Streaming: 1,372,992 kept / 3 filtered (100.0% kept), 717 rows/s
+2026-06-27 00:13:56 | INFO     | datasetforge.progress | Progress: 12.7 GB / 120.0 GB (10.6%) | Speed: 22.0 KB/s | ETA: 59d 7h 13m 28s
+2026-06-27 00:14:55 | INFO     | datasetforge.downloader | Streaming: 1,410,536 kept / 4 filtered (100.0% kept), 711 rows/s
+2026-06-27 00:14:56 | INFO     | datasetforge.progress | Progress: 12.9 GB / 120.0 GB (10.8%) | Speed: 61.8 MB/s | ETA: 29m 33s
+2026-06-27 00:15:25 | INFO     | datasetforge.downloader | Streaming: 1,434,141 kept / 4 filtered (100.0% kept), 712 rows/s
+2026-06-27 00:15:55 | INFO     | datasetforge.downloader | Streaming: 1,451,687 kept / 4 filtered (100.0% kept), 710 rows/s
+2026-06-27 00:16:17 | INFO     | datasetforge.progress | Progress: 13.3 GB / 120.0 GB (11.1%) | Speed: 8.8 KB/s | ETA: 147d 1h 22m 25s
+2026-06-27 00:16:27 | INFO     | datasetforge.downloader | Streaming: 1,470,536 kept / 4 filtered (100.0% kept), 708 rows/s
+2026-06-27 00:17:13 | INFO     | datasetforge.downloader | Streaming: 1,490,536 kept / 4 filtered (100.0% kept), 702 rows/s
+2026-06-27 00:17:25 | INFO     | datasetforge.progress | Progress: 13.7 GB / 120.0 GB (11.4%) | Speed: 8.4 KB/s | ETA: 153d 12h 28m 12s
+2026-06-27 00:18:09 | INFO     | datasetforge.downloader | Streaming: 1,528,081 kept / 4 filtered (100.0% kept), 702 rows/s
+2026-06-27 00:18:37 | INFO     | datasetforge.progress | Progress: 14.1 GB / 120.0 GB (11.7%) | Speed: 1.8 KB/s | ETA: 698d 20h 18m 46s
+2026-06-27 00:18:39 | INFO     | datasetforge.downloader | Streaming: 1,544,781 kept / 4 filtered (100.0% kept), 700 rows/s
+2026-06-27 00:19:14 | INFO     | datasetforge.downloader | Streaming: 1,568,080 kept / 5 filtered (100.0% kept), 699 rows/s
+2026-06-27 00:19:46 | INFO     | datasetforge.downloader | Streaming: 1,588,080 kept / 5 filtered (100.0% kept), 698 rows/s
+2026-06-27 00:19:48 | INFO     | datasetforge.progress | Progress: 14.5 GB / 120.0 GB (12.1%) | Speed: 5.8 KB/s | ETA: 221d 10h 40m 3s
+2026-06-27 00:20:25 | INFO     | datasetforge.downloader | Streaming: 1,608,080 kept / 5 filtered (100.0% kept), 695 rows/s
+2026-06-27 00:20:48 | INFO     | datasetforge.progress | Progress: 14.8 GB / 120.0 GB (12.4%) | Speed: 3.1 KB/s | ETA: 418d 3h 4s
+2026-06-27 00:20:58 | INFO     | datasetforge.downloader | Streaming: 1,628,080 kept / 5 filtered (100.0% kept), 694 rows/s
+2026-06-27 00:21:38 | INFO     | datasetforge.downloader | Streaming: 1,645,625 kept / 5 filtered (100.0% kept), 689 rows/s
+2026-06-27 00:21:48 | INFO     | datasetforge.progress | Progress: 15.2 GB / 120.0 GB (12.7%) | Speed: 20.6 MB/s | ETA: 1h 26m 40s
+2026-06-27 00:22:20 | INFO     | datasetforge.downloader | Streaming: 1,675,625 kept / 5 filtered (100.0% kept), 690 rows/s
+2026-06-27 00:23:00 | INFO     | datasetforge.downloader | Streaming: 1,705,625 kept / 5 filtered (100.0% kept), 691 rows/s
+2026-06-27 00:23:01 | INFO     | datasetforge.progress | Progress: 15.6 GB / 120.0 GB (13.0%) | Speed: 5.9 KB/s | ETA: 216d 13h 4m 45s
+2026-06-27 00:23:30 | INFO     | datasetforge.downloader | Streaming: 1,719,192 kept / 5 filtered (100.0% kept), 688 rows/s
+2026-06-27 00:24:00 | INFO     | datasetforge.downloader | Streaming: 1,736,474 kept / 5 filtered (100.0% kept), 686 rows/s
+2026-06-27 00:24:01 | INFO     | datasetforge.progress | Progress: 15.9 GB / 120.0 GB (13.2%) | Speed: 44.3 MB/s | ETA: 40m 4s
+2026-06-27 00:24:51 | INFO     | datasetforge.downloader | Streaming: 1,763,170 kept / 5 filtered (100.0% kept), 683 rows/s
+2026-06-27 00:25:09 | INFO     | datasetforge.progress | Progress: 16.3 GB / 120.0 GB (13.6%) | Speed: 11.9 KB/s | ETA: 105d 11h 20m 42s
+2026-06-27 00:25:37 | INFO     | datasetforge.downloader | Streaming: 1,793,170 kept / 5 filtered (100.0% kept), 683 rows/s
+2026-06-27 00:26:08 | INFO     | datasetforge.downloader | Streaming: 1,803,170 kept / 5 filtered (100.0% kept), 679 rows/s
+2026-06-27 00:26:10 | INFO     | datasetforge.progress | Progress: 16.5 GB / 120.0 GB (13.8%) | Speed: 3.0 KB/s | ETA: 413d 12h 56m 33s
+2026-06-27 00:26:13 | INFO     | datasetforge.sampler | Sampling complete: 1,770,000 rows, 14.0 GB
+2026-06-27 00:26:13 | INFO     | datasetforge.sampler |   Duplicates removed: 40
+2026-06-27 00:26:13 | INFO     | datasetforge.sampler |   Too short: 39,572
+2026-06-27 00:26:13 | INFO     | datasetforge.writer | Write complete: 1,769,975 rows, 16.6 GB, 2 shards
+2026-06-27 00:26:13 | INFO     | datasetforge.main | Completed dataset: bigcode/the-stack:data/python
+2026-06-27 00:26:13 | INFO     | datasetforge.main |   Bytes written: 17,847,815,267
+2026-06-27 00:26:13 | INFO     | datasetforge.main |   Rows written: 1,769,975
+2026-06-27 00:26:13 | INFO     | datasetforge.main | Processing dataset: HuggingFaceTB/finemath:finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.main |   Target size: 26.0 GB
+2026-06-27 00:26:13 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 00:26:13 | INFO     | datasetforge.main |   Subset: finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.writer | Writing to: /output/HuggingFaceTB_finemath_finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 00:26:13 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 00:26:13 | INFO     | datasetforge.sampler | Starting sampling: target=26.0 GB, start=0.0 B
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader | Streaming from entry: HuggingFaceTB/finemath:finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader |   Dataset: HuggingFaceTB/finemath
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader |   Subset: finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader | Starting stream: HuggingFaceTB/finemath
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader |   Subset: finemath-4plus
+2026-06-27 00:26:13 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 00:26:50 | INFO     | datasetforge.downloader | Streaming: 23,000 kept / 0 filtered (100.0% kept), 621 rows/s
+2026-06-27 00:27:10 | INFO     | datasetforge.progress | Progress: 238.6 MB / 120.0 GB (0.2%) | Speed: 7.3 KB/s | ETA: 198d 1h 46m 4s
+2026-06-27 00:27:20 | INFO     | datasetforge.downloader | Streaming: 70,013 kept / 0 filtered (100.0% kept), 1038 rows/s
+2026-06-27 00:27:56 | INFO     | datasetforge.downloader | Streaming: 104,680 kept / 0 filtered (100.0% kept), 1015 rows/s
+2026-06-27 00:28:13 | INFO     | datasetforge.progress | Progress: 653.4 MB / 120.0 GB (0.5%) | Speed: 4.1 KB/s | ETA: 356d 15h 8m 34s
+2026-06-27 00:28:27 | INFO     | datasetforge.downloader | Streaming: 127,680 kept / 0 filtered (100.0% kept), 950 rows/s
+2026-06-27 00:29:03 | INFO     | datasetforge.downloader | Streaming: 150,680 kept / 0 filtered (100.0% kept), 883 rows/s
+2026-06-27 00:29:25 | INFO     | datasetforge.progress | Progress: 952.4 MB / 120.0 GB (0.8%) | Speed: 3.0 KB/s | ETA: 485d 3h 6m 43s
+2026-06-27 00:29:41 | INFO     | datasetforge.downloader | Streaming: 174,680 kept / 0 filtered (100.0% kept), 840 rows/s
+2026-06-27 00:30:11 | INFO     | datasetforge.downloader | Streaming: 203,140 kept / 0 filtered (100.0% kept), 854 rows/s
+2026-06-27 00:30:28 | INFO     | datasetforge.progress | Progress: 1.2 GB / 120.0 GB (1.0%) | Speed: 4.8 KB/s | ETA: 297d 10h 39m 57s
+2026-06-27 00:30:47 | INFO     | datasetforge.downloader | Streaming: 220,360 kept / 0 filtered (100.0% kept), 804 rows/s
+2026-06-27 00:31:29 | INFO     | datasetforge.downloader | Streaming: 256,360 kept / 0 filtered (100.0% kept), 811 rows/s
+2026-06-27 00:31:29 | INFO     | datasetforge.progress | Progress: 1.5 GB / 120.0 GB (1.2%) | Speed: 2.6 KB/s | ETA: 546d 2h 38m 16s
+2026-06-27 00:32:16 | INFO     | datasetforge.downloader | Streaming: 280,360 kept / 0 filtered (100.0% kept), 771 rows/s
+2026-06-27 00:32:35 | INFO     | datasetforge.progress | Progress: 1.7 GB / 120.0 GB (1.4%) | Speed: 3.3 KB/s | ETA: 435d 15h 10m 54s
+2026-06-27 00:33:05 | INFO     | datasetforge.downloader | Streaming: 314,040 kept / 0 filtered (100.0% kept), 761 rows/s
+2026-06-27 00:33:35 | INFO     | datasetforge.progress | Progress: 2.0 GB / 120.0 GB (1.6%) | Speed: 27.9 MB/s | ETA: 1h 12m 9s
+2026-06-27 00:33:36 | INFO     | datasetforge.downloader | Streaming: 340,037 kept / 0 filtered (100.0% kept), 768 rows/s
+2026-06-27 00:34:17 | INFO     | datasetforge.downloader | Streaming: 361,040 kept / 0 filtered (100.0% kept), 746 rows/s
+2026-06-27 00:34:47 | INFO     | datasetforge.downloader | Streaming: 387,268 kept / 0 filtered (100.0% kept), 753 rows/s
+2026-06-27 00:34:47 | INFO     | datasetforge.progress | Progress: 2.2 GB / 120.0 GB (1.8%) | Speed: 4.3 KB/s | ETA: 335d 9h 23m 54s
+2026-06-27 00:35:37 | INFO     | datasetforge.downloader | Streaming: 418,720 kept / 0 filtered (100.0% kept), 743 rows/s
+2026-06-27 00:35:51 | INFO     | datasetforge.progress | Progress: 2.4 GB / 120.0 GB (2.0%) | Speed: 3.1 KB/s | ETA: 455d 4h 19m 16s
+2026-06-27 00:36:07 | INFO     | datasetforge.downloader | Streaming: 443,989 kept / 0 filtered (100.0% kept), 748 rows/s
+2026-06-27 00:36:38 | INFO     | datasetforge.downloader | Streaming: 453,720 kept / 0 filtered (100.0% kept), 725 rows/s
+2026-06-27 00:36:59 | INFO     | datasetforge.progress | Progress: 2.7 GB / 120.0 GB (2.2%) | Speed: 3.1 KB/s | ETA: 459d 21h 16m 19s
+2026-06-27 00:37:18 | INFO     | datasetforge.downloader | Streaming: 477,720 kept / 0 filtered (100.0% kept), 718 rows/s
+2026-06-27 00:37:55 | INFO     | datasetforge.downloader | Streaming: 513,720 kept / 0 filtered (100.0% kept), 731 rows/s
+2026-06-27 00:38:18 | INFO     | datasetforge.progress | Progress: 3.0 GB / 120.0 GB (2.5%) | Speed: 1.8 KB/s | ETA: 775d 6h 34m 7s
+2026-06-27 00:38:49 | INFO     | datasetforge.downloader | Streaming: 534,400 kept / 0 filtered (100.0% kept), 706 rows/s
+2026-06-27 00:40:08 | INFO     | datasetforge.downloader | Streaming: 558,400 kept / 0 filtered (100.0% kept), 669 rows/s
+2026-06-27 00:40:08 | INFO     | datasetforge.progress | Progress: 3.2 GB / 120.0 GB (2.7%) | Speed: 2.5 KB/s | ETA: 556d 12h 22m 30s
+2026-06-27 00:40:38 | INFO     | datasetforge.downloader | Streaming: 570,400 kept / 0 filtered (100.0% kept), 659 rows/s
+2026-06-27 00:41:27 | INFO     | datasetforge.downloader | Streaming: 594,400 kept / 0 filtered (100.0% kept), 650 rows/s
+2026-06-27 00:41:28 | INFO     | datasetforge.progress | Progress: 3.4 GB / 120.0 GB (2.9%) | Speed: 3.0 KB/s | ETA: 474d 10h 6m 29s
+2026-06-27 00:42:02 | INFO     | datasetforge.downloader | Streaming: 618,400 kept / 0 filtered (100.0% kept), 651 rows/s
+2026-06-27 00:43:20 | INFO     | datasetforge.downloader | Streaming: 628,080 kept / 0 filtered (100.0% kept), 611 rows/s
+2026-06-27 00:43:20 | INFO     | datasetforge.progress | Progress: 3.6 GB / 120.0 GB (3.0%) | Speed: 470.0 B/s | ETA: 3072d 39m 20s
+2026-06-27 00:44:04 | INFO     | datasetforge.downloader | Streaming: 651,080 kept / 0 filtered (100.0% kept), 608 rows/s
+2026-06-27 00:44:29 | INFO     | datasetforge.progress | Progress: 3.9 GB / 120.0 GB (3.2%) | Speed: 6.5 KB/s | ETA: 215d 23h 21m 41s
+2026-06-27 00:44:41 | INFO     | datasetforge.downloader | Streaming: 687,080 kept / 0 filtered (100.0% kept), 620 rows/s
+2026-06-27 00:45:16 | INFO     | datasetforge.downloader | Streaming: 710,080 kept / 0 filtered (100.0% kept), 621 rows/s
+2026-06-27 00:45:42 | INFO     | datasetforge.progress | Progress: 4.2 GB / 120.0 GB (3.5%) | Speed: 6.8 KB/s | ETA: 206d 7h 4m
+2026-06-27 00:45:50 | INFO     | datasetforge.downloader | Streaming: 742,760 kept / 0 filtered (100.0% kept), 631 rows/s
+2026-06-27 00:46:33 | INFO     | datasetforge.downloader | Streaming: 778,760 kept / 0 filtered (100.0% kept), 638 rows/s
+2026-06-27 00:46:48 | INFO     | datasetforge.progress | Progress: 4.5 GB / 120.0 GB (3.8%) | Speed: 12.2 KB/s | ETA: 115d 7h 20m 25s
+2026-06-27 00:47:07 | INFO     | datasetforge.downloader | Streaming: 801,760 kept / 0 filtered (100.0% kept), 639 rows/s
+2026-06-27 00:47:55 | INFO     | datasetforge.downloader | Streaming: 825,760 kept / 0 filtered (100.0% kept), 634 rows/s
+2026-06-27 00:47:58 | INFO     | datasetforge.progress | Progress: 4.8 GB / 120.0 GB (4.0%) | Speed: 2.7 KB/s | ETA: 515d 1h 22m 9s
+2026-06-27 00:48:26 | INFO     | datasetforge.downloader | Streaming: 837,440 kept / 0 filtered (100.0% kept), 628 rows/s
+2026-06-27 00:49:17 | INFO     | datasetforge.downloader | Streaming: 859,440 kept / 0 filtered (100.0% kept), 621 rows/s
+2026-06-27 00:49:17 | INFO     | datasetforge.progress | Progress: 4.9 GB / 120.0 GB (4.1%) | Speed: 1.3 KB/s | ETA: 1079d 9h 10m 14s
+2026-06-27 00:49:47 | INFO     | datasetforge.downloader | Streaming: 871,440 kept / 0 filtered (100.0% kept), 616 rows/s
+2026-06-27 00:50:24 | INFO     | datasetforge.downloader | Streaming: 907,440 kept / 0 filtered (100.0% kept), 625 rows/s
+2026-06-27 00:50:24 | INFO     | datasetforge.progress | Progress: 5.2 GB / 120.0 GB (4.3%) | Speed: 5.7 KB/s | ETA: 245d 5h 34m 52s
+2026-06-27 00:51:15 | INFO     | datasetforge.downloader | Streaming: 942,120 kept / 0 filtered (100.0% kept), 627 rows/s
+2026-06-27 00:51:45 | INFO     | datasetforge.downloader | Streaming: 956,020 kept / 0 filtered (100.0% kept), 624 rows/s
+2026-06-27 00:51:46 | INFO     | datasetforge.progress | Progress: 5.5 GB / 120.0 GB (4.6%) | Speed: 1.9 KB/s | ETA: 723d 3h 23m 57s
+2026-06-27 00:52:24 | INFO     | datasetforge.downloader | Streaming: 977,120 kept / 0 filtered (100.0% kept), 622 rows/s
+2026-06-27 00:52:46 | INFO     | datasetforge.progress | Progress: 5.7 GB / 120.0 GB (4.7%) | Speed: 1.9 KB/s | ETA: 714d 38m 2s
+2026-06-27 00:52:59 | INFO     | datasetforge.downloader | Streaming: 1,000,120 kept / 0 filtered (100.0% kept), 623 rows/s
+2026-06-27 00:53:46 | INFO     | datasetforge.downloader | Streaming: 1,023,120 kept / 0 filtered (100.0% kept), 619 rows/s
+2026-06-27 00:53:46 | INFO     | datasetforge.progress | Progress: 5.9 GB / 120.0 GB (5.0%) | Speed: 19.4 MB/s | ETA: 1h 40m 30s
+2026-06-27 00:54:40 | INFO     | datasetforge.downloader | Streaming: 1,046,800 kept / 0 filtered (100.0% kept), 613 rows/s
+2026-06-27 00:55:03 | INFO     | datasetforge.progress | Progress: 6.1 GB / 120.0 GB (5.1%) | Speed: 1.6 KB/s | ETA: 848d 13h 25m 59s
+2026-06-27 00:55:25 | INFO     | datasetforge.downloader | Streaming: 1,068,800 kept / 0 filtered (100.0% kept), 610 rows/s
+2026-06-27 00:56:01 | INFO     | datasetforge.downloader | Streaming: 1,080,800 kept / 0 filtered (100.0% kept), 604 rows/s
+2026-06-27 00:56:03 | INFO     | datasetforge.progress | Progress: 6.3 GB / 120.0 GB (5.3%) | Speed: 70.1 MB/s | ETA: 27m 40s
+2026-06-27 00:57:00 | INFO     | datasetforge.downloader | Streaming: 1,104,800 kept / 0 filtered (100.0% kept), 598 rows/s
+2026-06-27 00:57:51 | INFO     | datasetforge.downloader | Streaming: 1,116,800 kept / 0 filtered (100.0% kept), 588 rows/s
+2026-06-27 00:57:51 | INFO     | datasetforge.progress | Progress: 6.4 GB / 120.0 GB (5.4%) | Speed: 822.0 B/s | ETA: 1716d 16h 43m 39s
+2026-06-27 00:58:32 | INFO     | datasetforge.downloader | Streaming: 1,128,800 kept / 0 filtered (100.0% kept), 582 rows/s
+2026-06-27 00:59:08 | INFO     | datasetforge.downloader | Streaming: 1,151,480 kept / 0 filtered (100.0% kept), 583 rows/s
+2026-06-27 00:59:08 | INFO     | datasetforge.progress | Progress: 6.7 GB / 120.0 GB (5.6%) | Speed: 1.9 KB/s | ETA: 715d 6h 45m 59s
+2026-06-27 01:00:14 | INFO     | datasetforge.downloader | Streaming: 1,174,480 kept / 0 filtered (100.0% kept), 575 rows/s
+2026-06-27 01:00:15 | INFO     | datasetforge.progress | Progress: 6.8 GB / 120.0 GB (5.7%) | Speed: 1.5 KB/s | ETA: 891d 10h 58m 56s
+2026-06-27 01:01:08 | INFO     | datasetforge.downloader | Streaming: 1,198,480 kept / 0 filtered (100.0% kept), 572 rows/s
+2026-06-27 01:01:29 | INFO     | datasetforge.progress | Progress: 7.0 GB / 120.0 GB (5.9%) | Speed: 3.1 KB/s | ETA: 445d 14h 57m 33s
+2026-06-27 01:01:51 | INFO     | datasetforge.downloader | Streaming: 1,221,480 kept / 0 filtered (100.0% kept), 571 rows/s
+2026-06-27 01:02:24 | INFO     | datasetforge.downloader | Streaming: 1,245,480 kept / 0 filtered (100.0% kept), 574 rows/s
+2026-06-27 01:02:48 | INFO     | datasetforge.progress | Progress: 7.3 GB / 120.0 GB (6.0%) | Speed: 1.7 KB/s | ETA: 795d 15h 56m 33s
+2026-06-27 01:03:17 | INFO     | datasetforge.downloader | Streaming: 1,267,160 kept / 0 filtered (100.0% kept), 570 rows/s
+2026-06-27 01:04:30 | INFO     | datasetforge.downloader | Streaming: 1,291,160 kept / 0 filtered (100.0% kept), 562 rows/s
+2026-06-27 01:04:31 | INFO     | datasetforge.progress | Progress: 7.5 GB / 120.0 GB (6.2%) | Speed: 1.1 KB/s | ETA: 1277d 12h 51m 21s
+2026-06-27 01:05:09 | INFO     | datasetforge.downloader | Streaming: 1,303,160 kept / 0 filtered (100.0% kept), 558 rows/s
+2026-06-27 01:05:33 | INFO     | datasetforge.progress | Progress: 7.6 GB / 120.0 GB (6.3%) | Speed: 2.1 KB/s | ETA: 658d 3h 51m 34s
+2026-06-27 01:05:57 | INFO     | datasetforge.downloader | Streaming: 1,327,160 kept / 0 filtered (100.0% kept), 557 rows/s
+2026-06-27 01:06:44 | INFO     | datasetforge.downloader | Streaming: 1,339,160 kept / 0 filtered (100.0% kept), 551 rows/s
+2026-06-27 01:06:44 | INFO     | datasetforge.progress | Progress: 7.7 GB / 120.0 GB (6.4%) | Speed: 986.0 B/s | ETA: 1415d 2h 32m 6s
+2026-06-27 01:07:31 | INFO     | datasetforge.downloader | Streaming: 1,360,840 kept / 0 filtered (100.0% kept), 549 rows/s
+2026-06-27 01:08:00 | INFO     | datasetforge.progress | Progress: 8.0 GB / 120.0 GB (6.6%) | Speed: 2.0 KB/s | ETA: 683d 19h 26m 23s
+2026-06-27 01:08:15 | INFO     | datasetforge.downloader | Streaming: 1,383,840 kept / 0 filtered (100.0% kept), 549 rows/s
+2026-06-27 01:08:51 | INFO     | datasetforge.downloader | Streaming: 1,419,840 kept / 0 filtered (100.0% kept), 555 rows/s
+2026-06-27 01:09:15 | INFO     | datasetforge.progress | Progress: 8.3 GB / 120.0 GB (6.9%) | Speed: 2.0 KB/s | ETA: 683d 11h 33m 34s
+2026-06-27 01:09:32 | INFO     | datasetforge.downloader | Streaming: 1,443,840 kept / 0 filtered (100.0% kept), 555 rows/s
+2026-06-27 01:10:05 | INFO     | datasetforge.downloader | Streaming: 1,465,520 kept / 0 filtered (100.0% kept), 557 rows/s
+2026-06-27 01:10:19 | INFO     | datasetforge.progress | Progress: 8.5 GB / 120.0 GB (7.1%) | Speed: 10.0 KB/s | ETA: 135d 6h 30m 41s
+2026-06-27 01:10:43 | INFO     | datasetforge.downloader | Streaming: 1,500,520 kept / 0 filtered (100.0% kept), 562 rows/s
+2026-06-27 01:11:18 | INFO     | datasetforge.downloader | Streaming: 1,524,520 kept / 0 filtered (100.0% kept), 564 rows/s
+2026-06-27 01:11:19 | INFO     | datasetforge.progress | Progress: 8.9 GB / 120.0 GB (7.4%) | Speed: 75.1 MB/s | ETA: 25m 15s
+2026-06-27 01:11:56 | INFO     | datasetforge.downloader | Streaming: 1,548,520 kept / 0 filtered (100.0% kept), 564 rows/s
+2026-06-27 01:12:28 | INFO     | datasetforge.downloader | Streaming: 1,570,200 kept / 0 filtered (100.0% kept), 566 rows/s
+2026-06-27 01:12:30 | INFO     | datasetforge.progress | Progress: 9.1 GB / 120.0 GB (7.6%) | Speed: 2.4 KB/s | ETA: 569d 13h 38m 12s
+2026-06-27 01:13:10 | INFO     | datasetforge.downloader | Streaming: 1,593,200 kept / 0 filtered (100.0% kept), 565 rows/s
+2026-06-27 01:13:33 | INFO     | datasetforge.progress | Progress: 9.3 GB / 120.0 GB (7.8%) | Speed: 8.0 KB/s | ETA: 167d 14h 1m 29s
+2026-06-27 01:13:47 | INFO     | datasetforge.downloader | Streaming: 1,629,200 kept / 0 filtered (100.0% kept), 571 rows/s
+2026-06-27 01:14:32 | INFO     | datasetforge.downloader | Streaming: 1,653,200 kept / 0 filtered (100.0% kept), 570 rows/s
+2026-06-27 01:14:33 | INFO     | datasetforge.progress | Progress: 9.6 GB / 120.0 GB (8.0%) | Speed: 47.0 MB/s | ETA: 40m 3s
+2026-06-27 01:15:06 | INFO     | datasetforge.downloader | Streaming: 1,674,880 kept / 0 filtered (100.0% kept), 571 rows/s
+2026-06-27 01:16:12 | INFO     | datasetforge.downloader | Streaming: 1,697,880 kept / 0 filtered (100.0% kept), 566 rows/s
+2026-06-27 01:16:12 | INFO     | datasetforge.progress | Progress: 9.8 GB / 120.0 GB (8.2%) | Speed: 671.0 B/s | ETA: 2038d 2h 18m 3s
+2026-06-27 01:16:42 | INFO     | datasetforge.downloader | Streaming: 1,710,157 kept / 0 filtered (100.0% kept), 564 rows/s
+2026-06-27 01:17:25 | INFO     | datasetforge.downloader | Streaming: 1,721,880 kept / 0 filtered (100.0% kept), 560 rows/s
+2026-06-27 01:17:26 | INFO     | datasetforge.progress | Progress: 10.0 GB / 120.0 GB (8.3%) | Speed: 1.4 KB/s | ETA: 978d 19h 2m 28s
+2026-06-27 01:18:21 | INFO     | datasetforge.downloader | Streaming: 1,745,880 kept / 0 filtered (100.0% kept), 558 rows/s
+2026-06-27 01:19:06 | INFO     | datasetforge.downloader | Streaming: 1,757,880 kept / 0 filtered (100.0% kept), 554 rows/s
+2026-06-27 01:19:06 | INFO     | datasetforge.progress | Progress: 10.2 GB / 120.0 GB (8.5%) | Speed: 851.0 B/s | ETA: 1603d 12h 5m 38s
+2026-06-27 01:19:40 | INFO     | datasetforge.downloader | Streaming: 1,769,880 kept / 0 filtered (100.0% kept), 552 rows/s
+2026-06-27 01:20:11 | INFO     | datasetforge.downloader | Streaming: 1,779,560 kept / 0 filtered (100.0% kept), 550 rows/s
+2026-06-27 01:20:11 | INFO     | datasetforge.progress | Progress: 10.3 GB / 120.0 GB (8.6%) | Speed: 1.5 KB/s | ETA: 903d 23h 3m 44s
+2026-06-27 01:20:51 | INFO     | datasetforge.downloader | Streaming: 1,790,560 kept / 0 filtered (100.0% kept), 546 rows/s
+2026-06-27 01:21:19 | INFO     | datasetforge.progress | Progress: 10.4 GB / 120.0 GB (8.7%) | Speed: 2.2 KB/s | ETA: 609d 8h 16m 5s
+2026-06-27 01:21:41 | INFO     | datasetforge.downloader | Streaming: 1,814,560 kept / 0 filtered (100.0% kept), 545 rows/s
+2026-06-27 01:22:21 | INFO     | datasetforge.downloader | Streaming: 1,826,560 kept / 0 filtered (100.0% kept), 542 rows/s
+2026-06-27 01:22:22 | INFO     | datasetforge.progress | Progress: 10.6 GB / 120.0 GB (8.8%) | Speed: 1.1 KB/s | ETA: 1182d 13h 1m 45s
+2026-06-27 01:23:10 | INFO     | datasetforge.downloader | Streaming: 1,838,560 kept / 0 filtered (100.0% kept), 538 rows/s
+2026-06-27 01:24:10 | INFO     | datasetforge.downloader | Streaming: 1,850,560 kept / 0 filtered (100.0% kept), 532 rows/s
+2026-06-27 01:24:11 | INFO     | datasetforge.progress | Progress: 10.7 GB / 120.0 GB (8.9%) | Speed: 1.1 KB/s | ETA: 1194d 8h 28m 42s
+2026-06-27 01:26:15 | INFO     | datasetforge.downloader | Streaming: 1,862,560 kept / 0 filtered (100.0% kept), 517 rows/s
+2026-06-27 01:26:16 | INFO     | datasetforge.progress | Progress: 10.8 GB / 120.0 GB (9.0%) | Speed: 430.0 B/s | ETA: 3153d 9h 35m 37s
+2026-06-27 01:26:53 | INFO     | datasetforge.downloader | Streaming: 1,884,240 kept / 0 filtered (100.0% kept), 518 rows/s
+2026-06-27 01:27:32 | INFO     | datasetforge.downloader | Streaming: 1,907,240 kept / 0 filtered (100.0% kept), 518 rows/s
+2026-06-27 01:27:32 | INFO     | datasetforge.progress | Progress: 11.0 GB / 120.0 GB (9.2%) | Speed: 1.9 KB/s | ETA: 678d 11h 36m 37s
+2026-06-27 01:28:20 | INFO     | datasetforge.downloader | Streaming: 1,919,240 kept / 0 filtered (100.0% kept), 515 rows/s
+2026-06-27 01:29:09 | INFO     | datasetforge.downloader | Streaming: 1,931,240 kept / 0 filtered (100.0% kept), 511 rows/s
+2026-06-27 01:29:09 | INFO     | datasetforge.progress | Progress: 11.2 GB / 120.0 GB (9.3%) | Speed: 1.2 KB/s | ETA: 1129d 10h 6m 12s
+2026-06-27 01:30:23 | INFO     | datasetforge.downloader | Streaming: 1,943,240 kept / 0 filtered (100.0% kept), 505 rows/s
+2026-06-27 01:30:23 | INFO     | datasetforge.progress | Progress: 11.3 GB / 120.0 GB (9.4%) | Speed: 860.0 B/s | ETA: 1570d 9h 1m 11s
+2026-06-27 01:30:53 | INFO     | datasetforge.downloader | Streaming: 1,956,267 kept / 0 filtered (100.0% kept), 504 rows/s
+2026-06-27 01:31:46 | INFO     | datasetforge.downloader | Streaming: 1,967,240 kept / 0 filtered (100.0% kept), 500 rows/s
+2026-06-27 01:31:46 | INFO     | datasetforge.progress | Progress: 11.4 GB / 120.0 GB (9.5%) | Speed: 657.0 B/s | ETA: 2052d 14h 14m 16s
+2026-06-27 01:33:06 | INFO     | datasetforge.downloader | Streaming: 1,988,920 kept / 0 filtered (100.0% kept), 496 rows/s
+2026-06-27 01:33:06 | INFO     | datasetforge.progress | Progress: 11.5 GB / 120.0 GB (9.6%) | Speed: 707.0 B/s | ETA: 1906d 9h 35m 26s
+2026-06-27 01:34:08 | INFO     | datasetforge.downloader | Streaming: 1,999,920 kept / 0 filtered (100.0% kept), 491 rows/s
+2026-06-27 01:34:08 | INFO     | datasetforge.progress | Progress: 11.5 GB / 120.0 GB (9.6%) | Speed: 1.2 KB/s | ETA: 1132d 19h 11m 47s
+2026-06-27 01:34:43 | INFO     | datasetforge.downloader | Streaming: 2,011,920 kept / 0 filtered (100.0% kept), 489 rows/s
+2026-06-27 01:35:34 | INFO     | datasetforge.downloader | Streaming: 2,023,920 kept / 0 filtered (100.0% kept), 486 rows/s
+2026-06-27 01:35:35 | INFO     | datasetforge.progress | Progress: 11.7 GB / 120.0 GB (9.8%) | Speed: 959.0 B/s | ETA: 1403d 16m 36s
+2026-06-27 01:36:18 | INFO     | datasetforge.downloader | Streaming: 2,035,920 kept / 0 filtered (100.0% kept), 484 rows/s
+2026-06-27 01:36:43 | INFO     | datasetforge.progress | Progress: 11.8 GB / 120.0 GB (9.9%) | Speed: 1.8 KB/s | ETA: 717d 20h 7m 51s
+2026-06-27 01:38:11 | INFO     | datasetforge.downloader | Streaming: 2,058,920 kept / 0 filtered (100.0% kept), 477 rows/s
+2026-06-27 01:38:11 | INFO     | datasetforge.progress | Progress: 11.9 GB / 120.0 GB (9.9%) | Speed: 1016.0 B/s | ETA: 1321d 16h 2m 56s
+2026-06-27 01:39:07 | INFO     | datasetforge.downloader | Streaming: 2,070,920 kept / 0 filtered (100.0% kept), 473 rows/s
+2026-06-27 01:39:50 | INFO     | datasetforge.downloader | Streaming: 2,082,920 kept / 0 filtered (100.0% kept), 471 rows/s
+2026-06-27 01:39:51 | INFO     | datasetforge.progress | Progress: 12.1 GB / 120.0 GB (10.1%) | Speed: 1.3 KB/s | ETA: 997d 11h 34m 48s
+2026-06-27 01:40:29 | INFO     | datasetforge.downloader | Streaming: 2,093,600 kept / 0 filtered (100.0% kept), 470 rows/s
+2026-06-27 01:41:19 | INFO     | datasetforge.downloader | Streaming: 2,116,600 kept / 0 filtered (100.0% kept), 470 rows/s
+2026-06-27 01:41:19 | INFO     | datasetforge.progress | Progress: 12.2 GB / 120.0 GB (10.2%) | Speed: 2.8 KB/s | ETA: 464d 17h 7m 17s
+2026-06-27 01:41:56 | INFO     | datasetforge.downloader | Streaming: 2,128,600 kept / 0 filtered (100.0% kept), 468 rows/s
+2026-06-27 01:42:27 | INFO     | datasetforge.downloader | Streaming: 2,139,600 kept / 0 filtered (100.0% kept), 468 rows/s
+2026-06-27 01:42:27 | INFO     | datasetforge.progress | Progress: 12.4 GB / 120.0 GB (10.3%) | Speed: 4.7 KB/s | ETA: 280d 5h 59m 55s
+2026-06-27 01:43:02 | INFO     | datasetforge.downloader | Streaming: 2,175,600 kept / 0 filtered (100.0% kept), 472 rows/s
+2026-06-27 01:44:08 | INFO     | datasetforge.downloader | Streaming: 2,198,280 kept / 0 filtered (100.0% kept), 470 rows/s
+2026-06-27 01:44:09 | INFO     | datasetforge.progress | Progress: 12.7 GB / 120.0 GB (10.6%) | Speed: 1.1 KB/s | ETA: 1148d 18h 48m 46s
+2026-06-27 01:44:40 | INFO     | datasetforge.downloader | Streaming: 2,210,208 kept / 0 filtered (100.0% kept), 470 rows/s
+2026-06-27 01:45:22 | INFO     | datasetforge.downloader | Streaming: 2,221,280 kept / 0 filtered (100.0% kept), 468 rows/s
+2026-06-27 01:45:23 | INFO     | datasetforge.progress | Progress: 12.9 GB / 120.0 GB (10.7%) | Speed: 870.0 B/s | ETA: 1528d 23h 18m 23s
+2026-06-27 01:46:17 | INFO     | datasetforge.downloader | Streaming: 2,245,280 kept / 0 filtered (100.0% kept), 467 rows/s
+2026-06-27 01:46:40 | INFO     | datasetforge.progress | Progress: 13.1 GB / 120.0 GB (10.9%) | Speed: 3.4 KB/s | ETA: 378d 2h 16m 31s
+2026-06-27 01:47:00 | INFO     | datasetforge.downloader | Streaming: 2,269,280 kept / 0 filtered (100.0% kept), 468 rows/s
+2026-06-27 01:50:56 | INFO     | datasetforge.downloader | Streaming: 2,293,280 kept / 0 filtered (100.0% kept), 451 rows/s
+2026-06-27 01:50:56 | INFO     | datasetforge.progress | Progress: 13.3 GB / 120.0 GB (11.1%) | Speed: 480.0 B/s | ETA: 2761d 19h 37m 21s
+2026-06-27 01:51:32 | INFO     | datasetforge.downloader | Streaming: 2,302,960 kept / 0 filtered (100.0% kept), 450 rows/s
+2026-06-27 01:52:06 | INFO     | datasetforge.downloader | Streaming: 2,325,960 kept / 0 filtered (100.0% kept), 451 rows/s
+2026-06-27 01:52:07 | INFO     | datasetforge.progress | Progress: 13.5 GB / 120.0 GB (11.2%) | Speed: 3.9 KB/s | ETA: 333d 20h 1m 2s
+2026-06-27 01:52:39 | INFO     | datasetforge.downloader | Streaming: 2,361,960 kept / 0 filtered (100.0% kept), 455 rows/s
+2026-06-27 01:53:07 | INFO     | datasetforge.progress | Progress: 13.9 GB / 120.0 GB (11.6%) | Speed: 25.4 MB/s | ETA: 1h 11m 9s
+2026-06-27 01:53:48 | INFO     | datasetforge.downloader | Streaming: 2,407,640 kept / 0 filtered (100.0% kept), 458 rows/s
+2026-06-27 01:54:07 | INFO     | datasetforge.progress | Progress: 14.1 GB / 120.0 GB (11.7%) | Speed: 15.9 KB/s | ETA: 80d 21h 40m 59s
+2026-06-27 01:54:23 | INFO     | datasetforge.downloader | Streaming: 2,430,640 kept / 0 filtered (100.0% kept), 459 rows/s
+2026-06-27 01:55:00 | INFO     | datasetforge.downloader | Streaming: 2,454,640 kept / 0 filtered (100.0% kept), 461 rows/s
+2026-06-27 01:55:29 | INFO     | datasetforge.progress | Progress: 14.3 GB / 120.0 GB (11.9%) | Speed: 3.1 KB/s | ETA: 411d 6h 27m 16s
+2026-06-27 01:55:30 | INFO     | datasetforge.downloader | Streaming: 2,470,235 kept / 0 filtered (100.0% kept), 461 rows/s
+2026-06-27 01:56:41 | INFO     | datasetforge.downloader | Streaming: 2,490,640 kept / 0 filtered (100.0% kept), 459 rows/s
+2026-06-27 01:56:42 | INFO     | datasetforge.progress | Progress: 14.5 GB / 120.0 GB (12.1%) | Speed: 1.2 KB/s | ETA: 1042d 6h 18s
+2026-06-27 01:57:30 | INFO     | datasetforge.downloader | Streaming: 2,512,320 kept / 0 filtered (100.0% kept), 459 rows/s
+2026-06-27 01:57:44 | INFO     | datasetforge.progress | Progress: 14.6 GB / 120.0 GB (12.2%) | Speed: 5.0 KB/s | ETA: 257d 6h 23m 48s
+2026-06-27 01:58:07 | INFO     | datasetforge.downloader | Streaming: 2,535,320 kept / 0 filtered (100.0% kept), 460 rows/s
+2026-06-27 01:58:37 | INFO     | datasetforge.downloader | Streaming: 2,547,320 kept / 0 filtered (100.0% kept), 459 rows/s
+2026-06-27 01:59:10 | INFO     | datasetforge.downloader | Streaming: 2,559,320 kept / 0 filtered (100.0% kept), 459 rows/s
+2026-06-27 01:59:10 | INFO     | datasetforge.progress | Progress: 14.8 GB / 120.0 GB (12.3%) | Speed: 2.6 KB/s | ETA: 496d 3h 37m 28s
+2026-06-27 02:00:16 | INFO     | datasetforge.downloader | Streaming: 2,582,320 kept / 0 filtered (100.0% kept), 458 rows/s
+2026-06-27 02:00:17 | INFO     | datasetforge.progress | Progress: 15.0 GB / 120.0 GB (12.5%) | Speed: 3.2 KB/s | ETA: 404d 7h 57m 10s
+2026-06-27 02:01:05 | INFO     | datasetforge.downloader | Streaming: 2,594,320 kept / 0 filtered (100.0% kept), 456 rows/s
+2026-06-27 02:01:23 | INFO     | datasetforge.progress | Progress: 15.1 GB / 120.0 GB (12.6%) | Speed: 3.7 KB/s | ETA: 347d 15h 13m 48s
+2026-06-27 02:12:45 | INFO     | datasetforge.downloader | Streaming: 2,617,000 kept / 0 filtered (100.0% kept), 409 rows/s
+2026-06-27 02:12:45 | INFO     | datasetforge.progress | Progress: 15.2 GB / 120.0 GB (12.6%) | Speed: 79.0 B/s | ETA: 16415d 20h 8m 33s
+2026-06-27 02:13:21 | INFO     | datasetforge.downloader | Streaming: 2,663,000 kept / 0 filtered (100.0% kept), 414 rows/s
+2026-06-27 02:13:45 | INFO     | datasetforge.progress | Progress: 15.6 GB / 120.0 GB (13.0%) | Speed: 25.2 MB/s | ETA: 1h 10m 41s
+2026-06-27 02:13:53 | INFO     | datasetforge.downloader | Streaming: 2,698,000 kept / 0 filtered (100.0% kept), 418 rows/s
+2026-06-27 02:18:57 | WARNING  | datasetforge.cli | Received signal 2, initiating graceful shutdown...
+2026-06-27 02:18:57 | WARNING  | datasetforge.cli | Press Ctrl+C again to force exit
+2026-06-27 02:18:57 | INFO     | datasetforge.downloader | Streaming: 2,710,000 kept / 0 filtered (100.0% kept), 401 rows/s
+2026-06-27 02:18:57 | INFO     | datasetforge.progress | Progress: 15.7 GB / 120.0 GB (13.1%) | Speed: 172.0 B/s | ETA: 7516d 12h 28m 34s
+2026-06-27 02:19:34 | INFO     | datasetforge.downloader | Streaming: 2,732,680 kept / 0 filtered (100.0% kept), 402 rows/s
+2026-06-27 02:19:57 | INFO     | datasetforge.progress | Progress: 16.0 GB / 120.0 GB (13.4%) | Speed: 9.8 KB/s | ETA: 128d 18h 53m 42s
+2026-06-27 02:20:14 | INFO     | datasetforge.downloader | Streaming: 2,780,680 kept / 0 filtered (100.0% kept), 406 rows/s
+2026-06-27 02:21:04 | INFO     | datasetforge.downloader | Streaming: 2,826,360 kept / 0 filtered (100.0% kept), 410 rows/s
+2026-06-27 02:21:05 | INFO     | datasetforge.progress | Progress: 16.4 GB / 120.0 GB (13.7%) | Speed: 2.7 KB/s | ETA: 460d 2h 7m 58s
+2026-06-27 02:21:35 | INFO     | datasetforge.downloader | Streaming: 2,860,279 kept / 0 filtered (100.0% kept), 413 rows/s
+2026-06-27 02:22:08 | INFO     | datasetforge.downloader | Streaming: 2,909,360 kept / 0 filtered (100.0% kept), 418 rows/s
+2026-06-27 02:22:08 | INFO     | datasetforge.progress | Progress: 16.9 GB / 120.0 GB (14.0%) | Speed: 7.7 KB/s | ETA: 163d 14h 55m 52s
+2026-06-27 02:22:40 | INFO     | datasetforge.downloader | Streaming: 2,942,040 kept / 0 filtered (100.0% kept), 421 rows/s
+2026-06-27 02:23:08 | INFO     | datasetforge.progress | Progress: 17.3 GB / 120.0 GB (14.4%) | Speed: 36.4 MB/s | ETA: 48m 7s
+2026-06-27 02:23:13 | INFO     | datasetforge.downloader | Streaming: 2,990,040 kept / 0 filtered (100.0% kept), 426 rows/s
+2026-06-27 02:23:52 | INFO     | datasetforge.downloader | Streaming: 3,035,720 kept / 0 filtered (100.0% kept), 430 rows/s
+2026-06-27 02:24:10 | INFO     | datasetforge.progress | Progress: 17.7 GB / 120.0 GB (14.7%) | Speed: 2.4 KB/s | ETA: 510d 14h 40m 10s
+2026-06-27 02:24:23 | INFO     | datasetforge.downloader | Streaming: 3,070,303 kept / 0 filtered (100.0% kept), 433 rows/s
+2026-06-27 02:24:56 | INFO     | datasetforge.downloader | Streaming: 3,094,720 kept / 0 filtered (100.0% kept), 434 rows/s
+2026-06-27 02:25:11 | INFO     | datasetforge.progress | Progress: 18.1 GB / 120.0 GB (15.1%) | Speed: 28.4 KB/s | ETA: 43d 11h 6m 39s
+2026-06-27 02:25:26 | INFO     | datasetforge.downloader | Streaming: 3,151,400 kept / 0 filtered (100.0% kept), 441 rows/s
+2026-06-27 02:26:03 | INFO     | datasetforge.downloader | Streaming: 3,211,400 kept / 0 filtered (100.0% kept), 447 rows/s
+2026-06-27 02:26:12 | INFO     | datasetforge.progress | Progress: 18.8 GB / 120.0 GB (15.6%) | Speed: 24.2 KB/s | ETA: 50d 18h 19m 50s
+2026-06-27 02:26:34 | INFO     | datasetforge.downloader | Streaming: 3,245,080 kept / 0 filtered (100.0% kept), 449 rows/s
+2026-06-27 02:27:10 | INFO     | datasetforge.downloader | Streaming: 3,280,080 kept / 0 filtered (100.0% kept), 452 rows/s
+2026-06-27 02:27:12 | INFO     | datasetforge.progress | Progress: 19.1 GB / 120.0 GB (15.9%) | Speed: 69.7 KB/s | ETA: 17d 13h 56m 12s
+2026-06-27 02:27:43 | INFO     | datasetforge.downloader | Streaming: 3,304,080 kept / 0 filtered (100.0% kept), 453 rows/s
+2026-06-27 02:28:30 | INFO     | datasetforge.downloader | Streaming: 3,328,080 kept / 0 filtered (100.0% kept), 454 rows/s
+2026-06-27 02:28:31 | INFO     | datasetforge.progress | Progress: 19.3 GB / 120.0 GB (16.1%) | Speed: 1.6 KB/s | ETA: 771d 22h 54m 15s
+2026-06-27 02:29:01 | INFO     | datasetforge.downloader | Streaming: 3,370,333 kept / 0 filtered (100.0% kept), 457 rows/s
+2026-06-27 02:29:31 | INFO     | datasetforge.progress | Progress: 19.8 GB / 120.0 GB (16.5%) | Speed: 44.0 MB/s | ETA: 38m 53s
+2026-06-27 02:29:32 | INFO     | datasetforge.downloader | Streaming: 3,420,336 kept / 0 filtered (100.0% kept), 462 rows/s
+2026-06-27 02:30:07 | INFO     | datasetforge.downloader | Streaming: 3,465,440 kept / 0 filtered (100.0% kept), 466 rows/s
+2026-06-27 02:30:31 | INFO     | datasetforge.progress | Progress: 20.4 GB / 120.0 GB (17.0%) | Speed: 35.0 MB/s | ETA: 48m 32s
+2026-06-27 02:30:38 | INFO     | datasetforge.downloader | Streaming: 3,525,440 kept / 0 filtered (100.0% kept), 472 rows/s
+2026-06-27 02:31:11 | INFO     | datasetforge.downloader | Streaming: 3,559,120 kept / 0 filtered (100.0% kept), 475 rows/s
+2026-06-27 02:31:38 | INFO     | datasetforge.progress | Progress: 20.9 GB / 120.0 GB (17.4%) | Speed: 7.3 KB/s | ETA: 165d 1h 7m 10s
+2026-06-27 02:31:58 | INFO     | datasetforge.downloader | Streaming: 3,605,120 kept / 0 filtered (100.0% kept), 478 rows/s
+2026-06-27 02:32:28 | INFO     | datasetforge.downloader | Streaming: 3,670,358 kept / 0 filtered (100.0% kept), 485 rows/s
+2026-06-27 02:32:39 | INFO     | datasetforge.progress | Progress: 21.4 GB / 120.0 GB (17.8%) | Speed: 6.4 KB/s | ETA: 186d 19m
+2026-06-27 02:33:02 | INFO     | datasetforge.downloader | Streaming: 3,722,800 kept / 0 filtered (100.0% kept), 489 rows/s
+2026-06-27 02:33:48 | INFO     | datasetforge.downloader | Streaming: 3,746,800 kept / 0 filtered (100.0% kept), 489 rows/s
+2026-06-27 02:33:48 | INFO     | datasetforge.progress | Progress: 21.7 GB / 120.0 GB (18.1%) | Speed: 2.6 KB/s | ETA: 457d 22h 45m 59s
+2026-06-27 02:34:19 | INFO     | datasetforge.downloader | Streaming: 3,791,480 kept / 0 filtered (100.0% kept), 493 rows/s
+2026-06-27 02:34:50 | INFO     | datasetforge.downloader | Streaming: 3,851,480 kept / 0 filtered (100.0% kept), 499 rows/s
+2026-06-27 02:34:51 | INFO     | datasetforge.progress | Progress: 22.4 GB / 120.0 GB (18.7%) | Speed: 21.1 KB/s | ETA: 56d 3h 2m 1s
+2026-06-27 02:35:25 | INFO     | datasetforge.downloader | Streaming: 3,908,160 kept / 0 filtered (100.0% kept), 504 rows/s
+2026-06-27 02:35:53 | INFO     | datasetforge.progress | Progress: 23.0 GB / 120.0 GB (19.2%) | Speed: 20.4 KB/s | ETA: 57d 19h 9m 9s
+2026-06-27 02:35:55 | INFO     | datasetforge.downloader | Streaming: 3,974,122 kept / 0 filtered (100.0% kept), 511 rows/s
+2026-06-27 02:36:25 | INFO     | datasetforge.downloader | Streaming: 4,028,094 kept / 0 filtered (100.0% kept), 516 rows/s
+2026-06-27 02:36:56 | INFO     | datasetforge.downloader | Streaming: 4,082,518 kept / 0 filtered (100.0% kept), 521 rows/s
+2026-06-27 02:36:57 | INFO     | datasetforge.progress | Progress: 23.7 GB / 120.0 GB (19.8%) | Speed: 4.9 KB/s | ETA: 237d 9h 25m 28s
+2026-06-27 02:37:28 | INFO     | datasetforge.downloader | Streaming: 4,152,518 kept / 0 filtered (100.0% kept), 527 rows/s
+2026-06-27 02:38:00 | INFO     | datasetforge.downloader | Streaming: 4,187,197 kept / 0 filtered (100.0% kept), 530 rows/s
+2026-06-27 02:38:01 | INFO     | datasetforge.progress | Progress: 24.3 GB / 120.0 GB (20.3%) | Speed: 4.9 KB/s | ETA: 238d 21h 30m 13s
+2026-06-27 02:38:31 | INFO     | datasetforge.downloader | Streaming: 4,234,197 kept / 0 filtered (100.0% kept), 533 rows/s
+2026-06-27 02:39:01 | INFO     | datasetforge.progress | Progress: 24.9 GB / 120.0 GB (20.7%) | Speed: 11.3 KB/s | ETA: 102d 2h 28m 5s
+2026-06-27 02:39:03 | INFO     | datasetforge.downloader | Streaming: 4,290,409 kept / 0 filtered (100.0% kept), 538 rows/s
+2026-06-27 02:39:34 | INFO     | datasetforge.downloader | Streaming: 4,330,414 kept / 0 filtered (100.0% kept), 541 rows/s
+2026-06-27 02:40:03 | INFO     | datasetforge.progress | Progress: 25.3 GB / 120.0 GB (21.1%) | Speed: 5.8 KB/s | ETA: 198d 6h 24m 36s
+2026-06-27 02:40:05 | INFO     | datasetforge.downloader | Streaming: 4,370,415 kept / 0 filtered (100.0% kept), 544 rows/s
+2026-06-27 02:40:35 | INFO     | datasetforge.downloader | Streaming: 4,428,860 kept / 0 filtered (100.0% kept), 549 rows/s
+2026-06-27 02:41:07 | INFO     | datasetforge.downloader | Streaming: 4,478,555 kept / 0 filtered (100.0% kept), 553 rows/s
+2026-06-27 02:41:08 | INFO     | datasetforge.progress | Progress: 26.0 GB / 120.0 GB (21.7%) | Speed: 12.5 KB/s | ETA: 91d 14h 26m 34s
+2026-06-27 02:41:38 | INFO     | datasetforge.downloader | Streaming: 4,524,234 kept / 0 filtered (100.0% kept), 557 rows/s
+2026-06-27 02:42:16 | INFO     | datasetforge.downloader | Streaming: 4,605,913 kept / 0 filtered (100.0% kept), 564 rows/s
+2026-06-27 02:42:16 | INFO     | datasetforge.progress | Progress: 26.7 GB / 120.0 GB (22.3%) | Speed: 3.9 KB/s | ETA: 289d 11h 55m 21s
+2026-06-27 02:42:46 | INFO     | datasetforge.downloader | Streaming: 4,670,679 kept / 0 filtered (100.0% kept), 570 rows/s
+2026-06-27 02:43:37 | INFO     | datasetforge.downloader | Streaming: 4,710,592 kept / 0 filtered (100.0% kept), 571 rows/s
+2026-06-27 02:43:38 | INFO     | datasetforge.progress | Progress: 27.4 GB / 120.0 GB (22.8%) | Speed: 884.0 B/s | ETA: 1300d 21h 30m 1s
+2026-06-27 02:44:08 | INFO     | datasetforge.downloader | Streaming: 4,769,592 kept / 0 filtered (100.0% kept), 576 rows/s
+2026-06-27 02:44:38 | INFO     | datasetforge.progress | Progress: 27.9 GB / 120.0 GB (23.3%) | Speed: 14.7 KB/s | ETA: 76d 1h 4m 7s
+2026-06-27 02:44:40 | INFO     | datasetforge.downloader | Streaming: 4,810,460 kept / 0 filtered (100.0% kept), 579 rows/s
+2026-06-27 02:45:10 | INFO     | datasetforge.downloader | Streaming: 4,860,463 kept / 0 filtered (100.0% kept), 583 rows/s
+2026-06-27 02:45:42 | INFO     | datasetforge.downloader | Streaming: 4,898,271 kept / 0 filtered (100.0% kept), 585 rows/s
+2026-06-27 02:45:43 | INFO     | datasetforge.progress | Progress: 28.4 GB / 120.0 GB (23.7%) | Speed: 3.0 KB/s | ETA: 364d 11h 45m 18s
+2026-06-27 02:46:15 | INFO     | datasetforge.downloader | Streaming: 4,930,950 kept / 0 filtered (100.0% kept), 587 rows/s
+2026-06-27 02:46:43 | INFO     | datasetforge.progress | Progress: 29.0 GB / 120.0 GB (24.1%) | Speed: 11.4 MB/s | ETA: 2h 16m 39s
+2026-06-27 02:47:03 | INFO     | datasetforge.downloader | Streaming: 4,990,950 kept / 0 filtered (100.0% kept), 591 rows/s
+2026-06-27 02:47:06 | WARNING  | datasetforge.sampler | Deduplication cap reached (5,000,000 unique documents tracked). Dedup is now best-effort to bound memory; raise max_dedup_entries to track more.
+2026-06-27 02:47:38 | INFO     | datasetforge.downloader | Streaming: 5,035,629 kept / 0 filtered (100.0% kept), 593 rows/s
+2026-06-27 02:47:50 | INFO     | datasetforge.progress | Progress: 29.3 GB / 120.0 GB (24.4%) | Speed: 5.3 KB/s | ETA: 208d 12h 51m 3s
+2026-06-27 02:48:08 | INFO     | datasetforge.downloader | Streaming: 5,071,629 kept / 0 filtered (100.0% kept), 596 rows/s
+2026-06-27 02:48:39 | INFO     | datasetforge.downloader | Streaming: 5,110,480 kept / 0 filtered (100.0% kept), 598 rows/s
+2026-06-27 02:49:08 | INFO     | datasetforge.progress | Progress: 29.8 GB / 120.0 GB (24.8%) | Speed: 1.7 KB/s | ETA: 631d 3h 47m 2s
+2026-06-27 02:49:10 | INFO     | datasetforge.downloader | Streaming: 5,130,480 kept / 0 filtered (100.0% kept), 598 rows/s
+2026-06-27 02:49:41 | INFO     | datasetforge.downloader | Streaming: 5,163,308 kept / 0 filtered (100.0% kept), 600 rows/s
+2026-06-27 02:50:08 | INFO     | datasetforge.progress | Progress: 30.3 GB / 120.0 GB (25.2%) | Speed: 11.8 MB/s | ETA: 2h 10m 16s
+2026-06-27 02:50:11 | INFO     | datasetforge.downloader | Streaming: 5,228,333 kept / 0 filtered (100.0% kept), 605 rows/s
+2026-06-27 02:50:47 | INFO     | datasetforge.downloader | Streaming: 5,256,987 kept / 0 filtered (100.0% kept), 606 rows/s
+2026-06-27 02:51:20 | INFO     | datasetforge.downloader | Streaming: 5,280,987 kept / 0 filtered (100.0% kept), 607 rows/s
+2026-06-27 02:51:21 | INFO     | datasetforge.progress | Progress: 30.7 GB / 120.0 GB (25.6%) | Speed: 1.8 KB/s | ETA: 590d 13h 3m 2s
+2026-06-27 02:51:54 | INFO     | datasetforge.downloader | Streaming: 5,315,987 kept / 0 filtered (100.0% kept), 608 rows/s
+2026-06-27 02:52:26 | INFO     | datasetforge.downloader | Streaming: 5,349,666 kept / 0 filtered (100.0% kept), 610 rows/s
+2026-06-27 02:52:26 | INFO     | datasetforge.progress | Progress: 31.0 GB / 120.0 GB (25.9%) | Speed: 4.0 KB/s | ETA: 270d 23h 6m 52s
+2026-06-27 02:52:56 | INFO     | datasetforge.downloader | Streaming: 5,379,160 kept / 0 filtered (100.0% kept), 611 rows/s
+2026-06-27 02:53:28 | INFO     | datasetforge.downloader | Streaming: 5,408,666 kept / 0 filtered (100.0% kept), 612 rows/s
+2026-06-27 02:53:29 | INFO     | datasetforge.progress | Progress: 31.4 GB / 120.0 GB (26.2%) | Speed: 12.6 KB/s | ETA: 85d 47m 31s
+2026-06-27 02:53:58 | INFO     | datasetforge.downloader | Streaming: 5,458,145 kept / 0 filtered (100.0% kept), 616 rows/s
+2026-06-27 02:54:12 | INFO     | datasetforge.sampler | Sampling complete: 5,480,000 rows, 26.0 GB
+2026-06-27 02:54:12 | INFO     | datasetforge.sampler |   Too short: 517
+2026-06-27 02:54:12 | INFO     | datasetforge.writer | Write complete: 5,479,426 rows, 31.9 GB, 4 shards
+2026-06-27 02:54:12 | INFO     | datasetforge.main | Completed dataset: HuggingFaceTB/finemath:finemath-4plus
+2026-06-27 02:54:12 | INFO     | datasetforge.main |   Bytes written: 34,212,476,933
+2026-06-27 02:54:12 | INFO     | datasetforge.main |   Rows written: 5,479,426
+2026-06-27 02:54:12 | WARNING  | datasetforge.main | Interrupt detected, stopping build
+2026-06-27 02:54:13 | ERROR    | datasetforge.cli | Build failed
+2026-06-27 02:54:47 | INFO     | datasetforge | Logging initialized: /output/datasetforge.log
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | DatasetForge v1.0.0 starting
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | Configuration loaded: 10 datasets, 120.0 GB total
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | Starting resumed build
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | Total target size: 120.0 GB
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | HuggingFace token detected
+2026-06-27 02:54:47 | INFO     | datasetforge.cli | Output directory: /output
+2026-06-27 02:54:47 | INFO     | datasetforge.main | Previous build failed. Attempting to resume from last checkpoint.
+2026-06-27 02:54:47 | INFO     | datasetforge.main | Skipping validation (resume mode)
+2026-06-27 02:54:47 | INFO     | datasetforge.main | Phase 2: Building datasets...
+2026-06-27 02:54:51 | INFO     | datasetforge.main | Skipping completed dataset: bigcode/the-stack:data/python
+2026-06-27 02:54:51 | INFO     | datasetforge.main | Skipping completed dataset: HuggingFaceTB/finemath:finemath-4plus
+2026-06-27 02:54:51 | INFO     | datasetforge.main | Processing dataset: open-web-math/open-web-math
+2026-06-27 02:54:51 | INFO     | datasetforge.main |   Target size: 12.0 GB
+2026-06-27 02:54:51 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 02:54:51 | INFO     | datasetforge.writer | Writing to: /output/open-web-math_open-web-math
+2026-06-27 02:54:51 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 02:54:51 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 02:54:51 | INFO     | datasetforge.sampler | Starting sampling: target=12.0 GB, start=0.0 B
+2026-06-27 02:54:51 | INFO     | datasetforge.downloader | Streaming from entry: open-web-math/open-web-math
+2026-06-27 02:54:51 | INFO     | datasetforge.downloader |   Dataset: open-web-math/open-web-math
+2026-06-27 02:54:51 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 02:54:51 | INFO     | datasetforge.downloader | Starting stream: open-web-math/open-web-math
+2026-06-27 02:54:51 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 02:55:29 | INFO     | datasetforge.downloader | Streaming: 15,000 kept / 0 filtered (100.0% kept), 403 rows/s
+2026-06-27 02:56:00 | INFO     | datasetforge.downloader | Streaming: 36,000 kept / 0 filtered (100.0% kept), 529 rows/s
+2026-06-27 02:56:00 | INFO     | datasetforge.progress | Progress: 256.1 MB / 120.0 GB (0.2%) | Speed: 6.0 KB/s | ETA: 242d 18h 49m 32s
+2026-06-27 02:56:33 | INFO     | datasetforge.downloader | Streaming: 55,397 kept / 0 filtered (100.0% kept), 547 rows/s
+2026-06-27 02:57:07 | INFO     | datasetforge.downloader | Streaming: 110,794 kept / 0 filtered (100.0% kept), 817 rows/s
+2026-06-27 02:57:11 | INFO     | datasetforge.progress | Progress: 957.0 MB / 120.0 GB (0.8%) | Speed: 5.1 KB/s | ETA: 282d 12h 5m 25s
+2026-06-27 02:57:37 | INFO     | datasetforge.downloader | Streaming: 160,000 kept / 0 filtered (100.0% kept), 964 rows/s
+2026-06-27 02:58:11 | INFO     | datasetforge.downloader | Streaming: 194,191 kept / 0 filtered (100.0% kept), 972 rows/s
+2026-06-27 02:58:12 | INFO     | datasetforge.progress | Progress: 1.6 GB / 120.0 GB (1.3%) | Speed: 23.5 KB/s | ETA: 61d 3h 49m 20s
+2026-06-27 02:58:46 | INFO     | datasetforge.downloader | Streaming: 234,588 kept / 0 filtered (100.0% kept), 998 rows/s
+2026-06-27 02:59:13 | INFO     | datasetforge.progress | Progress: 2.2 GB / 120.0 GB (1.8%) | Speed: 21.8 KB/s | ETA: 65d 16h 12m 55s
+2026-06-27 02:59:21 | INFO     | datasetforge.downloader | Streaming: 276,985 kept / 0 filtered (100.0% kept), 1027 rows/s
+2026-06-27 02:59:57 | INFO     | datasetforge.downloader | Streaming: 332,382 kept / 0 filtered (100.0% kept), 1088 rows/s
+2026-06-27 03:00:14 | INFO     | datasetforge.progress | Progress: 3.0 GB / 120.0 GB (2.5%) | Speed: 19.2 KB/s | ETA: 73d 20h 58m 30s
+2026-06-27 03:00:33 | INFO     | datasetforge.downloader | Streaming: 367,382 kept / 0 filtered (100.0% kept), 1075 rows/s
+2026-06-27 03:01:36 | INFO     | datasetforge.downloader | Streaming: 401,779 kept / 0 filtered (100.0% kept), 993 rows/s
+2026-06-27 03:01:42 | INFO     | datasetforge.progress | Progress: 3.4 GB / 120.0 GB (2.9%) | Speed: 1.8 KB/s | ETA: 772d 14h 28m 22s
+2026-06-27 03:02:13 | INFO     | datasetforge.downloader | Streaming: 443,176 kept / 0 filtered (100.0% kept), 1004 rows/s
+2026-06-27 03:02:54 | INFO     | datasetforge.downloader | Streaming: 470,176 kept / 0 filtered (100.0% kept), 973 rows/s
+2026-06-27 03:03:10 | INFO     | datasetforge.progress | Progress: 4.0 GB / 120.0 GB (3.4%) | Speed: 1.9 KB/s | ETA: 751d 23h 27m 26s
+2026-06-27 03:03:25 | INFO     | datasetforge.downloader | Streaming: 498,573 kept / 0 filtered (100.0% kept), 972 rows/s
+2026-06-27 03:03:55 | INFO     | datasetforge.downloader | Streaming: 546,573 kept / 0 filtered (100.0% kept), 1005 rows/s
+2026-06-27 03:04:11 | INFO     | datasetforge.progress | Progress: 4.7 GB / 120.0 GB (3.9%) | Speed: 3.7 KB/s | ETA: 382d 23h 27m 5s
+2026-06-27 03:04:27 | INFO     | datasetforge.downloader | Streaming: 580,000 kept / 0 filtered (100.0% kept), 1008 rows/s
+2026-06-27 03:04:58 | INFO     | datasetforge.downloader | Streaming: 610,001 kept / 0 filtered (100.0% kept), 1005 rows/s
+2026-06-27 03:05:11 | INFO     | datasetforge.progress | Progress: 5.3 GB / 120.0 GB (4.4%) | Speed: 38.8 MB/s | ETA: 50m 29s
+2026-06-27 03:05:39 | INFO     | datasetforge.downloader | Streaming: 629,367 kept / 0 filtered (100.0% kept), 972 rows/s
+2026-06-27 03:06:20 | INFO     | datasetforge.downloader | Streaming: 658,367 kept / 0 filtered (100.0% kept), 956 rows/s
+2026-06-27 03:06:20 | INFO     | datasetforge.progress | Progress: 5.6 GB / 120.0 GB (4.6%) | Speed: 3.0 KB/s | ETA: 457d 13h 50m
+2026-06-27 03:06:56 | INFO     | datasetforge.downloader | Streaming: 677,764 kept / 0 filtered (100.0% kept), 936 rows/s
+2026-06-27 03:07:23 | INFO     | datasetforge.progress | Progress: 6.0 GB / 120.0 GB (5.0%) | Speed: 8.6 KB/s | ETA: 161d 16h 23s
+2026-06-27 03:07:26 | INFO     | datasetforge.downloader | Streaming: 712,535 kept / 0 filtered (100.0% kept), 945 rows/s
+2026-06-27 03:07:58 | INFO     | datasetforge.downloader | Streaming: 750,001 kept / 0 filtered (100.0% kept), 954 rows/s
+2026-06-27 03:08:23 | INFO     | datasetforge.progress | Progress: 6.8 GB / 120.0 GB (5.7%) | Speed: 23.3 MB/s | ETA: 1h 22m 59s
+2026-06-27 03:08:28 | INFO     | datasetforge.downloader | Streaming: 810,001 kept / 0 filtered (100.0% kept), 992 rows/s
+2026-06-27 03:09:11 | INFO     | datasetforge.downloader | Streaming: 844,955 kept / 0 filtered (100.0% kept), 983 rows/s
+2026-06-27 03:09:47 | INFO     | datasetforge.downloader | Streaming: 859,955 kept / 0 filtered (100.0% kept), 961 rows/s
+2026-06-27 03:09:47 | INFO     | datasetforge.progress | Progress: 7.3 GB / 120.0 GB (6.1%) | Speed: 2.0 KB/s | ETA: 686d 14h 51m 54s
+2026-06-27 03:10:17 | INFO     | datasetforge.downloader | Streaming: 900,886 kept / 0 filtered (100.0% kept), 974 rows/s
+2026-06-27 03:10:51 | INFO     | datasetforge.downloader | Streaming: 941,749 kept / 0 filtered (100.0% kept), 981 rows/s
+2026-06-27 03:10:58 | INFO     | datasetforge.progress | Progress: 8.1 GB / 120.0 GB (6.7%) | Speed: 5.5 KB/s | ETA: 248d 10h 20m 55s
+2026-06-27 03:11:23 | INFO     | datasetforge.downloader | Streaming: 969,749 kept / 0 filtered (100.0% kept), 978 rows/s
+2026-06-27 03:11:53 | INFO     | datasetforge.downloader | Streaming: 1,010,001 kept / 0 filtered (100.0% kept), 989 rows/s
+2026-06-27 03:12:07 | INFO     | datasetforge.progress | Progress: 8.7 GB / 120.0 GB (7.2%) | Speed: 2.1 KB/s | ETA: 649d 19h 2m 35s
+2026-06-27 03:12:29 | INFO     | datasetforge.downloader | Streaming: 1,031,146 kept / 0 filtered (100.0% kept), 975 rows/s
+2026-06-27 03:12:59 | INFO     | datasetforge.downloader | Streaming: 1,080,543 kept / 0 filtered (100.0% kept), 994 rows/s
+2026-06-27 03:13:07 | INFO     | datasetforge.progress | Progress: 9.4 GB / 120.0 GB (7.8%) | Speed: 17.5 KB/s | ETA: 76d 12h 27m 24s
+2026-06-27 03:13:29 | INFO     | datasetforge.downloader | Streaming: 1,135,940 kept / 0 filtered (100.0% kept), 1016 rows/s
+2026-06-27 03:14:00 | INFO     | datasetforge.downloader | Streaming: 1,170,002 kept / 0 filtered (100.0% kept), 1019 rows/s
+2026-06-27 03:14:10 | INFO     | datasetforge.progress | Progress: 10.1 GB / 120.0 GB (8.4%) | Speed: 29.4 KB/s | ETA: 45d 9h 56m 40s
+2026-06-27 03:14:34 | INFO     | datasetforge.downloader | Streaming: 1,218,734 kept / 0 filtered (100.0% kept), 1031 rows/s
+2026-06-27 03:15:04 | INFO     | datasetforge.downloader | Streaming: 1,260,003 kept / 0 filtered (100.0% kept), 1039 rows/s
+2026-06-27 03:15:10 | INFO     | datasetforge.progress | Progress: 10.8 GB / 120.0 GB (9.0%) | Speed: 89.7 MB/s | ETA: 20m 45s
+2026-06-27 03:15:35 | INFO     | datasetforge.downloader | Streaming: 1,308,131 kept / 0 filtered (100.0% kept), 1052 rows/s
+2026-06-27 03:16:07 | INFO     | datasetforge.downloader | Streaming: 1,356,528 kept / 0 filtered (100.0% kept), 1063 rows/s
+2026-06-27 03:16:15 | INFO     | datasetforge.progress | Progress: 11.7 GB / 120.0 GB (9.7%) | Speed: 8.4 KB/s | ETA: 157d 10h 3m 30s
+2026-06-27 03:16:37 | INFO     | datasetforge.downloader | Streaming: 1,410,004 kept / 0 filtered (100.0% kept), 1080 rows/s
+2026-06-27 03:17:08 | INFO     | datasetforge.downloader | Streaming: 1,460,322 kept / 0 filtered (100.0% kept), 1093 rows/s
+2026-06-27 03:17:15 | INFO     | datasetforge.progress | Progress: 12.6 GB / 120.0 GB (10.5%) | Speed: 33.3 MB/s | ETA: 55m 2s
+2026-06-27 03:17:39 | INFO     | datasetforge.downloader | Streaming: 1,510,004 kept / 0 filtered (100.0% kept), 1104 rows/s
+2026-06-27 03:18:10 | INFO     | datasetforge.downloader | Streaming: 1,560,004 kept / 0 filtered (100.0% kept), 1116 rows/s
+2026-06-27 03:18:15 | INFO     | datasetforge.progress | Progress: 13.4 GB / 120.0 GB (11.2%) | Speed: 16.8 MB/s | ETA: 1h 48m 29s
+2026-06-27 03:18:43 | INFO     | datasetforge.downloader | Streaming: 1,606,513 kept / 0 filtered (100.0% kept), 1122 rows/s
+2026-06-27 03:19:18 | INFO     | datasetforge.downloader | Streaming: 1,648,513 kept / 0 filtered (100.0% kept), 1124 rows/s
+2026-06-27 03:19:18 | INFO     | datasetforge.progress | Progress: 14.1 GB / 120.0 GB (11.7%) | Speed: 3.4 KB/s | ETA: 382d 12h 53m 53s
+2026-06-27 03:19:24 | INFO     | datasetforge.sampler | Sampling complete: 1,660,000 rows, 12.0 GB
+2026-06-27 03:19:24 | INFO     | datasetforge.sampler |   Duplicates removed: 4
+2026-06-27 03:19:24 | INFO     | datasetforge.writer | Write complete: 1,657,859 rows, 14.2 GB, 2 shards
+2026-06-27 03:19:24 | INFO     | datasetforge.main | Completed dataset: open-web-math/open-web-math
+2026-06-27 03:19:24 | INFO     | datasetforge.main |   Bytes written: 15,287,594,288
+2026-06-27 03:19:24 | INFO     | datasetforge.main |   Rows written: 1,657,859
+2026-06-27 03:19:24 | INFO     | datasetforge.main | Processing dataset: HuggingFaceTB/finemath:infiwebmath-3plus
+2026-06-27 03:19:24 | INFO     | datasetforge.main |   Target size: 14.0 GB
+2026-06-27 03:19:24 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 03:19:24 | INFO     | datasetforge.main |   Subset: infiwebmath-3plus
+2026-06-27 03:19:24 | INFO     | datasetforge.writer | Writing to: /output/HuggingFaceTB_finemath_infiwebmath-3plus
+2026-06-27 03:19:24 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 03:19:24 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 03:19:25 | INFO     | datasetforge.sampler | Starting sampling: target=14.0 GB, start=0.0 B
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader | Streaming from entry: HuggingFaceTB/finemath:infiwebmath-3plus
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader |   Dataset: HuggingFaceTB/finemath
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader |   Subset: infiwebmath-3plus
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader | Starting stream: HuggingFaceTB/finemath
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader |   Subset: infiwebmath-3plus
+2026-06-27 03:19:25 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 03:20:08 | INFO     | datasetforge.downloader | Streaming: 0 kept / 0 filtered (0.0% kept), 0 rows/s
+2026-06-27 03:20:19 | INFO     | datasetforge.progress | Progress: 4.3 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-27 03:20:38 | INFO     | datasetforge.downloader | Streaming: 30,020 kept / 0 filtered (100.0% kept), 408 rows/s
+2026-06-27 03:21:09 | INFO     | datasetforge.downloader | Streaming: 80,197 kept / 0 filtered (100.0% kept), 771 rows/s
+2026-06-27 03:21:19 | INFO     | datasetforge.progress | Progress: 695.0 MB / 120.0 GB (0.6%) | Speed: 25.7 MB/s | ETA: 1h 19m 16s
+2026-06-27 03:21:40 | INFO     | datasetforge.downloader | Streaming: 143,000 kept / 0 filtered (100.0% kept), 1057 rows/s
+2026-06-27 03:22:11 | INFO     | datasetforge.downloader | Streaming: 201,000 kept / 0 filtered (100.0% kept), 1205 rows/s
+2026-06-27 03:22:31 | INFO     | datasetforge.progress | Progress: 1.4 GB / 120.0 GB (1.2%) | Speed: 5.7 KB/s | ETA: 254d 10h 33m 3s
+2026-06-27 03:22:41 | INFO     | datasetforge.downloader | Streaming: 241,638 kept / 0 filtered (100.0% kept), 1227 rows/s
+2026-06-27 03:23:20 | INFO     | datasetforge.downloader | Streaming: 294,917 kept / 0 filtered (100.0% kept), 1253 rows/s
+2026-06-27 03:23:32 | INFO     | datasetforge.progress | Progress: 2.0 GB / 120.0 GB (1.7%) | Speed: 4.9 KB/s | ETA: 290d 23h 26m 50s
+2026-06-27 03:24:00 | INFO     | datasetforge.downloader | Streaming: 323,917 kept / 0 filtered (100.0% kept), 1178 rows/s
+2026-06-27 03:24:31 | INFO     | datasetforge.downloader | Streaming: 372,917 kept / 0 filtered (100.0% kept), 1218 rows/s
+2026-06-27 03:24:38 | INFO     | datasetforge.progress | Progress: 2.5 GB / 120.0 GB (2.1%) | Speed: 10.4 KB/s | ETA: 137d 5h 30m 25s
+2026-06-27 03:25:01 | INFO     | datasetforge.downloader | Streaming: 410,841 kept / 0 filtered (100.0% kept), 1222 rows/s
+2026-06-27 03:25:32 | INFO     | datasetforge.downloader | Streaming: 486,450 kept / 0 filtered (100.0% kept), 1325 rows/s
+2026-06-27 03:25:38 | INFO     | datasetforge.progress | Progress: 3.4 GB / 120.0 GB (2.8%) | Speed: 22.7 MB/s | ETA: 1h 27m 32s
+2026-06-27 03:26:03 | INFO     | datasetforge.downloader | Streaming: 578,960 kept / 0 filtered (100.0% kept), 1455 rows/s
+2026-06-27 03:26:34 | INFO     | datasetforge.downloader | Streaming: 650,751 kept / 0 filtered (100.0% kept), 1515 rows/s
+2026-06-27 03:26:38 | INFO     | datasetforge.progress | Progress: 4.3 GB / 120.0 GB (3.6%) | Speed: 28.6 KB/s | ETA: 49d 1h 1m 34s
+2026-06-27 03:27:05 | INFO     | datasetforge.downloader | Streaming: 706,751 kept / 0 filtered (100.0% kept), 1535 rows/s
+2026-06-27 03:27:36 | INFO     | datasetforge.downloader | Streaming: 764,751 kept / 0 filtered (100.0% kept), 1556 rows/s
+2026-06-27 03:27:42 | INFO     | datasetforge.progress | Progress: 5.1 GB / 120.0 GB (4.2%) | Speed: 11.9 KB/s | ETA: 117d 11h 57m 29s
+2026-06-27 03:28:10 | INFO     | datasetforge.downloader | Streaming: 822,751 kept / 0 filtered (100.0% kept), 1564 rows/s
+2026-06-27 03:28:44 | INFO     | datasetforge.downloader | Streaming: 875,668 kept / 0 filtered (100.0% kept), 1565 rows/s
+2026-06-27 03:28:45 | INFO     | datasetforge.progress | Progress: 5.8 GB / 120.0 GB (4.8%) | Speed: 8.9 KB/s | ETA: 156d 4h 8m 10s
+2026-06-27 03:29:15 | INFO     | datasetforge.downloader | Streaming: 943,169 kept / 0 filtered (100.0% kept), 1596 rows/s
+2026-06-27 03:29:46 | INFO     | datasetforge.downloader | Streaming: 1,002,668 kept / 0 filtered (100.0% kept), 1613 rows/s
+2026-06-27 03:29:47 | INFO     | datasetforge.progress | Progress: 6.6 GB / 120.0 GB (5.5%) | Speed: 15.2 KB/s | ETA: 90d 12h 2m 30s
+2026-06-27 03:30:18 | INFO     | datasetforge.downloader | Streaming: 1,052,668 kept / 0 filtered (100.0% kept), 1610 rows/s
+2026-06-27 03:30:49 | INFO     | datasetforge.downloader | Streaming: 1,102,585 kept / 0 filtered (100.0% kept), 1612 rows/s
+2026-06-27 03:30:49 | INFO     | datasetforge.progress | Progress: 7.3 GB / 120.0 GB (6.1%) | Speed: 12.9 KB/s | ETA: 106d 2h 50m 19s
+2026-06-27 03:31:20 | INFO     | datasetforge.downloader | Streaming: 1,170,585 kept / 0 filtered (100.0% kept), 1637 rows/s
+2026-06-27 03:31:50 | INFO     | datasetforge.downloader | Streaming: 1,238,343 kept / 0 filtered (100.0% kept), 1662 rows/s
+2026-06-27 03:31:50 | INFO     | datasetforge.progress | Progress: 8.1 GB / 120.0 GB (6.7%) | Speed: 20.1 KB/s | ETA: 67d 9h 41m 45s
+2026-06-27 03:32:20 | INFO     | datasetforge.downloader | Streaming: 1,301,502 kept / 0 filtered (100.0% kept), 1678 rows/s
+2026-06-27 03:32:50 | INFO     | datasetforge.downloader | Streaming: 1,367,544 kept / 0 filtered (100.0% kept), 1698 rows/s
+2026-06-27 03:32:54 | INFO     | datasetforge.progress | Progress: 9.0 GB / 120.0 GB (7.5%) | Speed: 10.7 KB/s | ETA: 125d 23h 23m 42s
+2026-06-27 03:33:20 | INFO     | datasetforge.downloader | Streaming: 1,421,076 kept / 0 filtered (100.0% kept), 1700 rows/s
+2026-06-27 03:33:50 | INFO     | datasetforge.downloader | Streaming: 1,485,608 kept / 0 filtered (100.0% kept), 1716 rows/s
+2026-06-27 03:33:54 | INFO     | datasetforge.progress | Progress: 9.8 GB / 120.0 GB (8.1%) | Speed: 16.1 MB/s | ETA: 1h 56m 51s
+2026-06-27 03:34:29 | INFO     | datasetforge.downloader | Streaming: 1,536,419 kept / 0 filtered (100.0% kept), 1699 rows/s
+2026-06-27 03:34:54 | INFO     | datasetforge.progress | Progress: 10.3 GB / 120.0 GB (8.6%) | Speed: 6.8 KB/s | ETA: 196d 22h 8m 8s
+2026-06-27 03:35:00 | INFO     | datasetforge.downloader | Streaming: 1,586,419 kept / 0 filtered (100.0% kept), 1697 rows/s
+2026-06-27 03:35:30 | INFO     | datasetforge.downloader | Streaming: 1,644,419 kept / 0 filtered (100.0% kept), 1702 rows/s
+2026-06-27 03:35:54 | INFO     | datasetforge.progress | Progress: 11.0 GB / 120.0 GB (9.2%) | Speed: 278.7 MB/s | ETA: 6m 40s
+2026-06-27 03:36:05 | INFO     | datasetforge.downloader | Streaming: 1,712,419 kept / 0 filtered (100.0% kept), 1712 rows/s
+2026-06-27 03:36:35 | INFO     | datasetforge.downloader | Streaming: 1,735,336 kept / 0 filtered (100.0% kept), 1684 rows/s
+2026-06-27 03:36:54 | INFO     | datasetforge.progress | Progress: 11.4 GB / 120.0 GB (9.5%) | Speed: 19.5 MB/s | ETA: 1h 35m 11s
+2026-06-27 03:37:11 | INFO     | datasetforge.downloader | Streaming: 1,773,336 kept / 0 filtered (100.0% kept), 1662 rows/s
+2026-06-27 03:37:41 | INFO     | datasetforge.downloader | Streaming: 1,842,037 kept / 0 filtered (100.0% kept), 1679 rows/s
+2026-06-27 03:37:54 | INFO     | datasetforge.progress | Progress: 12.1 GB / 120.0 GB (10.1%) | Speed: 19.0 KB/s | ETA: 68d 18h 13m 43s
+2026-06-27 03:38:12 | INFO     | datasetforge.downloader | Streaming: 1,909,851 kept / 0 filtered (100.0% kept), 1694 rows/s
+2026-06-27 03:38:43 | INFO     | datasetforge.downloader | Streaming: 1,975,769 kept / 0 filtered (100.0% kept), 1705 rows/s
+2026-06-27 03:39:05 | INFO     | datasetforge.progress | Progress: 12.9 GB / 120.0 GB (10.8%) | Speed: 4.4 KB/s | ETA: 298d 3h 1m
+2026-06-27 03:39:14 | INFO     | datasetforge.downloader | Streaming: 2,028,253 kept / 0 filtered (100.0% kept), 1705 rows/s
+2026-06-27 03:39:45 | INFO     | datasetforge.downloader | Streaming: 2,105,253 kept / 0 filtered (100.0% kept), 1725 rows/s
+2026-06-27 03:40:08 | INFO     | datasetforge.progress | Progress: 13.9 GB / 120.0 GB (11.6%) | Speed: 14.6 KB/s | ETA: 88d 7h 23m 59s
+2026-06-27 03:40:18 | INFO     | datasetforge.downloader | Streaming: 2,169,170 kept / 0 filtered (100.0% kept), 1731 rows/s
+2026-06-27 03:40:51 | INFO     | datasetforge.downloader | Streaming: 2,237,170 kept / 0 filtered (100.0% kept), 1738 rows/s
+2026-06-27 03:41:08 | INFO     | datasetforge.progress | Progress: 14.6 GB / 120.0 GB (12.2%) | Speed: 7.5 KB/s | ETA: 170d 17h 22m 48s
+2026-06-27 03:41:23 | INFO     | datasetforge.downloader | Streaming: 2,319,594 kept / 0 filtered (100.0% kept), 1760 rows/s
+2026-06-27 03:41:56 | INFO     | datasetforge.downloader | Streaming: 2,386,087 kept / 0 filtered (100.0% kept), 1766 rows/s
+2026-06-27 03:42:10 | INFO     | datasetforge.progress | Progress: 15.5 GB / 120.0 GB (12.9%) | Speed: 30.3 KB/s | ETA: 41d 20h 4m 13s
+2026-06-27 03:42:27 | INFO     | datasetforge.downloader | Streaming: 2,454,047 kept / 0 filtered (100.0% kept), 1776 rows/s
+2026-06-27 03:42:58 | INFO     | datasetforge.downloader | Streaming: 2,532,980 kept / 0 filtered (100.0% kept), 1792 rows/s
+2026-06-27 03:43:10 | INFO     | datasetforge.progress | Progress: 16.4 GB / 120.0 GB (13.7%) | Speed: 56.8 MB/s | ETA: 31m 9s
+2026-06-27 03:43:31 | INFO     | datasetforge.downloader | Streaming: 2,603,004 kept / 0 filtered (100.0% kept), 1799 rows/s
+2026-06-27 03:44:06 | INFO     | datasetforge.downloader | Streaming: 2,640,004 kept / 0 filtered (100.0% kept), 1782 rows/s
+2026-06-27 03:44:11 | INFO     | datasetforge.progress | Progress: 16.9 GB / 120.0 GB (14.1%) | Speed: 13.9 KB/s | ETA: 90d 4h 21m 21s
+2026-06-27 03:44:37 | INFO     | datasetforge.downloader | Streaming: 2,708,004 kept / 0 filtered (100.0% kept), 1790 rows/s
+2026-06-27 03:45:10 | INFO     | datasetforge.downloader | Streaming: 2,766,004 kept / 0 filtered (100.0% kept), 1790 rows/s
+2026-06-27 03:45:11 | INFO     | datasetforge.progress | Progress: 17.6 GB / 120.0 GB (14.7%) | Speed: 23.4 MB/s | ETA: 1h 14m 44s
+2026-06-27 03:46:57 | INFO     | datasetforge.downloader | Streaming: 2,819,921 kept / 0 filtered (100.0% kept), 1707 rows/s
+2026-06-27 03:47:11 | INFO     | datasetforge.progress | Progress: 17.9 GB / 120.0 GB (14.9%) | Speed: 1.3 KB/s | ETA: 963d 8h 10m 28s
+2026-06-27 03:47:28 | INFO     | datasetforge.downloader | Streaming: 2,847,921 kept / 0 filtered (100.0% kept), 1692 rows/s
+2026-06-27 03:47:59 | INFO     | datasetforge.downloader | Streaming: 2,896,921 kept / 0 filtered (100.0% kept), 1690 rows/s
+2026-06-27 03:48:04 | INFO     | datasetforge.sampler | Sampling complete: 2,710,000 rows, 14.0 GB
+2026-06-27 03:48:04 | INFO     | datasetforge.sampler |   Duplicates removed: 197,839
+2026-06-27 03:48:04 | INFO     | datasetforge.sampler |   Too short: 346
+2026-06-27 03:48:04 | INFO     | datasetforge.writer | Write complete: 2,706,084 rows, 18.4 GB, 2 shards
+2026-06-27 03:48:04 | INFO     | datasetforge.main | Completed dataset: HuggingFaceTB/finemath:infiwebmath-3plus
+2026-06-27 03:48:04 | INFO     | datasetforge.main |   Bytes written: 19,799,528,072
+2026-06-27 03:48:04 | INFO     | datasetforge.main |   Rows written: 2,706,084
+2026-06-27 03:48:04 | INFO     | datasetforge.main | Processing dataset: bigcode/the-stack:data/javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.main |   Target size: 8.0 GB
+2026-06-27 03:48:04 | INFO     | datasetforge.main |   Text column: content
+2026-06-27 03:48:04 | INFO     | datasetforge.main |   Data dir: data/javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.writer | Writing to: /output/bigcode_the-stack_data_javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 03:48:04 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 03:48:04 | INFO     | datasetforge.sampler | Starting sampling: target=8.0 GB, start=0.0 B
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader | Streaming from entry: bigcode/the-stack:data/javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader |   Dataset: bigcode/the-stack
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader |   Data dir: data/javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader | Starting stream: bigcode/the-stack
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader |   Data dir: data/javascript
+2026-06-27 03:48:04 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 03:48:30 | INFO     | datasetforge.progress | Progress: 1.8 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-27 03:48:40 | INFO     | datasetforge.downloader | Streaming: 30,000 kept / 0 filtered (100.0% kept), 837 rows/s
+2026-06-27 03:49:18 | INFO     | datasetforge.downloader | Streaming: 80,386 kept / 0 filtered (100.0% kept), 1098 rows/s
+2026-06-27 03:49:34 | INFO     | datasetforge.progress | Progress: 1.2 GB / 120.0 GB (1.0%) | Speed: 5.6 KB/s | ETA: 256d 7h 23m 41s
+2026-06-27 03:49:52 | INFO     | datasetforge.downloader | Streaming: 120,386 kept / 0 filtered (100.0% kept), 1120 rows/s
+2026-06-27 03:50:25 | INFO     | datasetforge.downloader | Streaming: 160,772 kept / 0 filtered (100.0% kept), 1142 rows/s
+2026-06-27 03:50:39 | INFO     | datasetforge.progress | Progress: 2.3 GB / 120.0 GB (1.9%) | Speed: 5.9 KB/s | ETA: 240d 4h 19m 29s
+2026-06-27 03:51:04 | INFO     | datasetforge.downloader | Streaming: 210,771 kept / 1 filtered (100.0% kept), 1171 rows/s
+2026-06-27 03:51:57 | INFO     | datasetforge.downloader | Streaming: 241,157 kept / 1 filtered (100.0% kept), 1037 rows/s
+2026-06-27 03:51:58 | INFO     | datasetforge.progress | Progress: 3.1 GB / 120.0 GB (2.6%) | Speed: 1010.0 B/s | ETA: 1437d 10h 8m 14s
+2026-06-27 03:52:34 | INFO     | datasetforge.downloader | Streaming: 281,157 kept / 1 filtered (100.0% kept), 1043 rows/s
+2026-06-27 03:53:35 | INFO     | datasetforge.downloader | Streaming: 321,542 kept / 2 filtered (100.0% kept), 972 rows/s
+2026-06-27 03:53:36 | INFO     | datasetforge.progress | Progress: 4.2 GB / 120.0 GB (3.5%) | Speed: 755.0 B/s | ETA: 1905d 5h 37m 50s
+2026-06-27 03:54:08 | INFO     | datasetforge.downloader | Streaming: 351,542 kept / 2 filtered (100.0% kept), 967 rows/s
+2026-06-27 03:54:36 | INFO     | datasetforge.progress | Progress: 5.1 GB / 120.0 GB (4.2%) | Speed: 29.2 KB/s | ETA: 47d 16h 34m 55s
+2026-06-27 03:54:38 | INFO     | datasetforge.downloader | Streaming: 399,613 kept / 2 filtered (100.0% kept), 1016 rows/s
+2026-06-27 03:55:11 | INFO     | datasetforge.downloader | Streaming: 421,928 kept / 2 filtered (100.0% kept), 989 rows/s
+2026-06-27 03:55:50 | INFO     | datasetforge.downloader | Streaming: 482,314 kept / 2 filtered (100.0% kept), 1036 rows/s
+2026-06-27 03:55:50 | INFO     | datasetforge.progress | Progress: 6.3 GB / 120.0 GB (5.2%) | Speed: 3.0 KB/s | ETA: 454d 19h 13m 47s
+2026-06-27 03:56:20 | INFO     | datasetforge.downloader | Streaming: 516,768 kept / 2 filtered (100.0% kept), 1043 rows/s
+2026-06-27 03:57:04 | INFO     | datasetforge.downloader | Streaming: 562,699 kept / 2 filtered (100.0% kept), 1043 rows/s
+2026-06-27 03:57:04 | INFO     | datasetforge.progress | Progress: 7.3 GB / 120.0 GB (6.1%) | Speed: 8.5 KB/s | ETA: 161d 2h 25m 42s
+2026-06-27 03:57:41 | INFO     | datasetforge.downloader | Streaming: 612,699 kept / 2 filtered (100.0% kept), 1062 rows/s
+2026-06-27 03:58:19 | INFO     | datasetforge.downloader | Streaming: 643,084 kept / 2 filtered (100.0% kept), 1047 rows/s
+2026-06-27 03:58:19 | INFO     | datasetforge.progress | Progress: 8.4 GB / 120.0 GB (7.0%) | Speed: 2.0 KB/s | ETA: 674d 15h 52m 46s
+2026-06-27 03:58:55 | INFO     | datasetforge.downloader | Streaming: 683,084 kept / 2 filtered (100.0% kept), 1050 rows/s
+2026-06-27 03:59:05 | INFO     | datasetforge.sampler | Sampling complete: 680,000 rows, 8.0 GB
+2026-06-27 03:59:05 | INFO     | datasetforge.sampler |   Duplicates removed: 23
+2026-06-27 03:59:05 | INFO     | datasetforge.sampler |   Too short: 18,053
+2026-06-27 03:59:05 | INFO     | datasetforge.writer | Write complete: 673,375 rows, 9.2 GB, 1 shards
+2026-06-27 03:59:05 | INFO     | datasetforge.main | Completed dataset: bigcode/the-stack:data/javascript
+2026-06-27 03:59:05 | INFO     | datasetforge.main |   Bytes written: 9,828,243,272
+2026-06-27 03:59:05 | INFO     | datasetforge.main |   Rows written: 673,375
+2026-06-27 03:59:05 | INFO     | datasetforge.main | Processing dataset: bigcode/the-stack:data/go
+2026-06-27 03:59:05 | INFO     | datasetforge.main |   Target size: 6.0 GB
+2026-06-27 03:59:05 | INFO     | datasetforge.main |   Text column: content
+2026-06-27 03:59:05 | INFO     | datasetforge.main |   Data dir: data/go
+2026-06-27 03:59:05 | INFO     | datasetforge.writer | Writing to: /output/bigcode_the-stack_data_go
+2026-06-27 03:59:05 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 03:59:05 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 03:59:05 | INFO     | datasetforge.sampler | Starting sampling: target=6.0 GB, start=0.0 B
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader | Streaming from entry: bigcode/the-stack:data/go
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader |   Dataset: bigcode/the-stack
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader |   Data dir: data/go
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader | Starting stream: bigcode/the-stack
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader |   Data dir: data/go
+2026-06-27 03:59:05 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 03:59:53 | INFO     | datasetforge.downloader | Streaming: 0 kept / 0 filtered (0.0% kept), 0 rows/s
+2026-06-27 04:00:06 | INFO     | datasetforge.progress | Progress: 7.4 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-27 04:00:24 | INFO     | datasetforge.downloader | Streaming: 40,000 kept / 0 filtered (100.0% kept), 507 rows/s
+2026-06-27 04:00:54 | INFO     | datasetforge.downloader | Streaming: 89,580 kept / 0 filtered (100.0% kept), 823 rows/s
+2026-06-27 04:01:20 | INFO     | datasetforge.progress | Progress: 1.1 GB / 120.0 GB (0.9%) | Speed: 4.6 KB/s | ETA: 313d 19h 13m 55s
+2026-06-27 04:01:33 | INFO     | datasetforge.downloader | Streaming: 111,333 kept / 0 filtered (100.0% kept), 752 rows/s
+2026-06-27 04:02:04 | INFO     | datasetforge.downloader | Streaming: 161,322 kept / 0 filtered (100.0% kept), 903 rows/s
+2026-06-27 04:02:20 | INFO     | datasetforge.progress | Progress: 2.1 GB / 120.0 GB (1.8%) | Speed: 236.7 KB/s | ETA: 6d 1h 4m 19s
+2026-06-27 04:02:36 | INFO     | datasetforge.downloader | Streaming: 202,666 kept / 0 filtered (100.0% kept), 963 rows/s
+2026-06-27 04:03:10 | INFO     | datasetforge.downloader | Streaming: 242,666 kept / 0 filtered (100.0% kept), 990 rows/s
+2026-06-27 04:03:23 | INFO     | datasetforge.progress | Progress: 2.9 GB / 120.0 GB (2.4%) | Speed: 56.7 KB/s | ETA: 25d 1h 10m 49s
+2026-06-27 04:03:43 | INFO     | datasetforge.downloader | Streaming: 303,999 kept / 0 filtered (100.0% kept), 1095 rows/s
+2026-06-27 04:04:13 | INFO     | datasetforge.downloader | Streaming: 365,419 kept / 0 filtered (100.0% kept), 1188 rows/s
+2026-06-27 04:04:23 | INFO     | datasetforge.progress | Progress: 4.3 GB / 120.0 GB (3.6%) | Speed: 124.7 KB/s | ETA: 11d 6h 3m 56s
+2026-06-27 04:04:43 | INFO     | datasetforge.downloader | Streaming: 415,332 kept / 0 filtered (100.0% kept), 1230 rows/s
+2026-06-27 04:05:14 | INFO     | datasetforge.downloader | Streaming: 445,332 kept / 0 filtered (100.0% kept), 1206 rows/s
+2026-06-27 04:05:27 | INFO     | datasetforge.progress | Progress: 5.0 GB / 120.0 GB (4.2%) | Speed: 17.0 KB/s | ETA: 82d 2h 44m 8s
+2026-06-27 04:05:53 | INFO     | datasetforge.downloader | Streaming: 485,332 kept / 0 filtered (100.0% kept), 1190 rows/s
+2026-06-27 04:06:23 | INFO     | datasetforge.downloader | Streaming: 515,318 kept / 0 filtered (100.0% kept), 1177 rows/s
+2026-06-27 04:06:27 | INFO     | datasetforge.progress | Progress: 5.7 GB / 120.0 GB (4.7%) | Speed: 11.8 KB/s | ETA: 118d 37m 23s
+2026-06-27 04:06:54 | INFO     | datasetforge.downloader | Streaming: 574,540 kept / 0 filtered (100.0% kept), 1226 rows/s
+2026-06-27 04:07:27 | INFO     | datasetforge.downloader | Streaming: 617,997 kept / 0 filtered (100.0% kept), 1232 rows/s
+2026-06-27 04:07:27 | INFO     | datasetforge.progress | Progress: 6.8 GB / 120.0 GB (5.6%) | Speed: 11.0 KB/s | ETA: 125d 2h 5m 45s
+2026-06-27 04:08:03 | INFO     | datasetforge.downloader | Streaming: 657,997 kept / 0 filtered (100.0% kept), 1224 rows/s
+2026-06-27 04:08:05 | INFO     | datasetforge.sampler | Sampling complete: 660,000 rows, 6.0 GB
+2026-06-27 04:08:05 | INFO     | datasetforge.sampler |   Too short: 5,255
+2026-06-27 04:08:05 | INFO     | datasetforge.writer | Write complete: 656,824 rows, 7.3 GB, 1 shards
+2026-06-27 04:08:05 | INFO     | datasetforge.main | Completed dataset: bigcode/the-stack:data/go
+2026-06-27 04:08:05 | INFO     | datasetforge.main |   Bytes written: 7,819,211,715
+2026-06-27 04:08:05 | INFO     | datasetforge.main |   Rows written: 656,824
+2026-06-27 04:08:05 | INFO     | datasetforge.main | Processing dataset: bigcode/the-stack:data/rust
+2026-06-27 04:08:05 | INFO     | datasetforge.main |   Target size: 4.0 GB
+2026-06-27 04:08:05 | INFO     | datasetforge.main |   Text column: content
+2026-06-27 04:08:05 | INFO     | datasetforge.main |   Data dir: data/rust
+2026-06-27 04:08:05 | INFO     | datasetforge.writer | Writing to: /output/bigcode_the-stack_data_rust
+2026-06-27 04:08:05 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 04:08:05 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 04:08:05 | INFO     | datasetforge.sampler | Starting sampling: target=4.0 GB, start=0.0 B
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader | Streaming from entry: bigcode/the-stack:data/rust
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader |   Dataset: bigcode/the-stack
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader |   Data dir: data/rust
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader | Starting stream: bigcode/the-stack
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader |   Data dir: data/rust
+2026-06-27 04:08:05 | INFO     | datasetforge.downloader |   Text column: content
+2026-06-27 04:08:36 | INFO     | datasetforge.progress | Progress: 5.4 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-27 04:08:39 | INFO     | datasetforge.downloader | Streaming: 18,898 kept / 0 filtered (100.0% kept), 552 rows/s
+2026-06-27 04:09:28 | INFO     | datasetforge.downloader | Streaming: 50,000 kept / 0 filtered (100.0% kept), 603 rows/s
+2026-06-27 04:09:37 | INFO     | datasetforge.progress | Progress: 728.8 MB / 120.0 GB (0.6%) | Speed: 24.7 KB/s | ETA: 58d 14h 7m 33s
+2026-06-27 04:10:03 | INFO     | datasetforge.downloader | Streaming: 76,431 kept / 0 filtered (100.0% kept), 644 rows/s
+2026-06-27 04:10:36 | INFO     | datasetforge.downloader | Streaming: 126,431 kept / 0 filtered (100.0% kept), 834 rows/s
+2026-06-27 04:10:37 | INFO     | datasetforge.progress | Progress: 1.7 GB / 120.0 GB (1.4%) | Speed: 61.2 MB/s | ETA: 32m 57s
+2026-06-27 04:11:06 | INFO     | datasetforge.downloader | Streaming: 153,543 kept / 0 filtered (100.0% kept), 846 rows/s
+2026-06-27 04:11:36 | INFO     | datasetforge.downloader | Streaming: 186,542 kept / 0 filtered (100.0% kept), 882 rows/s
+2026-06-27 04:11:44 | INFO     | datasetforge.progress | Progress: 2.5 GB / 120.0 GB (2.1%) | Speed: 15.3 KB/s | ETA: 93d 2h 42m 1s
+2026-06-27 04:12:17 | INFO     | datasetforge.downloader | Streaming: 229,293 kept / 0 filtered (100.0% kept), 909 rows/s
+2026-06-27 04:12:55 | INFO     | datasetforge.downloader | Streaming: 279,293 kept / 0 filtered (100.0% kept), 961 rows/s
+2026-06-27 04:12:56 | INFO     | datasetforge.progress | Progress: 3.8 GB / 120.0 GB (3.2%) | Speed: 7.2 KB/s | ETA: 197d 2h 20m 32s
+2026-06-27 04:13:25 | INFO     | datasetforge.downloader | Streaming: 319,836 kept / 0 filtered (100.0% kept), 998 rows/s
+2026-06-27 04:13:34 | INFO     | datasetforge.sampler | Sampling complete: 330,000 rows, 4.0 GB
+2026-06-27 04:13:34 | INFO     | datasetforge.sampler |   Duplicates removed: 2
+2026-06-27 04:13:34 | INFO     | datasetforge.sampler |   Too short: 6,957
+2026-06-27 04:13:34 | INFO     | datasetforge.writer | Write complete: 322,408 rows, 4.5 GB, 1 shards
+2026-06-27 04:13:34 | INFO     | datasetforge.main | Completed dataset: bigcode/the-stack:data/rust
+2026-06-27 04:13:34 | INFO     | datasetforge.main |   Bytes written: 4,846,271,691
+2026-06-27 04:13:34 | INFO     | datasetforge.main |   Rows written: 322,408
+2026-06-27 04:13:34 | INFO     | datasetforge.main | Processing dataset: HuggingFaceFW/fineweb-edu:sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.main |   Target size: 22.0 GB
+2026-06-27 04:13:34 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 04:13:34 | INFO     | datasetforge.main |   Subset: sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.writer | Writing to: /output/HuggingFaceFW_fineweb-edu_sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 04:13:34 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 04:13:34 | INFO     | datasetforge.sampler | Starting sampling: target=22.0 GB, start=0.0 B
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader | Streaming from entry: HuggingFaceFW/fineweb-edu:sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader |   Dataset: HuggingFaceFW/fineweb-edu
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader |   Subset: sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader | Starting stream: HuggingFaceFW/fineweb-edu
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader |   Subset: sample-100BT
+2026-06-27 04:13:34 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 04:13:56 | INFO     | datasetforge.progress | Progress: 52.1 MB / 120.0 GB (0.0%) | Speed: 51.6 KB/s | ETA: 28d 4h 46m 27s
+2026-06-27 04:14:12 | INFO     | datasetforge.downloader | Streaming: 30,000 kept / 0 filtered (100.0% kept), 795 rows/s
+2026-06-27 04:14:43 | INFO     | datasetforge.downloader | Streaming: 95,000 kept / 0 filtered (100.0% kept), 1384 rows/s
+2026-06-27 04:14:57 | INFO     | datasetforge.progress | Progress: 595.2 MB / 120.0 GB (0.5%) | Speed: 9.0 KB/s | ETA: 161d 11h 1m 6s
+2026-06-27 04:15:13 | INFO     | datasetforge.downloader | Streaming: 150,000 kept / 0 filtered (100.0% kept), 1520 rows/s
+2026-06-27 04:15:46 | INFO     | datasetforge.downloader | Streaming: 233,000 kept / 0 filtered (100.0% kept), 1769 rows/s
+2026-06-27 04:16:01 | INFO     | datasetforge.progress | Progress: 1.3 GB / 120.0 GB (1.1%) | Speed: 8.2 KB/s | ETA: 175d 12h 53m 38s
+2026-06-27 04:16:18 | INFO     | datasetforge.downloader | Streaming: 299,000 kept / 0 filtered (100.0% kept), 1818 rows/s
+2026-06-27 04:16:50 | INFO     | datasetforge.downloader | Streaming: 370,000 kept / 0 filtered (100.0% kept), 1884 rows/s
+2026-06-27 04:17:01 | INFO     | datasetforge.progress | Progress: 1.9 GB / 120.0 GB (1.6%) | Speed: 32.4 MB/s | ETA: 1h 2m 14s
+2026-06-27 04:17:21 | INFO     | datasetforge.downloader | Streaming: 460,254 kept / 0 filtered (100.0% kept), 2032 rows/s
+2026-06-27 04:17:54 | INFO     | datasetforge.downloader | Streaming: 519,000 kept / 0 filtered (100.0% kept), 1996 rows/s
+2026-06-27 04:18:04 | INFO     | datasetforge.progress | Progress: 2.6 GB / 120.0 GB (2.2%) | Speed: 6.0 KB/s | ETA: 235d 11h 42m 47s
+2026-06-27 04:18:26 | INFO     | datasetforge.downloader | Streaming: 596,000 kept / 0 filtered (100.0% kept), 2043 rows/s
+2026-06-27 04:18:56 | INFO     | datasetforge.downloader | Streaming: 672,000 kept / 0 filtered (100.0% kept), 2085 rows/s
+2026-06-27 04:19:05 | INFO     | datasetforge.progress | Progress: 3.4 GB / 120.0 GB (2.8%) | Speed: 17.2 KB/s | ETA: 82d 6h 1m 48s
+2026-06-27 04:19:30 | INFO     | datasetforge.downloader | Streaming: 736,000 kept / 0 filtered (100.0% kept), 2065 rows/s
+2026-06-27 04:20:02 | INFO     | datasetforge.downloader | Streaming: 835,000 kept / 0 filtered (100.0% kept), 2154 rows/s
+2026-06-27 04:20:07 | INFO     | datasetforge.progress | Progress: 4.1 GB / 120.0 GB (3.4%) | Speed: 9.1 KB/s | ETA: 153d 18h 7m 49s
+2026-06-27 04:20:35 | INFO     | datasetforge.downloader | Streaming: 901,000 kept / 0 filtered (100.0% kept), 2141 rows/s
+2026-06-27 04:21:08 | INFO     | datasetforge.downloader | Streaming: 962,000 kept / 0 filtered (100.0% kept), 2120 rows/s
+2026-06-27 04:21:08 | INFO     | datasetforge.progress | Progress: 4.6 GB / 120.0 GB (3.9%) | Speed: 7.7 KB/s | ETA: 181d 21h 18m 26s
+2026-06-27 04:21:42 | INFO     | datasetforge.downloader | Streaming: 1,006,000 kept / 0 filtered (100.0% kept), 2063 rows/s
+2026-06-27 04:22:08 | INFO     | datasetforge.progress | Progress: 5.0 GB / 120.0 GB (4.1%) | Speed: 4.0 KB/s | ETA: 352d 20h 17m 5s
+2026-06-27 04:22:19 | INFO     | datasetforge.downloader | Streaming: 1,040,000 kept / 0 filtered (100.0% kept), 1981 rows/s
+2026-06-27 04:22:52 | INFO     | datasetforge.downloader | Streaming: 1,109,000 kept / 0 filtered (100.0% kept), 1987 rows/s
+2026-06-27 04:23:11 | INFO     | datasetforge.progress | Progress: 5.6 GB / 120.0 GB (4.6%) | Speed: 24.4 KB/s | ETA: 56d 19h 51m 54s
+2026-06-27 04:23:22 | INFO     | datasetforge.downloader | Streaming: 1,191,500 kept / 0 filtered (100.0% kept), 2026 rows/s
+2026-06-27 04:23:52 | INFO     | datasetforge.downloader | Streaming: 1,263,805 kept / 0 filtered (100.0% kept), 2044 rows/s
+2026-06-27 04:24:14 | INFO     | datasetforge.progress | Progress: 6.3 GB / 120.0 GB (5.2%) | Speed: 5.2 KB/s | ETA: 264d 13h 56m 4s
+2026-06-27 04:24:26 | INFO     | datasetforge.downloader | Streaming: 1,314,000 kept / 0 filtered (100.0% kept), 2015 rows/s
+2026-06-27 04:24:56 | INFO     | datasetforge.downloader | Streaming: 1,398,704 kept / 0 filtered (100.0% kept), 2050 rows/s
+2026-06-27 04:25:19 | INFO     | datasetforge.progress | Progress: 7.0 GB / 120.0 GB (5.8%) | Speed: 5.6 KB/s | ETA: 244d 1h 29m 16s
+2026-06-27 04:25:28 | INFO     | datasetforge.downloader | Streaming: 1,453,000 kept / 0 filtered (100.0% kept), 2035 rows/s
+2026-06-27 04:26:06 | INFO     | datasetforge.downloader | Streaming: 1,507,000 kept / 0 filtered (100.0% kept), 2005 rows/s
+2026-06-27 04:26:19 | INFO     | datasetforge.progress | Progress: 7.4 GB / 120.0 GB (6.2%) | Speed: 413.0 MB/s | ETA: 4m 39s
+2026-06-27 04:26:36 | INFO     | datasetforge.downloader | Streaming: 1,566,222 kept / 0 filtered (100.0% kept), 2003 rows/s
+2026-06-27 04:27:09 | INFO     | datasetforge.downloader | Streaming: 1,650,000 kept / 0 filtered (100.0% kept), 2024 rows/s
+2026-06-27 04:27:22 | INFO     | datasetforge.progress | Progress: 8.1 GB / 120.0 GB (6.8%) | Speed: 11.4 KB/s | ETA: 119d 9h 45m 46s
+2026-06-27 04:27:44 | INFO     | datasetforge.downloader | Streaming: 1,723,000 kept / 0 filtered (100.0% kept), 2027 rows/s
+2026-06-27 04:28:16 | INFO     | datasetforge.downloader | Streaming: 1,793,000 kept / 0 filtered (100.0% kept), 2033 rows/s
+2026-06-27 04:28:24 | INFO     | datasetforge.progress | Progress: 8.7 GB / 120.0 GB (7.3%) | Speed: 48.6 KB/s | ETA: 27d 18h 34m 26s
+2026-06-27 04:28:47 | INFO     | datasetforge.downloader | Streaming: 1,882,000 kept / 0 filtered (100.0% kept), 2061 rows/s
+2026-06-27 04:29:18 | INFO     | datasetforge.downloader | Streaming: 1,969,170 kept / 0 filtered (100.0% kept), 2087 rows/s
+2026-06-27 04:29:27 | INFO     | datasetforge.progress | Progress: 9.6 GB / 120.0 GB (8.0%) | Speed: 10.4 KB/s | ETA: 128d 12h 48m 53s
+2026-06-27 04:29:48 | INFO     | datasetforge.downloader | Streaming: 2,060,539 kept / 0 filtered (100.0% kept), 2115 rows/s
+2026-06-27 04:30:18 | INFO     | datasetforge.downloader | Streaming: 2,129,000 kept / 0 filtered (100.0% kept), 2120 rows/s
+2026-06-27 04:30:28 | INFO     | datasetforge.progress | Progress: 10.3 GB / 120.0 GB (8.6%) | Speed: 14.1 KB/s | ETA: 94d 15h 27m 39s
+2026-06-27 04:31:02 | INFO     | datasetforge.downloader | Streaming: 2,182,000 kept / 0 filtered (100.0% kept), 2083 rows/s
+2026-06-27 04:31:32 | INFO     | datasetforge.downloader | Streaming: 2,237,807 kept / 0 filtered (100.0% kept), 2077 rows/s
+2026-06-27 04:31:32 | INFO     | datasetforge.progress | Progress: 10.8 GB / 120.0 GB (9.0%) | Speed: 14.6 KB/s | ETA: 90d 20h 33m 15s
+2026-06-27 04:32:04 | INFO     | datasetforge.downloader | Streaming: 2,324,000 kept / 0 filtered (100.0% kept), 2094 rows/s
+2026-06-27 04:32:33 | INFO     | datasetforge.progress | Progress: 11.5 GB / 120.0 GB (9.6%) | Speed: 11.6 KB/s | ETA: 113d 5h 10m
+2026-06-27 04:32:37 | INFO     | datasetforge.downloader | Streaming: 2,388,000 kept / 0 filtered (100.0% kept), 2090 rows/s
+2026-06-27 04:33:21 | INFO     | datasetforge.downloader | Streaming: 2,419,000 kept / 0 filtered (100.0% kept), 2039 rows/s
+2026-06-27 04:33:36 | INFO     | datasetforge.progress | Progress: 11.8 GB / 120.0 GB (9.8%) | Speed: 10.3 KB/s | ETA: 127d 23h 43m 20s
+2026-06-27 04:33:51 | INFO     | datasetforge.downloader | Streaming: 2,474,682 kept / 0 filtered (100.0% kept), 2033 rows/s
+2026-06-27 04:34:23 | INFO     | datasetforge.downloader | Streaming: 2,540,000 kept / 0 filtered (100.0% kept), 2034 rows/s
+2026-06-27 04:34:39 | INFO     | datasetforge.progress | Progress: 12.4 GB / 120.0 GB (10.4%) | Speed: 10.5 KB/s | ETA: 124d 19h 2m 16s
+2026-06-27 04:34:55 | INFO     | datasetforge.downloader | Streaming: 2,626,000 kept / 0 filtered (100.0% kept), 2049 rows/s
+2026-06-27 04:35:27 | INFO     | datasetforge.downloader | Streaming: 2,678,000 kept / 0 filtered (100.0% kept), 2040 rows/s
+2026-06-27 04:35:39 | INFO     | datasetforge.progress | Progress: 13.0 GB / 120.0 GB (10.9%) | Speed: 9.0 KB/s | ETA: 144d 21h 50m 22s
+2026-06-27 04:35:59 | INFO     | datasetforge.downloader | Streaming: 2,733,000 kept / 0 filtered (100.0% kept), 2032 rows/s
+2026-06-27 04:36:29 | INFO     | datasetforge.downloader | Streaming: 2,789,362 kept / 0 filtered (100.0% kept), 2029 rows/s
+2026-06-27 04:36:42 | INFO     | datasetforge.progress | Progress: 13.6 GB / 120.0 GB (11.3%) | Speed: 4.4 KB/s | ETA: 290d 9h 12m
+2026-06-27 04:37:00 | INFO     | datasetforge.downloader | Streaming: 2,843,000 kept / 0 filtered (100.0% kept), 2022 rows/s
+2026-06-27 04:37:30 | INFO     | datasetforge.downloader | Streaming: 2,890,452 kept / 0 filtered (100.0% kept), 2012 rows/s
+2026-06-27 04:37:47 | INFO     | datasetforge.progress | Progress: 14.0 GB / 120.0 GB (11.7%) | Speed: 4.7 KB/s | ETA: 275d 9h 47m 19s
+2026-06-27 04:38:04 | INFO     | datasetforge.downloader | Streaming: 2,938,000 kept / 0 filtered (100.0% kept), 1998 rows/s
+2026-06-27 04:38:35 | INFO     | datasetforge.downloader | Streaming: 3,016,000 kept / 0 filtered (100.0% kept), 2009 rows/s
+2026-06-27 04:38:50 | INFO     | datasetforge.progress | Progress: 14.7 GB / 120.0 GB (12.2%) | Speed: 12.1 KB/s | ETA: 105d 6h 3m 53s
+2026-06-27 04:39:07 | INFO     | datasetforge.downloader | Streaming: 3,094,000 kept / 0 filtered (100.0% kept), 2018 rows/s
+2026-06-27 04:39:41 | INFO     | datasetforge.downloader | Streaming: 3,187,000 kept / 0 filtered (100.0% kept), 2034 rows/s
+2026-06-27 04:39:52 | INFO     | datasetforge.progress | Progress: 15.5 GB / 120.0 GB (12.9%) | Speed: 7.9 KB/s | ETA: 160d 5h 51m 20s
+2026-06-27 04:40:13 | INFO     | datasetforge.downloader | Streaming: 3,275,000 kept / 0 filtered (100.0% kept), 2048 rows/s
+2026-06-27 04:40:48 | INFO     | datasetforge.downloader | Streaming: 3,359,000 kept / 0 filtered (100.0% kept), 2056 rows/s
+2026-06-27 04:40:53 | INFO     | datasetforge.progress | Progress: 16.3 GB / 120.0 GB (13.6%) | Speed: 14.7 KB/s | ETA: 85d 20h 42m 1s
+2026-06-27 04:41:18 | INFO     | datasetforge.downloader | Streaming: 3,440,750 kept / 0 filtered (100.0% kept), 2067 rows/s
+2026-06-27 04:41:50 | INFO     | datasetforge.downloader | Streaming: 3,489,000 kept / 0 filtered (100.0% kept), 2057 rows/s
+2026-06-27 04:41:55 | INFO     | datasetforge.progress | Progress: 16.8 GB / 120.0 GB (14.0%) | Speed: 4.7 KB/s | ETA: 264d 11h 31m 1s
+2026-06-27 04:42:21 | INFO     | datasetforge.downloader | Streaming: 3,555,000 kept / 0 filtered (100.0% kept), 2059 rows/s
+2026-06-27 04:43:06 | INFO     | datasetforge.downloader | Streaming: 3,629,000 kept / 0 filtered (100.0% kept), 2048 rows/s
+2026-06-27 04:43:06 | INFO     | datasetforge.progress | Progress: 17.5 GB / 120.0 GB (14.6%) | Speed: 2.1 KB/s | ETA: 598d 13h 5m 57s
+2026-06-27 04:43:38 | INFO     | datasetforge.downloader | Streaming: 3,682,000 kept / 0 filtered (100.0% kept), 2041 rows/s
+2026-06-27 04:44:07 | INFO     | datasetforge.progress | Progress: 18.0 GB / 120.0 GB (15.0%) | Speed: 6.8 KB/s | ETA: 181d 23h 26m 58s
+2026-06-27 04:44:10 | INFO     | datasetforge.downloader | Streaming: 3,740,000 kept / 0 filtered (100.0% kept), 2037 rows/s
+2026-06-27 04:44:44 | INFO     | datasetforge.downloader | Streaming: 3,806,000 kept / 0 filtered (100.0% kept), 2036 rows/s
+2026-06-27 04:45:09 | INFO     | datasetforge.progress | Progress: 18.6 GB / 120.0 GB (15.5%) | Speed: 9.2 KB/s | ETA: 133d 17h 37m 40s
+2026-06-27 04:45:14 | INFO     | datasetforge.downloader | Streaming: 3,878,542 kept / 0 filtered (100.0% kept), 2042 rows/s
+2026-06-27 04:45:44 | INFO     | datasetforge.downloader | Streaming: 3,964,000 kept / 0 filtered (100.0% kept), 2054 rows/s
+2026-06-27 04:46:09 | INFO     | datasetforge.progress | Progress: 19.5 GB / 120.0 GB (16.3%) | Speed: 15.0 MB/s | ETA: 1h 54m 36s
+2026-06-27 04:46:15 | INFO     | datasetforge.downloader | Streaming: 4,070,000 kept / 0 filtered (100.0% kept), 2075 rows/s
+2026-06-27 04:46:47 | INFO     | datasetforge.downloader | Streaming: 4,133,000 kept / 0 filtered (100.0% kept), 2073 rows/s
+2026-06-27 04:47:17 | INFO     | datasetforge.progress | Progress: 20.1 GB / 120.0 GB (16.7%) | Speed: 6.6 KB/s | ETA: 182d 8h 27m 5s
+2026-06-27 04:47:25 | INFO     | datasetforge.downloader | Streaming: 4,178,000 kept / 0 filtered (100.0% kept), 2058 rows/s
+2026-06-27 04:47:55 | INFO     | datasetforge.downloader | Streaming: 4,234,000 kept / 0 filtered (100.0% kept), 2054 rows/s
+2026-06-27 04:48:17 | INFO     | datasetforge.progress | Progress: 20.5 GB / 120.0 GB (17.1%) | Speed: 12.8 KB/s | ETA: 94d 7h 38m 8s
+2026-06-27 04:48:25 | INFO     | datasetforge.downloader | Streaming: 4,295,180 kept / 0 filtered (100.0% kept), 2054 rows/s
+2026-06-27 04:48:56 | INFO     | datasetforge.downloader | Streaming: 4,338,000 kept / 0 filtered (100.0% kept), 2044 rows/s
+2026-06-27 04:49:18 | INFO     | datasetforge.progress | Progress: 21.1 GB / 120.0 GB (17.5%) | Speed: 8.1 KB/s | ETA: 147d 23h 20m 5s
+2026-06-27 04:49:28 | INFO     | datasetforge.downloader | Streaming: 4,396,000 kept / 0 filtered (100.0% kept), 2041 rows/s
+2026-06-27 04:49:59 | INFO     | datasetforge.downloader | Streaming: 4,464,000 kept / 0 filtered (100.0% kept), 2043 rows/s
+2026-06-27 04:50:20 | INFO     | datasetforge.progress | Progress: 21.7 GB / 120.0 GB (18.1%) | Speed: 6.3 KB/s | ETA: 190d 20h 41m 11s
+2026-06-27 04:50:32 | INFO     | datasetforge.downloader | Streaming: 4,531,000 kept / 0 filtered (100.0% kept), 2043 rows/s
+2026-06-27 04:51:03 | INFO     | datasetforge.downloader | Streaming: 4,603,000 kept / 0 filtered (100.0% kept), 2047 rows/s
+2026-06-27 04:51:26 | INFO     | datasetforge.progress | Progress: 22.4 GB / 120.0 GB (18.6%) | Speed: 6.0 KB/s | ETA: 198d 11h 39m 33s
+2026-06-27 04:51:34 | INFO     | datasetforge.downloader | Streaming: 4,679,000 kept / 0 filtered (100.0% kept), 2052 rows/s
+2026-06-27 04:52:05 | INFO     | datasetforge.downloader | Streaming: 4,745,000 kept / 0 filtered (100.0% kept), 2053 rows/s
+2026-06-27 04:52:29 | INFO     | datasetforge.progress | Progress: 23.0 GB / 120.0 GB (19.2%) | Speed: 10.7 KB/s | ETA: 110d 11h 6m 53s
+2026-06-27 04:52:37 | INFO     | datasetforge.downloader | Streaming: 4,818,000 kept / 0 filtered (100.0% kept), 2056 rows/s
+2026-06-27 04:53:09 | INFO     | datasetforge.downloader | Streaming: 4,896,000 kept / 0 filtered (100.0% kept), 2061 rows/s
+2026-06-27 04:53:29 | INFO     | datasetforge.progress | Progress: 23.8 GB / 120.0 GB (19.8%) | Speed: 22.7 MB/s | ETA: 1h 12m 14s
+2026-06-27 04:53:41 | INFO     | datasetforge.downloader | Streaming: 4,998,000 kept / 0 filtered (100.0% kept), 2076 rows/s
+2026-06-27 04:53:42 | INFO     | datasetforge.sampler | Sampling complete: 4,940,000 rows, 22.0 GB
+2026-06-27 04:53:42 | INFO     | datasetforge.sampler |   Duplicates removed: 66,391
+2026-06-27 04:53:42 | INFO     | datasetforge.writer | Write complete: 4,936,244 rows, 24.0 GB, 3 shards
+2026-06-27 04:53:42 | INFO     | datasetforge.main | Completed dataset: HuggingFaceFW/fineweb-edu:sample-100BT
+2026-06-27 04:53:42 | INFO     | datasetforge.main |   Bytes written: 25,799,715,071
+2026-06-27 04:53:42 | INFO     | datasetforge.main |   Rows written: 4,936,244
+2026-06-27 04:53:42 | INFO     | datasetforge.main | Processing dataset: HuggingFaceFW/finewiki:en
+2026-06-27 04:53:42 | INFO     | datasetforge.main |   Target size: 8.0 GB
+2026-06-27 04:53:42 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 04:53:42 | INFO     | datasetforge.main |   Subset: en
+2026-06-27 04:53:42 | INFO     | datasetforge.writer | Writing to: /output/HuggingFaceFW_finewiki_en
+2026-06-27 04:53:42 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 04:53:42 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 04:53:42 | INFO     | datasetforge.sampler | Starting sampling: target=8.0 GB, start=0.0 B
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader | Streaming from entry: HuggingFaceFW/finewiki:en
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader |   Dataset: HuggingFaceFW/finewiki
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader |   Subset: en
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader | Starting stream: HuggingFaceFW/finewiki
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader |   Subset: en
+2026-06-27 04:53:42 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 04:54:15 | INFO     | datasetforge.downloader | Streaming: 60,533 kept / 0 filtered (100.0% kept), 1836 rows/s
+2026-06-27 04:54:33 | INFO     | datasetforge.progress | Progress: 838.5 MB / 120.0 GB (0.7%) | Speed: 55.1 KB/s | ETA: 26d 6h 4m 4s
+2026-06-27 04:54:47 | INFO     | datasetforge.downloader | Streaming: 104,000 kept / 0 filtered (100.0% kept), 1613 rows/s
+2026-06-27 04:55:19 | INFO     | datasetforge.downloader | Streaming: 148,000 kept / 0 filtered (100.0% kept), 1535 rows/s
+2026-06-27 04:55:36 | INFO     | datasetforge.progress | Progress: 2.0 GB / 120.0 GB (1.7%) | Speed: 10.5 KB/s | ETA: 136d 1h 48m 26s
+2026-06-27 04:55:52 | INFO     | datasetforge.downloader | Streaming: 183,000 kept / 0 filtered (100.0% kept), 1411 rows/s
+2026-06-27 04:56:22 | INFO     | datasetforge.downloader | Streaming: 211,164 kept / 0 filtered (100.0% kept), 1320 rows/s
+2026-06-27 04:56:42 | INFO     | datasetforge.progress | Progress: 3.3 GB / 120.0 GB (2.7%) | Speed: 21.1 KB/s | ETA: 67d 2h 10m 38s
+2026-06-27 04:56:54 | INFO     | datasetforge.downloader | Streaming: 240,000 kept / 0 filtered (100.0% kept), 1255 rows/s
+2026-06-27 04:57:24 | INFO     | datasetforge.downloader | Streaming: 265,000 kept / 0 filtered (100.0% kept), 1195 rows/s
+2026-06-27 04:57:47 | INFO     | datasetforge.progress | Progress: 4.6 GB / 120.0 GB (3.8%) | Speed: 10.8 KB/s | ETA: 130d 4h 51m 49s
+2026-06-27 04:57:56 | INFO     | datasetforge.downloader | Streaming: 285,000 kept / 0 filtered (100.0% kept), 1124 rows/s
+2026-06-27 04:58:29 | INFO     | datasetforge.downloader | Streaming: 300,000 kept / 0 filtered (100.0% kept), 1046 rows/s
+2026-06-27 04:59:00 | INFO     | datasetforge.downloader | Streaming: 312,000 kept / 0 filtered (100.0% kept), 982 rows/s
+2026-06-27 04:59:00 | INFO     | datasetforge.progress | Progress: 5.6 GB / 120.0 GB (4.6%) | Speed: 8.1 KB/s | ETA: 171d 3h 5m 58s
+2026-06-27 04:59:31 | INFO     | datasetforge.downloader | Streaming: 365,000 kept / 0 filtered (100.0% kept), 1047 rows/s
+2026-06-27 05:00:01 | INFO     | datasetforge.downloader | Streaming: 428,456 kept / 0 filtered (100.0% kept), 1131 rows/s
+2026-06-27 05:00:02 | INFO     | datasetforge.progress | Progress: 7.2 GB / 120.0 GB (6.0%) | Speed: 20.5 KB/s | ETA: 66d 22h 30m 3s
+2026-06-27 05:00:34 | INFO     | datasetforge.downloader | Streaming: 493,456 kept / 0 filtered (100.0% kept), 1198 rows/s
+2026-06-27 05:01:14 | INFO     | datasetforge.downloader | Streaming: 533,456 kept / 0 filtered (100.0% kept), 1183 rows/s
+2026-06-27 05:01:14 | INFO     | datasetforge.progress | Progress: 8.3 GB / 120.0 GB (6.9%) | Speed: 3.9 KB/s | ETA: 346d 19h 22m 35s
+2026-06-27 05:01:45 | INFO     | datasetforge.downloader | Streaming: 564,456 kept / 0 filtered (100.0% kept), 1170 rows/s
+2026-06-27 05:02:25 | INFO     | datasetforge.downloader | Streaming: 590,456 kept / 0 filtered (100.0% kept), 1130 rows/s
+2026-06-27 05:02:32 | INFO     | datasetforge.progress | Progress: 9.3 GB / 120.0 GB (7.8%) | Speed: 3.4 KB/s | ETA: 389d 13h 59m 20s
+2026-06-27 05:02:59 | INFO     | datasetforge.downloader | Streaming: 614,456 kept / 0 filtered (100.0% kept), 1103 rows/s
+2026-06-27 05:03:30 | INFO     | datasetforge.downloader | Streaming: 645,237 kept / 0 filtered (100.0% kept), 1099 rows/s
+2026-06-27 05:03:41 | INFO     | datasetforge.progress | Progress: 10.6 GB / 120.0 GB (8.8%) | Speed: 9.1 KB/s | ETA: 145d 15h 30m 41s
+2026-06-27 05:04:00 | INFO     | datasetforge.downloader | Streaming: 673,456 kept / 0 filtered (100.0% kept), 1091 rows/s
+2026-06-27 05:04:31 | INFO     | datasetforge.downloader | Streaming: 695,397 kept / 0 filtered (100.0% kept), 1072 rows/s
+2026-06-27 05:04:47 | INFO     | datasetforge.progress | Progress: 11.9 GB / 120.0 GB (9.9%) | Speed: 7.1 KB/s | ETA: 183d 23h 5m 28s
+2026-06-27 05:05:04 | INFO     | datasetforge.downloader | Streaming: 727,456 kept / 0 filtered (100.0% kept), 1068 rows/s
+2026-06-27 05:05:36 | INFO     | datasetforge.downloader | Streaming: 743,456 kept / 0 filtered (100.0% kept), 1042 rows/s
+2026-06-27 05:05:49 | INFO     | datasetforge.progress | Progress: 13.2 GB / 120.0 GB (11.0%) | Speed: 29.6 KB/s | ETA: 43d 20h 25m 58s
+2026-06-27 05:06:09 | INFO     | datasetforge.downloader | Streaming: 806,456 kept / 0 filtered (100.0% kept), 1080 rows/s
+2026-06-27 05:06:41 | INFO     | datasetforge.downloader | Streaming: 879,728 kept / 0 filtered (100.0% kept), 1130 rows/s
+2026-06-27 05:06:49 | INFO     | datasetforge.progress | Progress: 14.5 GB / 120.0 GB (12.1%) | Speed: 25.0 KB/s | ETA: 51d 3h 5m 43s
+2026-06-27 05:07:11 | INFO     | datasetforge.downloader | Streaming: 952,551 kept / 0 filtered (100.0% kept), 1178 rows/s
+2026-06-27 05:07:45 | INFO     | datasetforge.downloader | Streaming: 992,728 kept / 0 filtered (100.0% kept), 1178 rows/s
+2026-06-27 05:07:50 | INFO     | datasetforge.progress | Progress: 15.6 GB / 120.0 GB (13.0%) | Speed: 15.5 KB/s | ETA: 81d 16h 22m 5s
+2026-06-27 05:08:15 | INFO     | datasetforge.downloader | Streaming: 1,037,728 kept / 0 filtered (100.0% kept), 1189 rows/s
+2026-06-27 05:08:48 | INFO     | datasetforge.downloader | Streaming: 1,083,728 kept / 0 filtered (100.0% kept), 1197 rows/s
+2026-06-27 05:08:51 | INFO     | datasetforge.progress | Progress: 17.2 GB / 120.0 GB (14.3%) | Speed: 21.7 KB/s | ETA: 57d 10h 44m 46s
+2026-06-27 05:09:18 | INFO     | datasetforge.downloader | Streaming: 1,139,239 kept / 0 filtered (100.0% kept), 1218 rows/s
+2026-06-27 05:09:50 | INFO     | datasetforge.downloader | Streaming: 1,184,728 kept / 0 filtered (100.0% kept), 1225 rows/s
+2026-06-27 05:09:55 | INFO     | datasetforge.progress | Progress: 18.8 GB / 120.0 GB (15.6%) | Speed: 6.6 KB/s | ETA: 187d 8h 34m 33s
+2026-06-27 05:10:21 | INFO     | datasetforge.downloader | Streaming: 1,208,728 kept / 0 filtered (100.0% kept), 1211 rows/s
+2026-06-27 05:10:53 | INFO     | datasetforge.downloader | Streaming: 1,222,728 kept / 0 filtered (100.0% kept), 1186 rows/s
+2026-06-27 05:11:06 | INFO     | datasetforge.progress | Progress: 20.3 GB / 120.0 GB (16.9%) | Speed: 6.6 KB/s | ETA: 181d 23h 59m 8s
+2026-06-27 05:11:26 | INFO     | datasetforge.downloader | Streaming: 1,271,728 kept / 0 filtered (100.0% kept), 1196 rows/s
+2026-06-27 05:11:56 | INFO     | datasetforge.downloader | Streaming: 1,344,878 kept / 0 filtered (100.0% kept), 1230 rows/s
+2026-06-27 05:12:07 | INFO     | datasetforge.progress | Progress: 21.6 GB / 120.0 GB (18.0%) | Speed: 13.4 KB/s | ETA: 88d 20h 37m 25s
+2026-06-27 05:12:29 | INFO     | datasetforge.downloader | Streaming: 1,411,875 kept / 0 filtered (100.0% kept), 1253 rows/s
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader | Streaming: 1,441,875 kept / 0 filtered (100.0% kept), 1246 rows/s
+2026-06-27 05:13:00 | INFO     | datasetforge.sampler | Sampling complete: 1,430,000 rows, 8.0 GB
+2026-06-27 05:13:00 | INFO     | datasetforge.sampler |   Duplicates removed: 4,671
+2026-06-27 05:13:00 | INFO     | datasetforge.sampler |   Too short: 9,213
+2026-06-27 05:13:00 | INFO     | datasetforge.writer | Write complete: 1,423,618 rows, 22.4 GB, 3 shards
+2026-06-27 05:13:00 | INFO     | datasetforge.main | Completed dataset: HuggingFaceFW/finewiki:en
+2026-06-27 05:13:00 | INFO     | datasetforge.main |   Bytes written: 24,097,654,393
+2026-06-27 05:13:00 | INFO     | datasetforge.main |   Rows written: 1,423,618
+2026-06-27 05:13:00 | INFO     | datasetforge.main | Processing dataset: wikimedia/wikipedia:20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.main |   Target size: 6.0 GB
+2026-06-27 05:13:00 | INFO     | datasetforge.main |   Text column: text
+2026-06-27 05:13:00 | INFO     | datasetforge.main |   Subset: 20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.writer | Writing to: /output/wikimedia_wikipedia_20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.writer | Format: jsonl, Compression: zstd
+2026-06-27 05:13:00 | INFO     | datasetforge.writer | Shard size: 10.0 GB
+2026-06-27 05:13:00 | INFO     | datasetforge.sampler | Starting sampling: target=6.0 GB, start=0.0 B
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader | Streaming from entry: wikimedia/wikipedia:20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader |   Dataset: wikimedia/wikipedia
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader |   Subset: 20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader | Starting stream: wikimedia/wikipedia
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader |   Subset: 20231101.en
+2026-06-27 05:13:00 | INFO     | datasetforge.downloader |   Text column: text
+2026-06-27 05:13:17 | INFO     | datasetforge.progress | Progress: 5.3 KB / 120.0 GB (0.0%) | Speed: calculating... | ETA: calculating...
+2026-06-27 05:13:33 | INFO     | datasetforge.downloader | Streaming: 38,475 kept / 0 filtered (100.0% kept), 1172 rows/s
+2026-06-27 05:14:06 | INFO     | datasetforge.downloader | Streaming: 102,000 kept / 0 filtered (100.0% kept), 1559 rows/s
+2026-06-27 05:14:18 | INFO     | datasetforge.progress | Progress: 547.2 MB / 120.0 GB (0.4%) | Speed: 7.6 KB/s | ETA: 191d 11h 33m 29s
+2026-06-27 05:14:38 | INFO     | datasetforge.downloader | Streaming: 183,289 kept / 0 filtered (100.0% kept), 1876 rows/s
+2026-06-27 05:15:14 | INFO     | datasetforge.downloader | Streaming: 269,289 kept / 0 filtered (100.0% kept), 2020 rows/s
+2026-06-27 05:15:20 | INFO     | datasetforge.progress | Progress: 1.1 GB / 120.0 GB (1.0%) | Speed: 5.7 KB/s | ETA: 252d 23h 4m 30s
+2026-06-27 05:15:46 | INFO     | datasetforge.downloader | Streaming: 359,578 kept / 0 filtered (100.0% kept), 2167 rows/s
+2026-06-27 05:16:17 | INFO     | datasetforge.downloader | Streaming: 435,578 kept / 0 filtered (100.0% kept), 2219 rows/s
+2026-06-27 05:16:20 | INFO     | datasetforge.progress | Progress: 1.7 GB / 120.0 GB (1.4%) | Speed: 9.8 KB/s | ETA: 145d 17h 58m 55s
+2026-06-27 05:16:50 | INFO     | datasetforge.downloader | Streaming: 541,867 kept / 0 filtered (100.0% kept), 2361 rows/s
+2026-06-27 05:17:21 | INFO     | datasetforge.downloader | Streaming: 643,156 kept / 0 filtered (100.0% kept), 2468 rows/s
+2026-06-27 05:17:21 | INFO     | datasetforge.progress | Progress: 2.4 GB / 120.0 GB (2.0%) | Speed: 7.2 KB/s | ETA: 197d 20h 16m 13s
+2026-06-27 05:17:51 | INFO     | datasetforge.downloader | Streaming: 797,445 kept / 0 filtered (100.0% kept), 2743 rows/s
+2026-06-27 05:18:22 | INFO     | datasetforge.downloader | Streaming: 955,734 kept / 0 filtered (100.0% kept), 2977 rows/s
+2026-06-27 05:18:22 | INFO     | datasetforge.progress | Progress: 3.3 GB / 120.0 GB (2.7%) | Speed: 6.5 KB/s | ETA: 219d 11h 50m 44s
+2026-06-27 05:18:53 | INFO     | datasetforge.downloader | Streaming: 1,094,022 kept / 0 filtered (100.0% kept), 3099 rows/s
+2026-06-27 05:19:22 | INFO     | datasetforge.progress | Progress: 3.9 GB / 120.0 GB (3.3%) | Speed: 2.8 KB/s | ETA: 502d 14h 26m 45s
+2026-06-27 05:19:29 | INFO     | datasetforge.downloader | Streaming: 1,231,022 kept / 0 filtered (100.0% kept), 3169 rows/s
+2026-06-27 05:20:10 | INFO     | datasetforge.downloader | Streaming: 1,327,310 kept / 0 filtered (100.0% kept), 3088 rows/s
+2026-06-27 05:20:22 | INFO     | datasetforge.progress | Progress: 4.4 GB / 120.0 GB (3.7%) | Speed: 118.0 MB/s | ETA: 16m 42s
+2026-06-27 05:20:40 | INFO     | datasetforge.downloader | Streaming: 1,474,875 kept / 0 filtered (100.0% kept), 3207 rows/s
+2026-06-27 05:21:12 | INFO     | datasetforge.downloader | Streaming: 1,581,886 kept / 0 filtered (100.0% kept), 3217 rows/s
+2026-06-27 05:21:24 | INFO     | datasetforge.progress | Progress: 5.0 GB / 120.0 GB (4.2%) | Speed: 5.3 KB/s | ETA: 265d 8h 30m 33s
+2026-06-27 05:21:43 | INFO     | datasetforge.downloader | Streaming: 1,742,174 kept / 0 filtered (100.0% kept), 3335 rows/s
+2026-06-27 05:22:15 | INFO     | datasetforge.downloader | Streaming: 1,921,462 kept / 0 filtered (100.0% kept), 3467 rows/s
+2026-06-27 05:22:25 | INFO     | datasetforge.progress | Progress: 5.9 GB / 120.0 GB (4.9%) | Speed: 17.6 KB/s | ETA: 78d 12h 7m 2s
+2026-06-27 05:22:45 | INFO     | datasetforge.downloader | Streaming: 2,089,931 kept / 0 filtered (100.0% kept), 3577 rows/s
+2026-06-27 05:23:00 | INFO     | datasetforge.sampler | Sampling complete: 2,150,000 rows, 6.0 GB
+2026-06-27 05:23:00 | INFO     | datasetforge.sampler |   Duplicates removed: 209
+2026-06-27 05:23:00 | INFO     | datasetforge.sampler |   Too short: 8,658
+2026-06-27 05:23:00 | INFO     | datasetforge.writer | Write complete: 2,146,762 rows, 6.3 GB, 1 shards
+2026-06-27 05:23:00 | INFO     | datasetforge.main | Completed dataset: wikimedia/wikipedia:20231101.en
+2026-06-27 05:23:00 | INFO     | datasetforge.main |   Bytes written: 6,793,202,253
+2026-06-27 05:23:00 | INFO     | datasetforge.main |   Rows written: 2,146,762
+2026-06-27 05:23:00 | INFO     | datasetforge.main | Phase 3: Verifying output...
+2026-06-27 05:23:00 | INFO     | datasetforge.main | Generating checksums...
+2026-06-27 05:23:00 | INFO     | datasetforge.utils.checksums | Generating checksums for 20 files...
+2026-06-27 05:24:58 | INFO     | datasetforge.utils.checksums | Generated 20 checksums
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Generated checksums for 20 files
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Content produced (uncompressed): 166,331,712,955 bytes
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Target (uncompressed): 128,849,018,880 bytes
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Coverage: 129.1%
+2026-06-27 05:24:58 | INFO     | datasetforge.main | On-disk size: 46,746,178,362 bytes
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Compression: zstd (3.6x smaller on disk)
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Phase 4: Generating manifest...
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Manifest written to: /output/manifest.json
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Build completed successfully!
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Total bytes written: 166,331,712,955
+2026-06-27 05:24:58 | INFO     | datasetforge.main | Total rows written: 21,772,575
+2026-06-27 05:24:58 | INFO     | datasetforge.cli | Build completed successfully
+2026-06-27 15:54:49 | ERROR    | datasetforge.downloader | Failed to load dataset: Cannot send a request, as the client has been closed.
+2026-06-27 15:54:49 | ERROR    | datasetforge.main | Failed to process dataset bigcode/the-stack:Python: Cannot send a request, as the client has been closed.
+Traceback (most recent call last):
+  File "/app/datasetforge/main.py", line 479, in _run_build_phase
+    bytes_written, rows_written = writer.write(
+                                  ^^^^^^^^^^^^^
+  File "/app/datasetforge/writer.py", line 233, in write
+    self._write_jsonl(data_stream, output_dir, dataset_entry, progress_callback)
+  File "/app/datasetforge/writer.py", line 329, in _write_jsonl
+    for row in data_stream:
+  File "/app/datasetforge/sampler.py", line 371, in sample
+    yield from self._sample_with_shuffle(
+  File "/app/datasetforge/sampler.py", line 526, in _sample_with_shuffle
+    for row in data_stream:
+  File "/app/datasetforge/downloader.py", line 411, in stream_from_entry
+    yield from self.stream(
+  File "/app/datasetforge/downloader.py", line 338, in stream
+    for row in self._iterate_with_filter(dataset, filter_config, text_column):
+  File "/app/datasetforge/downloader.py", line 528, in _iterate_with_filter
+    for row in dataset_iter:
+  File "/opt/venv/lib/python3.11/site-packages/datasets/iterable_dataset.py", line 2815, in __iter__
+    for key, example in ex_iterable:
+  File "/opt/venv/lib/python3.11/site-packages/datasets/iterable_dataset.py", line 2352, in __iter__
+    for key, pa_table in self._iter_arrow():
+  File "/opt/venv/lib/python3.11/site-packages/datasets/iterable_dataset.py", line 2377, in _iter_arrow
+    for key, pa_table in self.ex_iterable._iter_arrow():
+  File "/opt/venv/lib/python3.11/site-packages/datasets/iterable_dataset.py", line 536, in _iter_arrow
+    for key, pa_table in iterator:
+  File "/opt/venv/lib/python3.11/site-packages/datasets/iterable_dataset.py", line 419, in _iter_arrow
+    for key, pa_table in self.generate_tables_fn(**gen_kwags):
+  File "/opt/venv/lib/python3.11/site-packages/datasets/packaged_modules/parquet/parquet.py", line 207, in _generate_tables
+    for batch_idx, record_batch in enumerate(
+  File "pyarrow/_dataset.pyx", line 3934, in _iterator
+  File "pyarrow/_dataset.pyx", line 3524, in pyarrow._dataset.TaggedRecordBatchIterator.__next__
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 89, in pyarrow.lib.check_status
+  File "/opt/venv/lib/python3.11/site-packages/datasets/utils/file_utils.py", line 844, in read_with_retries
+    out = read(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/huggingface_hub/hf_file_system.py", line 1238, in read
+    return super().read(length)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/fsspec/spec.py", line 2125, in read
+    out = self.cache._fetch(self.loc, self.loc + length)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/fsspec/caching.py", line 279, in _fetch
+    self.cache = self.fetcher(start, end)  # new block replaces old
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/huggingface_hub/hf_file_system.py", line 1194, in _fetch_range
+    r = http_backoff("GET", url, headers=headers, timeout=constants.HF_HUB_DOWNLOAD_TIMEOUT)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 570, in http_backoff
+    return next(
+           ^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 478, in _http_backoff_base
+    response = client.request(method=method, url=url, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.11/site-packages/httpx/_client.py", line 901, in send
+    raise RuntimeError("Cannot send a request, as the client has been closed.")
+RuntimeError: Cannot send a request, as the client has been closed.
+2026-06-27 15:54:52 | WARNING  | datasetforge.main | Interrupt detected, stopping build
+2026-06-27 15:54:52 | ERROR    | datasetforge.cli | Build failed

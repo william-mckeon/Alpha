@@ -1,0 +1,30 @@
+Arcus
+Copyright 2026 William McKeon
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+================================================================================
+Provenance
+================================================================================
+
+Arcus is an **original, from-scratch** Mixture-of-Depths-and-Experts (MoDE)
+foundation model. Its architecture, weights, and tokenizer choice are not derived
+from any other model's weights:
+
+  - The MoDE mechanism (Mixture-of-Depths + Mixture-of-Experts) is an independent
+    implementation, built on top of the BoeNet research project (the author's own).
+  - The tokenizer is OpenAI's `tiktoken` `o200k_base` encoding (used as a library;
+    Arcus ships no model weights from any third party).
+
+================================================================================
+Archived code (legacy/)
+================================================================================
+
+The `legacy/` directory contains an earlier, archived line of work that WRAPPED
+HuggingFace's Qwen3 models (a Mixture-of-Depths router around a pretrained MoE).
+That code is a Derivative Work of Qwen3 (Apache 2.0, Copyright the Qwen team /
+Alibaba Cloud) and retains that attribution. It is not part of the from-scratch
+Arcus foundation model and ships no Qwen weights.
+
+"Qwen" is a trademark of its respective owner. Arcus is not endorsed by or
+affiliated with the Qwen team or Alibaba Cloud.
