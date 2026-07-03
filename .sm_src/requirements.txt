@@ -1,0 +1,19 @@
+# Extra deps for the SageMaker PyTorch container (Script Mode).
+#
+# The SageMaker PyTorch DLC already ships torch + numpy (matched to its CUDA), so we DO NOT
+# list them here — pinning torch would fight the container's build. Only the lightweight
+# Arcus-specific deps go here; SageMaker pip-installs this file into the training container.
+tiktoken>=0.7.0
+zstandard>=0.22.0
+huggingface_hub>=0.20
+safetensors>=0.4.0
+tqdm>=4.65
+
+# --- footprint levers (specs/0007), L40S/Ada only; harmless if a lever is left off ---
+# 8-bit AdamW optimizer states (~7 GB less VRAM). Supported on Ada sm_89; do NOT put on the
+# 5080/Blackwell base install (flagged fragile on sm_120).
+bitsandbytes>=0.43.0
+# Fused linear+cross-entropy (Triton). Optional — arcus/loss.py falls back to a pure-torch
+# chunked path if absent, so leave commented unless it installs cleanly on the container:
+# cut-cross-entropy
+# liger-kernel

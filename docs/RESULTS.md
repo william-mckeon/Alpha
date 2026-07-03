@@ -48,6 +48,21 @@ capacity 0.25 · multi-epoch / multi-seed.
 
 ---
 
+## Stage 0 — 0.5B fluency run (pending)
+
+The first run whose bar is **"can it talk?"**, not just "does the harness work?" Pretrain
+`0.5b` (4×2560 ≈614M, o200k) streaming on the 5080 — the largest rung that fits 16 GB with no
+spill — over a real, ~1-pass token budget, then read samples from `scripts/sample_arcus.py`.
+See [specs/0008](../specs/0008-fluency-pretraining.md).
+
+To be logged here once run: the training command, the `val_ppl` trend (must keep falling to the
+end — improving, not memorizing), and **verbatim sampled generations** at a few prompts (the
+qualitative fluency verdict — coherent/on-domain vs. gibberish), plus the HF artifact
+(`Islanderintel/arcus-alpha-0.5b`) and its upload→download→sample round-trip. Honest read in the
+R1 style: fluency is "it can talk," not a quality claim.
+
+---
+
 ## Scale-bench runs (0.9b / 1b) — in progress
 
 The grow-params bench rungs (`0.9b` 8×2560 ≈889M, `1b` 10×2560 ≈1078M, 128k context) build

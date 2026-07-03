@@ -23,7 +23,7 @@ corpus that exists now. Arcus runs that experiment: **does the thesis hold on re
 
 | Part | Choice | Why |
 |---|---|---|
-| Tokenizer | tiktoken **`cl100k_base`** (tied embeddings) | boenet's BPE; ~half o200k's embedding/logits cost at the efficient scale Arcus targets (o200k stays available for scale-up) |
+| Tokenizer | tiktoken **`o200k_base`** (tied embeddings) | latest tiktoken; shares the gpt-oss-120b teacher's text vocab → unlocks **logit-KL** distillation (not just response-based); `cl100k_base` (~half the embedding/logits cost) stays for small bench runs |
 | Norm | **RMSNorm** | modern standard, cheaper |
 | Positions | **RoPE** | extrapolates; no learned-position cap |
 | Attention | **GQA + QK-norm**, dense | small KV cache at scale; attention never routed, so RoPE/GQA untouched by MoD |

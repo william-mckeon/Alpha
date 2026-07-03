@@ -19,7 +19,7 @@ Arcus is an original, **from-scratch** MoDE language model:
 
 The mechanism comes from the **BoeNet** research project (validated at toy scale: MoDE
 *matches* dense quality at ~half the per-token compute). Arcus modernizes the substrate
-(**RoPE · RMSNorm · GQA+QK-norm · SwiGLU**), tokenizes with tiktoken **`cl100k_base`**,
+(**RoPE · RMSNorm · GQA+QK-norm · SwiGLU**), tokenizes with tiktoken **`o200k_base`**,
 and chases boenet's *efficiency* thesis — foundation-model quality at a fraction of the
 dense compute, on accessible hardware. It trains from scratch on the
 **alpha dataset** (a ~120 GB STEM/code corpus).
@@ -44,7 +44,7 @@ pure MoE). Full design: [docs/ARCUS_MODEL_DESIGN.md](docs/ARCUS_MODEL_DESIGN.md)
 
 ```
 arcus/
-  tokenizer.py     tiktoken cl100k_base (default; o200k optional)
+  tokenizer.py     tiktoken o200k_base (default; cl100k optional for small runs)
   backbone.py      RoPE / RMSNorm / GQA+QK-norm / SwiGLU (dense attention)
   moe.py           the E — top-1, grow-params (4→8→10 experts), batched bmm dispatch, Switch lb-loss
   mod_core.py      the D — fixed-K causal selection + straight-through gate

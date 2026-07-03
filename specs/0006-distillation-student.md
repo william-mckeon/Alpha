@@ -32,13 +32,14 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
   agentic-coding trajectories; Arcus learns from them. The teacher is never a weight donor
   or a seed — different architecture and tokenizer. Arcus's value is sovereignty; the
   teacher's value is its *outputs*.
-- **Response-based distillation only.** Arcus is `cl100k_base`; gpt-oss is `o200k`/harmony.
-  Mismatched vocabularies mean Arcus can take **sequence-level (text) SFT** on the teacher's
-  trajectories but **not logit-KL** (soft labels need aligned tokenizers — reserved in the
-  openagent-code plan for the same-family Tier 1, gpt-oss-20b).
+- **Distillation: response-based now, logit-KL on the table.** Arcus uses `o200k_base`, which
+  shares the text vocabulary of the teacher's `o200k_harmony` — so beyond sequence-level (text)
+  SFT, **logit-KL (soft-label) distillation is feasible** over the shared token space (the
+  harmony *chat* special tokens differ, but base-LM soft labels over text align). That tokenizer
+  match is the whole reason Arcus moved off cl100k, which would have been response-only.
 - **Tool-calling is a learned SFT skill.** The captured trajectories are the curriculum;
   `CODE_TOOL_MODE=json` is the no-native fallback. Arcus needs a chat template (reserved
-  role / tool-call special tokens — `cl100k` ships none) before SFT can render rows.
+  role / tool-call special tokens — `o200k_base` ships none) before SFT can render rows.
 - **The sequencing is fixed: pretrain to fluency → *then* distil.** SFT shapes a fluent
   model's behavior; it cannot conjure language from a base that has only seen tens of
   millions of tokens. Distillation is finishing school, not language acquisition.
@@ -47,7 +48,7 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
 
 - [ ] Arcus pretrained to **fluency** (coherent generation, not gibberish) — the
       prerequisite for any SFT. See [0005-scale-and-training.md](0005-scale-and-training.md).
-- [ ] A **chat template** + reserved role/tool special tokens defined for `cl100k`.
+- [ ] A **chat template** + reserved role/tool special tokens defined for `o200k`.
 - [ ] A **vLLM serving shim** registers `ArcusMoDE` (a custom architecture vLLM does not
       know), or the transformers-fallback server path is used with `CODE_TOOL_MODE=json`.
 - [ ] Arcus loads behind openagent-code's `CODE_API_BASE` and answers a tool-call probe.
@@ -57,12 +58,17 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
 
 ## Non-goals (this pass)
 
-- **Logit-KL (soft-label) distillation** — needs a shared tokenizer with the teacher;
-  out of reach for `cl100k` Arcus.
+- **Logit-KL (soft-label) distillation now, before response-based SFT is proven** — the
+  `o200k_base` match makes it *feasible* (no longer out of reach), but it's deferred: prove
+  response-based SFT first, and logit-KL additionally needs the teacher's per-token logprobs
+  exposed by the serving path (Bedrock/vLLM top-k logprobs).
 - **Beating the teacher** — distillation caps the student at the teacher on the captured
   distribution; surpassing gpt-oss-120b needs RL (openagent-code's later rung), not SFT.
 - **The harness itself** — tools, capture, eval, serving live in the openagent-code repo;
   Arcus does not reimplement them. This spec documents the *contract*, not the body.
+- **Serving-weight quantization** — once the vLLM/ArcusMoDE shim exists, fp8/int8 weight-only
+  quantization of the experts (~half the served weights again, near-lossless, eval-gated) is a
+  serving-footprint option detailed in [0007-footprint-reduction.md](0007-footprint-reduction.md).
 - **A from-scratch student that competes today** — the openagent-code spec's own estimate
   is ~25–30B tokens for a usable from-scratch ~1.3B model; the current local runs are
   validation, far short of that bar.

@@ -15,6 +15,8 @@ def test_public_api_imports():
         get_config,
         get_tokenizer,
         pack_kept,
+        generate,
+        load_model,
     )
 
     assert arcus.__version__

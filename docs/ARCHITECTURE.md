@@ -1,7 +1,7 @@
 # Arcus Alpha — Architecture
 
 > The from-scratch MoDE foundation model — built on top of boenet, tokenized with
-> tiktoken `cl100k_base`, designed for **efficiency** (foundation-quality per unit of
+> tiktoken `o200k_base`, designed for **efficiency** (foundation-quality per unit of
 > compute). Full rationale + ladder in [ARCUS_MODEL_DESIGN.md](ARCUS_MODEL_DESIGN.md);
 > this is the structural map.
 

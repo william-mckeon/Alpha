@@ -22,6 +22,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Footprint levers (specs/0007) for the cloud L40S run: 8-bit AdamW (+ optional fused-CE kernel).
+# Deliberately NOT in base — bitsandbytes/triton are patchy on the 5080/Blackwell (sm_120).
+# Install only on the L40S:  pip install -e ".[cloud]"
+cloud = [
+    "bitsandbytes>=0.43.0",
+    # "cut-cross-entropy",   # optional fused linear-CE kernel; arcus/loss.py has a torch fallback
+]
+# Laptop-side tools to SUBMIT the SageMaker training job (launch.py). Pin the SDK to v2 — v3
+# is a rewrite that restructured `sagemaker.pytorch.PyTorch` (the Estimator API launch.py uses)
+# away. Install alongside the AWS CLI v2 (installed separately via the MSI):
+#   pip install -e ".[launch]"
+launch = [
+    "sagemaker>=2.200,<3",
+    "boto3>=1.34.0",
+]
 # The archived Qwen-wrapper path under legacy/.
 legacy = [
     "transformers>=5.0.0",

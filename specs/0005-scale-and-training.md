@@ -37,6 +37,13 @@ same code runs unchanged on cloud GPUs.
   fatal.
 - **`scripts/memcheck.py`.** Prints the VRAM breakdown (weights / AdamW states / transient)
   with MoD active, so fit-vs-spill is settled by measurement, not arithmetic.
+- **Streaming loader + spot-safe cloud path.** `arcus/data.py: stream_token_batches` yields
+  batches without holding the corpus in RAM (the in-memory `packed_batches` caps at the few-
+  billion tokens that fit memory); `train_streaming` drives by a TOKEN budget, not epochs.
+  `arcus/checkpoint.py` saves/loads the **full training state** (model + optimizer + scheduler +
+  step + RNG) so a reclaimed spot instance resumes instead of restarting. `launch.py` submits it
+  to SageMaker as a managed-spot job (Script Mode, no Docker) with `HF_TOKEN` forwarded from the
+  shell and checkpoints synced to S3. See [docs/TRAINING.md](../docs/TRAINING.md).
 
 ## Acceptance (checkable)
 
@@ -47,7 +54,9 @@ same code runs unchanged on cloud GPUs.
 - [x] `memcheck.py --preset 1b` reports the breakdown and a fit/spill verdict.
 - [x] The trainer writes `epochs.csv`, shows a progress bar, and uploads to HF per epoch and
       every `--save_every_steps` steps.
-- [ ] A real multi-epoch run reaches a logged `val_ppl` (in progress; results → RESULTS.md).
+- [x] `--stream` trains from the shards without an in-RAM cap; `--resume` restores the full
+      training state into a fresh process (model + optimizer moments + step) — spot-rehearsal verified.
+- [ ] A real cloud run reaches a logged `val_ppl` (the SageMaker seed; results → RESULTS.md).
 
 ## Non-goals (this pass)
 
@@ -56,8 +65,8 @@ same code runs unchanged on cloud GPUs.
 - **Fitting a 1B fp32 model in 16 GB** — it cannot (see Notes). Spilling to shared RAM is
   accepted on the laptop bench; the real pretraining is cloud.
 - **Quality verdicts** — this is the trainer and the sizes, not the thesis. See RESULTS.md.
-- **Distributed / streaming-loader cloud stack** — the scale-up engineering, unchanged in
-  architecture (ROADMAP).
+- **Distributed (multi-GPU / FSDP) training** — the seed run is single-GPU; FSDP is the
+  alpha-0.5 / 3B-plus rung (ROADMAP). The streaming loader + spot path *are* built (above).
 
 ## Notes
 
@@ -71,4 +80,6 @@ same code runs unchanged on cloud GPUs.
   "learn its way down" over training.
 - **Cheapest fit.** fp32 1B needs >16 GB; either a ≥24 GB GPU (cloud) or a leaner optimizer
   (8-bit Adam — fragile on Blackwell). Batch size barely moves it; the fp32 AdamW states are
-  the bottleneck.
+  the bottleneck. The leaner-optimizer + fused-CE + bf16 footprint levers are built and
+  flag-gated in [0007-footprint-reduction.md](0007-footprint-reduction.md) — 8-bit AdamW drops
+  the 1B onto a 24 GB card on the L40S.

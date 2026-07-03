@@ -40,7 +40,7 @@ def main() -> int:
         return 1
     dev = "cuda"
 
-    tok = get_tokenizer("cl100k_base")
+    tok = get_tokenizer("o200k_base")
     cfg = get_config(a.preset, vocab_size=tok.vocab_size)
     model = ArcusMoDE(cfg).to(dev)
     model.gradient_checkpointing = True
@@ -79,6 +79,11 @@ def main() -> int:
     verdict = "FITS in VRAM" if gb(peak) <= a.vram_gb else \
         f"OVER {a.vram_gb:.0f} GB by {over:.1f} GB -> spills to shared system RAM (slow)"
     print(f"  = PEAK                         : {gb(peak):6.2f} GB / {a.vram_gb:.0f}   ->  {verdict}")
+    # projection: 8-bit AdamW (specs/0007) quantizes the m+v states ~4x (L40S; fp32 params kept)
+    adamw_gb = gb(static - w0)
+    proj_peak = gb(peak) - adamw_gb * 0.75
+    print(f"  ~ with --optimizer adamw8bit   : AdamW {adamw_gb:5.2f} -> ~{adamw_gb / 4:4.2f} GB, "
+          f"projected peak ~{proj_peak:5.2f} GB (L40S)")
     return 0
 
 

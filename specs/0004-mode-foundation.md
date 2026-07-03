@@ -13,7 +13,7 @@ CPU and is the test gate; `alpha-0.1`+ are cloud.
 
 ## Concepts
 
-- **`arcus/tokenizer.py`** — tiktoken `cl100k_base` (default); tied embeddings.
+- **`arcus/tokenizer.py`** — tiktoken `o200k_base` (default; cl100k optional); tied embeddings.
 - **`arcus/backbone.py`** — RMSNorm, RoPE, GQA(+QK-norm), SwiGLU; dense attention.
 - **`arcus/moe.py`** — top-1, grow-params (4→8→10 experts, batched `bmm` dispatch), causal overflow, Switch lb-loss.
 - **`arcus/model.py`** — assembles MoDE; `last_aux_loss`, `last_compute_fraction`.
