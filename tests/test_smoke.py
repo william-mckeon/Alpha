@@ -17,6 +17,7 @@ def test_public_api_imports():
         pack_kept,
         generate,
         load_model,
+        grow_experts,
     )
 
     assert arcus.__version__

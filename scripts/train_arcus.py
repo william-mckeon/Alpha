@@ -27,7 +27,7 @@ from arcus.tokenizer import get_tokenizer
 from arcus.model_config import get_config, PRESETS
 from arcus.model import ArcusMoDE
 from arcus.config import TrainConfig
-from arcus.data import packed_batches, stream_token_batches
+from arcus.data import packed_batches, stream_token_batches, build_val_set
 from arcus.train import train_end_to_end, train_streaming
 
 
@@ -37,6 +37,9 @@ def main() -> int:
     ap.add_argument("--shards", default="./alpha dataset", help="root of the *.jsonl.zst shards")
     ap.add_argument("--encoding", default="o200k_base", help="o200k_base (default; teacher-aligned) or cl100k_base")
     ap.add_argument("--seq_len", type=int, default=512)
+    ap.add_argument("--val_docs", type=int, default=64,
+                    help="held-out val docs PER SHARD (build_val_set); the stream skips these so "
+                         "val is diverse (all domains) + never leaks into training")
     ap.add_argument("--max_seq_len", type=int, default=None,
                     help="model context window / RoPE cache size; independent of --seq_len "
                          "(the training length). e.g. 131072 to declare GPT-OSS-120B's 128k context")
@@ -59,6 +62,10 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--dense", action="store_true",
                     help="matched dense baseline: n_experts=1, capacity=1.0 (MoE+MoD off)")
+    ap.add_argument("--init_from", default=None,
+                    help="warm-start from a GROWN checkpoint dir (config.json + model.safetensors) "
+                         "instead of a fresh preset init — the growth ladder (specs/0010). Builds the "
+                         "model from that checkpoint's config (its n_experts etc.); fresh optimizer.")
     ap.add_argument("--run_name", default=None, help="runs/<run_name>/ for epoch log + checkpoint")
     ap.add_argument("--grad_accum", type=int, default=1, help="micro-batches per optimizer step")
     ap.add_argument("--hf_repo", default=None, help="HF repo id to upload each epoch (backup/serving)")
@@ -121,8 +128,13 @@ def main() -> int:
         overrides["lb_loss_weight"] = args.lb_loss_weight
     if args.dense:
         overrides.update(n_experts=1, capacity=1.0)
-    cfg = get_config(args.preset, vocab_size=tok.vocab_size, **overrides)
-    model = ArcusMoDE(cfg)
+    if args.init_from:
+        from arcus.generate import load_model
+        model, _, cfg = load_model(args.init_from, device="cpu", dtype=torch.float32)
+        print(f"[init_from] warm-started from {args.init_from} (grown checkpoint) | experts={cfg.n_experts}")
+    else:
+        cfg = get_config(args.preset, vocab_size=tok.vocab_size, **overrides)
+        model = ArcusMoDE(cfg)
     kind = "dense baseline" if args.dense else "MoDE"
     print(f"[model] {args.preset} {kind} | params={model.num_parameters()/1e6:.1f}M | "
           f"vocab={cfg.vocab_size} dim={cfg.dim} layers={cfg.n_layers} experts={cfg.n_experts} "
@@ -154,11 +166,14 @@ def main() -> int:
         print(f"[stream] {shards} | total_steps={total_steps:,} (~{args.max_tokens:,} tokens) "
               f"warmup={warmup_steps} save_every={save_every} resume={resume_on}")
         print(f"[run] {run_dir} | ckpt_dir {ckpt_dir}" + (f" | hf {args.hf_repo}" if args.hf_repo else ""))
-        # a small in-memory val slice for the ppl health signal (rough — not a clean held-out set)
-        _, val_b = packed_batches(shards, tok, seq_len=args.seq_len,
-                                  batch_size=args.batch_size, max_tokens=2_000_000)
+        # DIVERSE, HELD-OUT val set (spans all domains) + the stream skips exactly those docs, so
+        # val_ppl is a real convergence signal and never leaks into training (shards are one-domain-
+        # per-folder, so the old first-2M-tokens val slice was a single domain — see docs/RESULTS.md).
+        val_b = build_val_set(shards, tok, seq_len=args.seq_len,
+                              batch_size=args.batch_size, val_docs_per_shard=args.val_docs)
         stream = stream_token_batches(shards, tok, seq_len=args.seq_len,
-                                      batch_size=args.batch_size, seed=args.seed)
+                                      batch_size=args.batch_size, seed=args.seed,
+                                      val_docs_per_shard=args.val_docs)
         history = train_streaming(model, tcfg, stream, val_b, total_steps, device=device,
                                   log_path=log_path, save_dir=save_dir, ckpt_dir=ckpt_dir,
                                   hf_repo=args.hf_repo, encoding=args.encoding, resume=resume_on)

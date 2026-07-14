@@ -3,7 +3,8 @@
 > Give Arcus a chat/tool *format* so it can be SFT'd on openagent-code's agent trajectories and,
 > later, serve tool-calls behind `CODE_API_BASE`. `o200k_base` ships only `endoftext` — no role
 > or tool tokens — so this is the first thing Stage 2 ([0009](0009-self-improving-loop.md)) needs.
-> Contract only; not built yet.
+> Contract only; not built yet. **Private** (Arcus Code); it trains on trajectories from the
+> **public** harness across the [0012](0012-arcus-code-boundary.md) boundary.
 
 ## Goal
 
@@ -31,11 +32,13 @@ the substrate SFT and serving both stand on.
   Stage 0 is already in flight, **(b) is the plan for this cycle** — and it is literally a
   row-append growth, so it **reuses the growth operator** ([0010](0010-growth-operator.md)).
   Reserve-at-pretraining becomes the default on any future restart.
-- **The chat template.** A renderer: `messages [{role, content, tool_calls?}] + tools → (token
-  ids, loss_mask)`, where prompt tokens are masked (`-100`) and only the assistant/tool-call
-  completion carries loss — the completion-only SFT that `train.py:_micro_loss` does **not** do
-  today (the masked-SFT gap, [0009](0009-self-improving-loop.md) Stage 2). It must consume exactly
-  what openagent-code's `convert.py:to_rows` emits (`{messages, completion, tools}`).
+- **The chat template.** A renderer: Responses-API-style items → `(token ids, loss_mask)`, where
+  prompt tokens are masked (`-100`) and only the assistant items (`function_call` / `custom_tool_call`
+  / message / reasoning) carry loss — the completion-only SFT that `train.py:_micro_loss` does **not**
+  do today (the masked-SFT gap, [0009](0009-self-improving-loop.md) Stage 2). The **tool format is
+  Codex's** (`function_call` {name, JSON-string args, call_id}, `custom_tool_call` {name, raw input},
+  `apply_patch` grammar; [0013](0013-agent-tooling.md)), and the SFT source is **rollout JSONL** — not
+  openagent-code's old `{messages, completion, tools}` shape.
 - **Tool protocol: JSON first, native later.** openagent-code supports `CODE_TOOL_MODE=json`
   (tool calls as JSON in the assistant text — *no* special parser) and `native` (server parses
   structured tool_calls). **JSON mode needs no tool-call tokens** and is the minimal first target;

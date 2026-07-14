@@ -1,9 +1,10 @@
 # The growth operator (Stage 1) — grow a trained checkpoint into a bigger one
 
 > The keystone of the ladder ([0009](0009-self-improving-loop.md)): take a trained smaller
-> Arcus and produce a larger one that computes the **same function at the instant it grows**,
-> then keep training. The first and cleanest dial is **adding experts** — incrementally, a few
-> per revision. This spec is the contract for that operator; it is not built yet.
+> Arcus and produce a larger one that computes **nearly the same function at the instant it
+> grows** (near-lossless — see the recipe), then keep training. The first and cleanest dial is
+> **adding experts** — incrementally, a few per revision. **Built** (`arcus/grow.py`); **private**
+> — Arcus Code ([0012](0012-arcus-code-boundary.md)).
 
 ## Goal
 
@@ -22,19 +23,25 @@ are named here but deferred (harder; see Non-goals).
   (top-1: still one expert per token); (2) **dim** — wider hidden state; (3) **depth** — more
   MoDE blocks. Under top-1 routing, experts are the cheapest dial to grow and the cleanest to do
   losslessly, so they come first.
-- **Lossless@grow.** Immediately after growing, before any training, `model'(x) == model(x)`.
-  This is the property that makes growth safe: no loss spike, no relearning what it knew. It is
-  the growth analogue of the model's existing `lossless@cap=1.0` gate.
-- **The expert-addition recipe (top-1, provably lossless).** The MoE is `moe.py:BatchedExperts`
+- **Near-lossless@grow.** Immediately after growing, before any training, `model'(x) ≈ model(x)`
+  to ~`exp(-dormant_margin)` (bit-identical at high margin). This is what makes growth safe: no
+  loss spike, no relearning what it knew. *Exact* bit-identity would force a **dead** expert (see
+  the recipe), so near-lossless is the honest, trainable version.
+- **The expert-addition recipe (top-1, near-lossless).** The MoE is `moe.py:BatchedExperts`
   — stacked expert weights `gate_proj/up_proj/down_proj` of shape `[E, …]` — plus a router
-  `Linear(dim, E)`. To add expert `E→E+1`: **append expert `e' = an exact copy of an existing
-  expert `i`** (copy its three weight slices), and **append router row `w_e' = copy of `w_i``.
-  Then `e'` and `i` compute the *same function*, so the MoE output is **invariant to which twin
-  top-1 selects** — output is bit-identical regardless of argmax tie-breaking. Training + the
-  Switch load-balance loss (`moe.py:135`) then push the twins apart so `e'` earns its own tokens.
+  `Linear(dim, E, bias=True)`. To add expert `E→E+1`: **append `e' = a warm COPY of an existing
+  expert `i`** (its three weight slices), **copy `i`'s router row**, and **lower `e'`'s router
+  bias by a `dormant_margin`** so `e'`'s logit sits a margin below `i`'s for every token. At init
+  `e'` is *dormant* — never the argmax (a full margin under `i`) and contributing only
+  ~`exp(-margin)` to the softmax denominator — so the output matches the original to that
+  tolerance, yet `e'` still *tracks* `i` (same router direction) so training + the Switch
+  load-balance loss (`moe.py:135`) differentiate it. **Near-lossless, not bit-identical:** the
+  gate is a softmax over ALL experts, so any *active* added expert inflates the denominator and
+  shrinks the source's probability — there is no exactly-lossless *active* grow under top-1. High
+  margin ≈ bit-identical (dormant); low margin differentiates faster at a small, recovered bump.
 - **Splitting a hot expert (variant).** Instead of copying an arbitrary expert, copy the one the
   load-balance stats show is *overloaded*, and perturb the copy slightly — targets new capacity
-  where routing says it's needed, and breaks the twin symmetry faster. Still lossless (a small
+  where routing says it's needed, and breaks the twin symmetry faster. Still near-lossless (a small
   perturbation ≈ copy at init; or apply the perturbation as the first training step).
 - **Incremental, per-revision.** The operator adds `+k` experts (k small, often 1) so the loop
   grows capacity in small, individually-validated steps (4→5→6→…) — less inherited-basin shock
@@ -46,26 +53,27 @@ are named here but deferred (harder; see Non-goals).
 
 ## Interface (contract, not code)
 
-- `arcus/grow.py` — pure checkpoint→checkpoint transforms: `grow_experts(state_dict, cfg, add=1,
-  source=…) -> (state_dict', cfg')`, where a fresh `ArcusMoDE(cfg')` loads `state_dict'` with no
-  shape error. Mirrors `hf_upload`/`checkpoint` formats so the output is a normal checkpoint dir.
-- A driver path — a `--init_from <ckpt>` (grow-then-continue) flag on `train_arcus.py`, or a
-  standalone `scripts/grow_arcus.py` that writes the grown checkpoint for `--init_from`/`--resume`.
-- Optimizer growth — a companion transform for the AdamW state (carry old, seed new from source).
+- `arcus/grow.py` **(built)** — `grow_experts(state_dict, cfg, add=1, source="roundrobin",
+  dormant_margin=8.0) -> (state_dict', cfg')`; a fresh `ArcusMoDE(cfg')` loads `state_dict'` with
+  no shape error. Public API (`arcus.grow_experts`).
+- `scripts/grow_arcus.py` **(built)** — CLI: read a checkpoint, grow (`--to_experts` / `--add`),
+  write a grown checkpoint dir. `train_arcus.py --init_from <dir>` **(built)** warm-starts from it
+  (builds the model from the grown `config.json`; fresh optimizer).
+- Optimizer-moment carry — a *follow-up* (skip the re-warmup); the first build uses a fresh optimizer.
 
 ## Acceptance (checkable)
 
-- [ ] `grow_experts` on a trained `(state_dict, cfg)` returns `(state_dict', cfg')` with
-      `n_experts + k`; a fresh `ArcusMoDE(cfg')` loads it with zero missing/unexpected keys.
-- [ ] **Lossless@grow:** for random `x`, `grown(x)` equals `original(x)` to fp tolerance
-      *before any training* (the copied-expert invariance). A `tests/test_grow.py` asserts this
-      + shape-correctness on the `tiny` preset.
-- [ ] Growing `+1` expert works and is the default granularity (supports per-revision growth).
-- [ ] A grown `0.5b`(4)→`0.9b`(8), continued-trained, reaches within a **measured, small**
-      `val_ppl` gap of a from-scratch `0.9b` — the calibration that validates the operator while
-      a from-scratch control is still affordable ([0009](0009-self-improving-loop.md) Stage 1).
-- [ ] Optimizer moments carry: old params keep `m`/`v`; copied params inherit the source's; the
-      grown model resumes without a loss spike.
+- [x] `grow_experts` on a trained `(state_dict, cfg)` returns `(state_dict', cfg')` with
+      `n_experts + k`; a fresh `ArcusMoDE(cfg')` loads it with zero unexpected keys (`arcus/grow.py`).
+- [x] **Near-lossless@grow:** for random `x`, `grown(x)` ≈ `original(x)` to fp tolerance at high
+      margin *before any training*. `tests/test_grow.py` asserts it + shape-correctness on `tiny`.
+- [x] Growing `+1` works (per-revision default); `+6` (`0.5b` 4→`1b` 10) verified end-to-end via
+      `scripts/grow_arcus.py`.
+- [ ] A grown `0.5b`(4)→`1b`(10), continued-trained (`train_arcus.py --init_from`), reaches within
+      a **measured, small** `val_ppl` gap of the from-scratch `1b` (already training) — the
+      calibration; waits on the 0.5B finishing ([0009](0009-self-improving-loop.md) Stage 1).
+- [ ] Optimizer moments carry (skip the re-warmup) — a follow-up; the first build uses a fresh
+      optimizer on the warm weights.
 
 ## Non-goals (this pass)
 
@@ -84,9 +92,11 @@ are named here but deferred (harder; see Non-goals).
   weight + fp32 optimizer state; that is exactly what takes the 4-expert 0.5B (fits 16 GB) to the
   10-expert 1B (spills). So local growth has a ceiling of a few experts past 0.5B; beyond that is
   cloud. Growth is *sparse compute, dense storage* — the ceiling is param count, as ever.
-- **Losslessness does not depend on argmax tie-breaking** — the twins compute identically, so the
-  MoE output is the same whichever wins. This is why copy-init is robust where softmax-mixing
-  tricks (net2net for top-k) do not apply under hard top-1.
+- **Why not bit-identical (the honest catch).** A warm copy computes the same *function*, but the
+  gate is a *softmax over all experts* — adding an expert inflates the denominator and shrinks the
+  source's probability, so the output shifts. The dormant margin makes that shift ~`exp(-margin)`
+  (negligible at high margin); it cannot be exactly zero for an *active* expert under top-1
+  (net2net's softmax-mixing tricks don't apply to hard top-1 either). So: near-lossless, recovered.
 - **Experts are not the only dial forever.** On a fixed 1024-dim/12-layer backbone, piling on
   experts eventually gives a lopsided model (huge FFN capacity, unchanged attention/reasoning
   depth). Past the expert-growth rungs, the ladder also grows `dim`/layers (the `alpha-*` rungs).

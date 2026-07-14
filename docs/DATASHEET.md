@@ -19,7 +19,7 @@
 | Context | `max_seq_len` (RoPE cache) decoupled from the training `seq_len`; up to **131072** (GPT-OSS-120B parity) |
 | Lossless | `capacity = 1.0` ⇒ pure MoE (MoD is a no-op) |
 | Training | end-to-end (no freeze); fp32 master + bf16 AMP + grad-checkpoint/accum; per-epoch + mid-run HF checkpoint. Matched dense baseline via `--dense` |
-| Presets | `tiny` (5080 test) · **`0.5b`** 4×2560 ≈512M · **`0.9b`** 8×2560 ≈889M · **`1b`** 10×2560 ≈1078M · `alpha-0.1/0.5/1.0` (cloud ladder) |
+| Presets | `tiny` (5080 test) · **`0.5b`** 4×2560 ≈614M · **`0.9b`** 8×2560 ≈991M · **`1b`** 10×2560 ≈1180M · `alpha-0.1/0.5/1.0` (cloud ladder) |
 | Dispatch | experts are stacked weights run in batched `bmm` (`moe.py: BatchedExperts`) — wall-clock does not scale with expert count |
 | Corpus | the alpha dataset (~120 GB STEM/code; raw text, `o200k`-tokenized on the fly) |
 | License | Apache 2.0, original work |
@@ -31,8 +31,8 @@
 
 Everything, from scratch: the tokenizer wrapper (`arcus/tokenizer.py`), the backbone
 (`backbone.py`), the MoE (`moe.py`), the MoD core (`mod_core.py`), the model assembly
-(`model.py`), the end-to-end trainer (`train.py`), and the sampler (`generate.py`). No
-third-party model weights.
+(`model.py`), the end-to-end trainer (`train.py`), the sampler (`generate.py`), and the growth operator
+(`grow.py`). No third-party model weights.
 
 ## Forward & training contract
 
@@ -74,10 +74,11 @@ model unchanged (only the Adam moments quantize).
 | 0.2.0 | Scale presets (`0.5b`/`0.9b`/`1b`, grow-params 4→8→10 experts), batched MoE dispatch, 128k context decoupled from training length, and the production trainer (fp32+AMP+grad-ckpt/accum, per-epoch + mid-run HF checkpoint, `memcheck.py`). Built and run on the 5080 bench (1B trains with a shared-RAM spill). See [specs/0005](../specs/0005-scale-and-training.md). |
 | 0.3.0 | Footprint levers ([specs/0007](../specs/0007-footprint-reduction.md)), flag-gated with fp32 defaults so the 5080 path is unchanged. **bf16 serving** (served artifact ~4.7 GB → ~2.4 GB, lossless — the forward is already bf16; on by default). Reserved for the cloud L40S run: **8-bit AdamW** (~7 GB less training VRAM), **fused cross-entropy** (no full 200k-logits), **bf16-v** resume checkpoints. Same 1.18B model, same accuracy — only side state / serving precision relaxed. |
 | 0.4.0 | **Sampler** (`arcus/generate.py`: `generate` + `load_model`; CLI `scripts/sample_arcus.py`) — the fluency check that reads the model instead of only its `val_ppl`. Opens **Stage 0** ([specs/0008](../specs/0008-fluency-pretraining.md)): pretrain the 0.5B to fluency on the 5080. The `0.5B → 85B` self-improving loop is planned in [specs/0009](../specs/0009-self-improving-loop.md). No change to the model or trainer — only the ability to generate + reload a checkpoint. |
+| 0.5.0 | **Growth operator** (`arcus/grow.py`: `grow_experts`; CLI `scripts/grow_arcus.py`; `train_arcus.py --init_from`) — grow a trained checkpoint by **adding experts** (near-lossless@grow: warm-copy an expert + dormant router init), the Stage 1 keystone of the 0.5B→85B ladder ([specs/0010](../specs/0010-growth-operator.md)). 39 tests; `4→10` experts verified end-to-end. No change to the model's forward. |
 
 ## Cross-references
 
-- [README.md](../README.md) · [ROADMAP.md](../ROADMAP.md) · [ARCUS_MODEL_DESIGN.md](ARCUS_MODEL_DESIGN.md) · [TRAINING.md](TRAINING.md) · [RESULTS.md](RESULTS.md) · [specs/0005](../specs/0005-scale-and-training.md) · [specs/0006](../specs/0006-distillation-student.md) · [NOTICE](../NOTICE)
+- [README.md](../README.md) · [ROADMAP.md](../ROADMAP.md) · [ARCUS_MODEL_DESIGN.md](ARCUS_MODEL_DESIGN.md) · [TRAINING.md](TRAINING.md) · [RESULTS.md](RESULTS.md) · [specs/0005](../specs/0005-scale-and-training.md) · [specs/0006](../specs/0006-distillation-student.md) · [specs/0009](../specs/0009-self-improving-loop.md) · [specs/0012](../specs/0012-arcus-code-boundary.md) · [NOTICE](../NOTICE)
 
 ---
 

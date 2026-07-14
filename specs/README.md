@@ -41,4 +41,6 @@ Suggested shape:
 - [0009-self-improving-loop.md](0009-self-improving-loop.md) — the north star: 0.5B → 85B via growth + verifier-filtered SFT + RLVR (the plan/contract, mostly unbuilt)
 - [0010-growth-operator.md](0010-growth-operator.md) — Stage 1 keystone: grow a trained checkpoint into a bigger one (expert-addition, lossless@grow), incremental per revision
 - [0011-chat-template.md](0011-chat-template.md) — Stage 2 prerequisite: o200k chat/tool special tokens + embedding-resize + the SFT chat template
+- [0012-arcus-code-boundary.md](0012-arcus-code-boundary.md) — the public/private boundary that converges: openagent-code (public showcase) → Arcus Code (the complete private system); the data handoff
+- [0013-agent-tooling.md](0013-agent-tooling.md) — the Codex-referenced coding CLI + the tool-call format contract; the three-phase build (openagent-code → Arcus Code → model converges)
 - _archived (Qwen path, in `../legacy/specs/`): 0001-mode-qwen-wrapper · 0002-coexistence · 0003-dense-mod_

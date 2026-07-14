@@ -3,6 +3,10 @@ launch.py
 
 Submit the Arcus training run to AWS SageMaker as a (managed-spot) training job.
 
+NOTE: AWS spot is quota-walled for new accounts (g5/g6e default to 0; increases may be denied
+until you have usage history). RunPod is the CURRENT training platform (see docs/TRAINING.md);
+this launcher stays for when the AWS quota clears.
+
 This is "make it spot": the estimator's `use_spot_instances` + `max_wait` + `checkpoint_s3_uri`,
 with `HF_TOKEN` forwarded from YOUR shell (never hardcoded, never committed). The job runs
 `scripts/train_arcus.py` in SageMaker's prebuilt PyTorch container (Script Mode) — no Docker,

@@ -47,7 +47,7 @@ scale). Every run is read against the matched dense baseline (`--dense`).
 | Preset | Size | Where | Role |
 |---|---|---|---|
 | `tiny` | few M | 5080 / CPU | pipeline validation (tests) |
-| `0.5b` / `0.9b` / `1b` | 512M / 889M / 1078M | 5080 bench | grow-params (4 / 8 / 10 experts); architecture + trainer at real size — **not** a quality rung |
+| `0.5b` / `0.9b` / `1b` | 614M / 991M / 1180M | 5080 bench | grow-params (4 / 8 / 10 experts); architecture + trainer at real size — **not** a quality rung |
 | `alpha-0.1` | ~1.3B | cloud (1–few GPUs) | first real quality finding |
 | `alpha-0.5` | ~7–13B | cloud | "this competes" |
 | `alpha-1.0` | ~70–86B | cluster | optional far end — not the goal |

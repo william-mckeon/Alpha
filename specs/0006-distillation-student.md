@@ -12,18 +12,22 @@ Make Arcus the model that openagent-code serves and trains: a coding agent power
 model owned end to end (pretrain + tokenizer + weights), taught by a strong open teacher
 on the maintainer's own captured agentic-coding work.
 
-The two halves of one thesis:
+The two halves of one thesis — with a **public/private wall** between them
+([0012-arcus-code-boundary.md](0012-arcus-code-boundary.md)):
 
-- **openagent-code** — the harness/body: tools, the agent loop, trajectory capture, the
-  train/eval firewall, the eval gate, and the swappable serving boundary. *Already built.*
-- **Arcus** — the brain, from scratch. *Built here.*
+- **openagent-code** (**public**) — the harness/body: tools, the agent loop, trajectory capture,
+  the train/eval firewall, the eval gate, and the swappable serving boundary. Commodity,
+  portfolio-facing, student-agnostic. *Already built.*
+- **Arcus Code** (**private**, this repo) — the brain *and its training*: the from-scratch model,
+  the growth operator, masked-SFT, the serving shim, and the self-improving/RLVR loop. The novel IP.
 
-The handoff is already designed and partly built on the Arcus side:
+The boundary is a **data handoff, not code coupling** — trajectory JSONL flows public→private,
+model checkpoints flow private→public. So no proprietary training ever touches the public repo:
 
 ```
-Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
-   → vLLM serve → openagent-code CODE_API_BASE one-line swap
-   → runs real agentic tasks → captures trajectories → SFT/distil back into Arcus
+Arcus pretrains (private) → serving shim (private) → generic OpenAI endpoint
+   → openagent-code CODE_API_BASE (public) → runs real agentic tasks → captures trajectories
+   → [public → private handoff] → curate + masked-SFT + RLVR (private) → new Arcus checkpoint
 ```
 
 ## Concepts
@@ -37,9 +41,10 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
   SFT, **logit-KL (soft-label) distillation is feasible** over the shared token space (the
   harmony *chat* special tokens differ, but base-LM soft labels over text align). That tokenizer
   match is the whole reason Arcus moved off cl100k, which would have been response-only.
-- **Tool-calling is a learned SFT skill.** The captured trajectories are the curriculum;
-  `CODE_TOOL_MODE=json` is the no-native fallback. Arcus needs a chat template (reserved
-  role / tool-call special tokens — `o200k_base` ships none) before SFT can render rows.
+- **Tool-calling is a learned SFT skill.** The captured trajectories are the curriculum; the tool
+  format is **Codex's** (`function_call` / `custom_tool_call` / `apply_patch`, [0013](0013-agent-tooling.md)).
+  Arcus needs a chat template (reserved role / tool-call special tokens — `o200k_base` ships none)
+  before SFT can render rows ([0011](0011-chat-template.md)).
 - **The sequencing is fixed: pretrain to fluency → *then* distil.** SFT shapes a fluent
   model's behavior; it cannot conjure language from a base that has only seen tens of
   millions of tokens. Distillation is finishing school, not language acquisition.
@@ -63,9 +68,11 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
   response-based SFT first, and logit-KL additionally needs the teacher's per-token logprobs
   exposed by the serving path (Bedrock/vLLM top-k logprobs).
 - **Beating the teacher** — distillation caps the student at the teacher on the captured
-  distribution; surpassing gpt-oss-120b needs RL (openagent-code's later rung), not SFT.
-- **The harness itself** — tools, capture, eval, serving live in the openagent-code repo;
-  Arcus does not reimplement them. This spec documents the *contract*, not the body.
+  distribution; surpassing gpt-oss-120b needs RL — the **private RLVR loop**
+  ([0009](0009-self-improving-loop.md) Stage 5), not SFT.
+- **The harness itself** — tools, capture, eval, serving live in the **public** openagent-code
+  repo; Arcus does not reimplement them ([0012](0012-arcus-code-boundary.md)). This spec documents
+  the *contract*, not the body.
 - **Serving-weight quantization** — once the vLLM/ArcusMoDE shim exists, fp8/int8 weight-only
   quantization of the experts (~half the served weights again, near-lossless, eval-gated) is a
   serving-footprint option detailed in [0007-footprint-reduction.md](0007-footprint-reduction.md).
@@ -79,9 +86,9 @@ Arcus pretrains → arcus/hf_upload.py → HuggingFace (Islanderintel/arcus-*)
   (Chinchilla floor; 100+ for a strong model). Start the ladder at **1B × ~20–100B tokens**
   and climb — small rungs are cheap and yield the scaling curve that de-risks the big runs.
   50B tokens pairs with a ~2.5B model; a 5B model wants ~100B tokens. See ROADMAP.
-- **Cloud is throughput, not a gate.** The 5080 can pretrain Arcus (~110M tokens/day); it
-  just takes weeks for billions of tokens. Cloud compresses weeks into days. The corpus
-  (~120 GB) is not the bottleneck — time is.
+- **Cloud is throughput, not a gate.** The 5080 can pretrain Arcus but slowly; real runs go on
+  **RunPod** (L40S / A100 by the hour — AWS SageMaker is quota-walled for new accounts). The corpus
+  (~120 GB) is not the bottleneck — time is. See [docs/TRAINING.md](../docs/TRAINING.md).
 - **Honest gaps for Arcus to plug in:** (1) a vLLM shim for `ArcusMoDE`; (2) a chat template
   + tool special tokens; (3) enough pretraining to tool-call at all (small students
   tool-call worse — doubly so from scratch); (4) scale. The path is fully mapped in

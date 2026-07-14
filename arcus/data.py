@@ -71,14 +71,23 @@ def iter_shard_texts(shard_root: str, text_keys=("text", "content")):
 
 
 def stream_token_batches(shard_root: str, tokenizer, seq_len: int = 512, batch_size: int = 2,
-                         seed: int = 0, shuffle_buffer: int = 8192, loop: bool = True):
+                         seed: int = 0, shuffle_buffer: int = 8192, loop: bool = True,
+                         val_docs_per_shard: int = 0):
     """Stream `(input_ids[B, seq_len], labels[B, seq_len])` from the shards WITHOUT holding the
-    corpus in RAM — the cloud-scale loader (the in-memory `packed_batches` caps you at the few
-    billion tokens that fit in memory). Tokenizes documents on the fly into a small rolling
-    buffer, packs `seq_len+1` windows (stride `seq_len`, matching `pack_tokens`), and emits
-    batches. Shard order is shuffled each pass so sources interleave (the shards are one-source-
-    per-folder), and a shuffle buffer mixes nearby windows. Infinite when `loop=True` — the
-    trainer stops on its own token/step budget."""
+    corpus in RAM.
+
+    INTERLEAVES the shards — one document from EVERY shard per round-robin cycle — so every batch
+    MIXES domains. This is the fix for a real bug: the shards are one-source-per-folder (Go / math /
+    wiki / ...) and 1-4 GB each, so reading them one-at-a-time (the old loader shuffled only the
+    *order*) trained the model in domain BLOCKS — it specialized on Go, then math, then wiki, and
+    *forgot* earlier domains, which showed up as val_ppl swinging 40<->500 across the run. Round-
+    robin interleaving keeps all domains present at once. A shuffle buffer mixes nearby windows on
+    top; a shard read fully within a pass keeps natural domain proportions (bigger domains = more
+    shards = more turns). Infinite when `loop=True`.
+
+    `val_docs_per_shard` > 0 SKIPS the first N documents of each shard — those are held out for the
+    val set (`build_val_set` reads exactly them), so validation never leaks into training."""
+    import itertools
     import random
 
     rng = random.Random(seed)
@@ -86,16 +95,24 @@ def stream_token_batches(shard_root: str, tokenizer, seq_len: int = 512, batch_s
     paths = _shard_paths(shard_root)
     if not paths:
         return
+
+    def train_docs(path):                                   # this shard's TRAIN docs (val held out)
+        return itertools.islice(_read_shard(path), val_docs_per_shard, None)
+
     tok_buf, win_buf, bi, bl = [], [], [], []
     while True:
-        order = paths[:]
-        rng.shuffle(order)                       # interleave sources across the pass
-        for path in order:
-            for text in _read_shard(path):
+        iters = {i: train_docs(p) for i, p in enumerate(paths)}   # fresh pass: every shard open
+        while iters:
+            for i in list(iters):                            # round-robin: one doc from each shard
+                try:
+                    text = next(iters[i])
+                except StopIteration:
+                    del iters[i]                             # this shard is done for the pass
+                    continue
                 tok_buf.extend(tokenizer.encode(text, add_eot=True))
                 while len(tok_buf) >= window:
                     w = tok_buf[:window]
-                    del tok_buf[:seq_len]        # slide by seq_len (1-token overlap = the label)
+                    del tok_buf[:seq_len]                    # slide by seq_len (1-token overlap = the label)
                     win_buf.append(w)
                     if len(win_buf) >= shuffle_buffer:
                         w2 = win_buf.pop(rng.randrange(len(win_buf)))   # local shuffle
@@ -113,6 +130,24 @@ def stream_token_batches(shard_root: str, tokenizer, seq_len: int = 512, batch_s
         if len(bi) == batch_size:
             yield (torch.tensor(bi, dtype=torch.long), torch.tensor(bl, dtype=torch.long))
             bi, bl = [], []
+
+
+def build_val_set(shard_root: str, tokenizer, seq_len: int = 512, batch_size: int = 8,
+                  val_docs_per_shard: int = 64):
+    """A DIVERSE, HELD-OUT val set: the first `val_docs_per_shard` documents of EVERY shard, so it
+    spans all domains (Go / math / wiki / ...) instead of one. `stream_token_batches` skips exactly
+    these documents (pass the same `val_docs_per_shard`), so val never leaks into train. Returns a
+    list of (input_ids, labels) batches — feed straight to `arcus.eval.perplexity`.
+
+    This replaces the old `packed_batches(..., max_tokens=2M)` val slice, which was a single domain
+    (whatever globbed first) and made val_ppl an unreadable, domain-confounded signal."""
+    import itertools
+    ids = []
+    for path in _shard_paths(shard_root):
+        for text in itertools.islice(_read_shard(path), val_docs_per_shard):
+            ids.extend(tokenizer.encode(text, add_eot=True))
+    inputs, labels = pack_tokens(ids, seq_len)
+    return _to_batches(inputs, labels, batch_size)
 
 
 def packed_batches(shard_root: str, tokenizer, seq_len: int = 1024, batch_size: int = 8,

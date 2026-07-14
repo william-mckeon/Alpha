@@ -95,6 +95,10 @@ Measure before you commit hours. It prints the VRAM breakdown with MoD active:
   = PEAK                       : 18.64 GB / 16  -> OVER by 2.6 GB (spills to shared RAM)
 ```
 
+> Snapshot from the **cl100k** build (1078M). The current **o200k_base** tokenizer makes the `1b`
+> **~1180M** (≈+0.4 GB weights / +0.8 GB AdamW), so it spills a little harder — the fit verdict is
+> unchanged. Re-run `memcheck.py --preset 1b` for live figures on your card.
+
 ### The memory reality (16 GB)
 
 - A **1B fp32** model needs ~18–22 GB. It does **not** fit 16 GB. On Windows the driver
@@ -146,9 +150,99 @@ All flag-gated, **fp32 defaults preserve the 5080 path**; opt in on the cloud L4
 
 `memcheck.py` prints a projected `--optimizer adamw8bit` peak so you can see the fit before the run.
 
-## SageMaker spot run (the real seed)
+## Cloud training — RunPod (the current path)
 
-The cloud seed runs as a **managed-spot training job** via `launch.py` — SageMaker's prebuilt
+Real runs go on **RunPod** — an L40S (48 GB) or A100 by the hour, **no quota wall** (AWS SageMaker
+spot is quota-blocked for new accounts; see below). The trainer is portable: only `launch.py` is
+SageMaker-specific — `train_arcus.py` + the streaming loader run on any GPU box.
+
+**One-time pod setup** (on the pod, via its JupyterLab terminal or SSH):
+
+```bash
+# 1. code — clone the PRIVATE repo (fine-grained PAT, read-only, this repo)
+cd /workspace && git clone https://<GITHUB_PAT>@github.com/william-mckeon/Alpha-base.git
+cd Alpha-base
+# 2. deps — DON'T reinstall torch (the RunPod PyTorch image already has a CUDA-matched build)
+pip install tiktoken zstandard safetensors huggingface_hub tqdm numpy bitsandbytes
+pip install -e . --no-deps
+# 3. data — pull the 47 GB corpus S3 -> volume (RunPod Cloud Sync is cleanest; or aws s3 sync)
+aws s3 sync s3://arcus-training-wmckeon/alpha-dataset "alpha dataset"
+```
+
+Keep everything on the **persistent `/workspace` volume** (a network mount) so a pod stop/interruption
+is recoverable via `--resume`. It's **region-locked** — replace a dead pod in the *same* region to
+reattach the volume (the HF checkpoint is your cross-region fallback).
+
+**Run it — inside `tmux`** so it survives a disconnect. These are **pod (bash)** commands: the trailing
+`\` is bash line-continuation and will fail on a local Windows PowerShell prompt — there, put each command
+on **one line** (PowerShell's continuation character is a backtick, not `\`).
+
+```bash
+export HF_TOKEN="<your token>"
+tmux new -s arcus     # detach: Ctrl-B then D  |  reattach: tmux attach -t arcus
+
+# 0.5B fluency (Stage 0) — the L40S fits a big batch
+python scripts/train_arcus.py --preset 0.5b --stream --shards "alpha dataset" \
+    --max_tokens 12000000000 --seq_len 512 --batch_size 16 --grad_accum 4 --fused_ce \
+    --run_name arcus_0.5b_fluency --save_every_steps 500 --resume \
+    --hf_repo Islanderintel/arcus-alpha-v0.05-0.5b
+
+# 1B seed — same card, batch 8 (add --optimizer adamw8bit to push batch 12-16)
+python scripts/train_arcus.py --preset 1b --stream --shards "alpha dataset" \
+    --max_tokens 12000000000 --seq_len 512 --batch_size 8 --grad_accum 8 --fused_ce \
+    --run_name arcus_1b_seed --save_every_steps 500 --resume \
+    --hf_repo Islanderintel/arcus-alpha-v0.1-1b
+```
+
+**Cost + throughput** (measured: ~17.5k tokens/s for the 1B on an L40S):
+
+| Run | Time | ~Cost (L40S @ ~$0.79–0.99/hr) |
+|---|---|---|
+| 0.5B fluency, 12B tokens | ~7 days | ~$130–165 |
+| 1B seed, 12B tokens | ~8 days | ~$150–190 |
+
+≈ **$13–16 per billion tokens** on the L40S; faster cards (A100/H100) finish sooner at ~the same
+total (compute-bound). No multi-GPU yet — the trainer is single-GPU (no FSDP).
+
+## Growth — climb a rung (Stage 1)
+
+Grow a *trained* checkpoint into a bigger one by **adding experts** (near-lossless@grow;
+[specs/0010](../specs/0010-growth-operator.md)), then continue training — how the ladder climbs
+without retraining from scratch. On the same backbone, `0.5b` (4 experts) → `1b` (10 experts) is
+just `+6` experts:
+
+```bash
+# grow the finished 0.5B into the 1B architecture
+python scripts/grow_arcus.py --ckpt runs/arcus_0.5b_fluency/checkpoint \
+    --out runs/arcus_grown_1b/checkpoint --to_experts 10
+
+# continue training the grown model (warm-started; fresh optimizer)
+python scripts/train_arcus.py --preset 1b --stream --shards "alpha dataset" \
+    --init_from runs/arcus_grown_1b/checkpoint --max_tokens 12000000000 --seq_len 512 \
+    --batch_size 8 --grad_accum 8 --fused_ce --run_name arcus_grown_1b --save_every_steps 500 --resume \
+    --hf_repo Islanderintel/arcus-alpha-grown-1b
+```
+
+`--dormant_margin` (default 8) trades init-losslessness (high) against how fast the new experts
+differentiate (low). **Calibration:** compare the grown 1B against the *from-scratch* 1B
+(`arcus_1b_seed`) with **`scripts/eval_ppl.py`**, not the training-time `val_ppl` — the latter is
+domain-confounded (single-domain val slice; see [docs/RESULTS.md](RESULTS.md)). `eval_ppl` scores
+both checkpoints on the same diverse, held-out val set (all domains), so the gap it reports is the
+operator's true quality cost, measured while a from-scratch control is still affordable
+([specs/0009](../specs/0009-self-improving-loop.md) Stage 1):
+
+```bash
+python scripts/eval_ppl.py --ckpt runs/arcus_grown_1b/checkpoint   # or --repo <hf-id>
+python scripts/eval_ppl.py --ckpt runs/arcus_1b_seed/checkpoint    # the from-scratch control
+```
+
+## SageMaker spot run (the AWS alternative — currently quota-walled)
+
+> **AWS is the *for-later* path.** New accounts have **0** g5/g6e spot quota, and AWS may *deny* a
+> spot increase until you have usage history (see the note below). Use **RunPod** (above) now;
+> switch here once the quota clears.
+
+The seed can also run as a **managed-spot training job** via `launch.py` — SageMaker's prebuilt
 PyTorch container (Script Mode), **no Docker / ECR**. `launch.py` forwards `HF_TOKEN` from your
 shell (never hardcoded), streams the corpus from S3, checkpoints the full training state to
 `/opt/ml/checkpoints` (S3-synced), and `--resume` continues after a spot interruption.

@@ -22,6 +22,8 @@ from arcus.model_config import ModelConfig, get_config, PRESETS
 from arcus.model import ArcusMoDE, MoDEBlock
 from arcus.loss import chunked_cross_entropy
 from arcus.generate import generate, load_model
+from arcus.grow import grow_experts
+from arcus.hf_utils import resolve_checkpoint, repo_last_modified
 
 __version__ = "0.1.0"
 
@@ -33,4 +35,6 @@ __all__ = [
     "ArcusMoDE", "MoDEBlock",
     "chunked_cross_entropy",
     "generate", "load_model",
+    "grow_experts",
+    "resolve_checkpoint", "repo_last_modified",
 ]

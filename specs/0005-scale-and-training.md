@@ -16,7 +16,7 @@ same code runs unchanged on cloud GPUs.
 
 - **Grow-params expert ladder.** The MoE capacity play is *more total params at constant
   active compute* — keep each expert wide (2560) and add more of them (top-1 throughout):
-  `0.5b` 4×2560 ≈ 512M · `0.9b` 8×2560 ≈ 889M · `1b` 10×2560 ≈ 1078M. (Param-matched
+  `0.5b` 4×2560 ≈ 614M · `0.9b` 8×2560 ≈ 991M · `1b` 10×2560 ≈ 1180M (o200k_base; measured). (Param-matched
   *fine-grained* experts — more, smaller — are the opposite trade and are **not** the path:
   under top-1 they cut per-token compute without adding capacity.)
 - **Batched MoE dispatch (`arcus/moe.py: BatchedExperts`).** Experts are stacked weights
@@ -38,16 +38,20 @@ same code runs unchanged on cloud GPUs.
 - **`scripts/memcheck.py`.** Prints the VRAM breakdown (weights / AdamW states / transient)
   with MoD active, so fit-vs-spill is settled by measurement, not arithmetic.
 - **Streaming loader + spot-safe cloud path.** `arcus/data.py: stream_token_batches` yields
-  batches without holding the corpus in RAM (the in-memory `packed_batches` caps at the few-
-  billion tokens that fit memory); `train_streaming` drives by a TOKEN budget, not epochs.
+  batches without holding the corpus in RAM, **interleaving all shards round-robin so every batch
+  mixes domains** — the shards are one-source-per-folder, and reading them one-at-a-time trained the
+  model in domain *blocks* (specialize-then-forget; see [docs/RESULTS.md](../docs/RESULTS.md)).
+  `build_val_set` holds out a **diverse** val set (first N docs of every shard, skipped by the
+  stream) so `val_ppl` is honest; `train_streaming` drives by a TOKEN budget, not epochs.
   `arcus/checkpoint.py` saves/loads the **full training state** (model + optimizer + scheduler +
-  step + RNG) so a reclaimed spot instance resumes instead of restarting. `launch.py` submits it
-  to SageMaker as a managed-spot job (Script Mode, no Docker) with `HF_TOKEN` forwarded from the
-  shell and checkpoints synced to S3. See [docs/TRAINING.md](../docs/TRAINING.md).
+  step + RNG) so an interrupted run resumes instead of restarting — the same `--resume` works on
+  any GPU box. Real runs go on **RunPod** (L40S/A100 by the hour; AWS SageMaker is quota-walled for
+  new accounts, so `launch.py`'s managed-spot path is a for-later alternative). See
+  [docs/TRAINING.md](../docs/TRAINING.md).
 
 ## Acceptance (checkable)
 
-- [x] `0.5b` / `0.9b` / `1b` presets build at ~512M / ~889M / ~1078M with 4 / 8 / 10 experts.
+- [x] `0.5b` / `0.9b` / `1b` presets build at ~614M / ~991M / ~1180M with 4 / 8 / 10 experts.
 - [x] Batched dispatch is parameter-identical to the per-expert loop; all tests pass
       (`test_moe.py`, `test_model.py` updated for stacked expert weights).
 - [x] `--max_seq_len 131072` builds (RoPE buffer ~67 MB) while training at `--seq_len 512`.

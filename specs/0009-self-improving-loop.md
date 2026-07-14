@@ -22,7 +22,10 @@ openagent-code's full SFT-distillation harness). The organizing metaphor is deve
   openagent-code (`OpenCode`) is the *harness/body*: the Bedrock gpt-oss-120b teacher, capture
   (`trajectory.py`), curation + train/eval firewall (`convert.py:is_trainable`), LoRA-SFT with
   prompt-masking (`sft.py:build_example`), the eval gate (`compare.py`), the serve/swap boundary
-  (`CODE_API_BASE`, vLLM), and tool-calling (native + JSON). The loop wires the two together.
+  (`CODE_API_BASE`, vLLM), and tool-calling (native + JSON). The loop wires the two together across a **public/private
+boundary** ([0012](0012-arcus-code-boundary.md)): the harness is public, the training is private. The harness is being upgraded to the
+**Codex-referenced tooling + tool-call format** and migrated into Arcus Code via the three-phase
+build ([0013](0013-agent-tooling.md)).
 - **The reasoning core.** Arcus does not need to *know* everything; it needs to *comprehend*
   and *reason*, and look facts up. Retrieval offloads **factual recall** — never language,
   reasoning, or knowing-what-to-search. So the corpus is reasoning-dense (STEM/code) and the
@@ -63,28 +66,39 @@ the few-B rungs.
 
 ## The stages (each a gate)
 
-- **Stage 0 — babble.** Pretrain `0.5b` to fluency on the 5080 (free). Built; see
-  [0008](0008-fluency-pretraining.md). *Prerequisite for all of the below.*
-- **Stage 1 — validate the growth operator** ([0010](0010-growth-operator.md)). Build it (gap 1);
-  grow 0.5B→1B by **adding experts** (lossless@grow, incremental per revision); compare grown-1B
-  `val_ppl` to a from-scratch 1B. The one rung where from-scratch is affordable as a control —
-  *calibrate the operator here before trusting it up high.*
-- **Stage 2 — talk in the agent's format** ([0011](0011-chat-template.md)). o200k chat template +
-  tool tokens (gap 2, + the embedding-resize that reuses [0010](0010-growth-operator.md)) +
-  masked-SFT (gap 3); render openagent-code trajectories (`convert.py` rows) into masked SFT.
-  Teacher supplies the examples.
-- **Stage 3 — close the loop, read-only.** Serving shim (gap 4); plug Arcus behind
-  `CODE_API_BASE`; run `compare.py` (Arcus as student vs base). Prove the plumbing turns; nothing
-  self-improves yet.
-- **Stage 4 — learn by doing (experiential SFT).** Arcus serves → runs tasks → capture → curate
-  (`is_trainable` = the anti-collapse filter) → masked-SFT → gate → promote. **Keep old + new data
-  each round** (consolidation). SFT-only.
-- **Stage 5 — earn judgment (RLVR).** After SFT plateaus, repurpose verify into a reward (gap 5);
-  reward confident-and-right, penalize confident-and-wrong. Where calibration ("know what you
-  don't know") is actually learned.
-- **Stage 6 — grow up the ladder.** Repeat grow→train→SFT→RL at 1→2→4→8→…→85B. Build FSDP; grow
-  the **dataset** alongside each rung (Chinchilla; public corpora past ~4B). Re-validate the
-  growth operator at low rungs; rely on it up high.
+Each stage is tagged **public** (openagent-code) or **private** (Arcus Code) per
+[0012](0012-arcus-code-boundary.md): everything that *trains* is private; the harness that
+*acts / measures / serves the boundary* is public.
+
+- **Stage 0 — babble** · *running (private).* Pretrain `0.5b` to fluency — now on **RunPod L40S**
+  (the 5080 was the bench; the L40S is ~2.5× faster and drops the flaky-upload crashes). Tooling
+  built: the sampler ([0008](0008-fluency-pretraining.md)) makes fluency *checkable*. *Prerequisite
+  for all of the below.*
+- **Stage 1 — build + validate the growth operator** · *spec'd (0010), next (private).* Add experts
+  by **appending an exact copy + its router row** → output invariant to top-1's pick → **lossless@grow**
+  regardless of tie-breaking; incremental (+1/revision). Buildable + unit-testable on `tiny` *now*,
+  independent of the runs. Calibration — grow the real 0.5B→1B, compare `val_ppl` to a from-scratch
+  1B — waits for the 0.5B. The one rung where from-scratch is an affordable control.
+- **Stage 2 — talk in the agent's format** · *chat template spec'd (0011); masked-SFT not built (private).*
+  Minimal o200k chat/tool tokens + the **embedding-resize that reuses the growth operator**; JSON tool
+  mode first; **masked-SFT** (completion-only loss). openagent-code (**public**) captures trajectories
+  (`convert.py` rows); Arcus Code (**private**) trains on them. Teacher supplies the examples. The tool format is **Codex's** (`function_call`/`custom_tool_call`/`apply_patch`, [0013](0013-agent-tooling.md)); capture is **rollout JSONL**.
+- **Stage 3 — close the loop, read-only** · *not built (serving shim private; harness public).* Build
+  the vLLM shim (**private** — it exposes the architecture; it serves a *generic* OpenAI endpoint **emitting the Codex tool items** — [0013](0013-agent-tooling.md));
+  point openagent-code's `CODE_API_BASE` at it and run `compare.py` (Arcus as student vs base). Prove
+  the plumbing turns; nothing self-improves yet.
+- **Stage 4 — learn by doing (experiential flywheel)** · *not built (split).* **Public:** serve → run →
+  capture → eval gate. **Private:** curate (`is_trainable` = the anti-collapse filter — train only on
+  what *verified*) → masked-SFT → promote. **Keep old + new data each round** (consolidation vs.
+  forgetting). Teacher bootstraps; self-generation takes over. SFT-only.
+- **Stage 5 — earn judgment (RLVR)** · *not built — a NEW capability (private).* openagent-code has **no
+  RL** (verify is a filter/gate, never a reward). Repurpose the public verify sandbox into a **reward**
+  — confident-and-right up, confident-and-wrong down. **Only after SFT plateaus.** Where calibration is
+  learned; RL distinguishes the two failure modes SFT can't.
+- **Stage 6 — grow up the ladder** · *documented, not spec'd (private).* Repeat grow→train→SFT→RL at
+  1→2→4→8→…→85B. **Build FSDP** (single-GPU only today) and **grow the dataset** with each rung
+  (Chinchilla; public corpora past ~4B). Cloud is **RunPod** (AWS quota-walled). Re-validate the
+  operator at low rungs; trust it up high.
 
 ## Acceptance (checkable)
 

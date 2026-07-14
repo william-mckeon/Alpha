@@ -5,9 +5,7 @@ Hear the model talk — load a trained checkpoint and print a sampled continuati
 This is the Stage 0 fluency check (specs/0008-fluency-pretraining.md): `val_ppl` says the
 model is learning; this says whether the text is coherent.
 
-  python scripts/sample_arcus.py --ckpt runs/arcus_0.5b_fluency/checkpoint \
-      --prompt "The key idea behind gradient descent is" \
-      --max_new_tokens 160 --temperature 0.8 --top_k 50
+  python scripts/sample_arcus.py --ckpt runs/arcus_0.5b_fluency/checkpoint --prompt "The key idea behind gradient descent is" --max_new_tokens 160 --temperature 0.8 --top_k 50
 
 Point --ckpt at any dir holding config.json + model.safetensors (what the trainer writes
 each save, and what --hf_repo uploads). --temperature 0 is greedy/deterministic.

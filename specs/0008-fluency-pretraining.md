@@ -10,7 +10,7 @@
 Train `0.5b` (dim 1024 · 12 layers · 4×2560 experts · ~614M params, o200k) to **fluency**:
 coherent generation, not gibberish. The `0.5b` is the largest rung that trains **cleanly on
 the 5080 with no spill** (fp32 fits ~14–15 GB of 16 GB — unlike the 1B, which spills), so
-Stage 0 is a **free, local** run, not a cloud job. Its output is a saved, uploaded checkpoint
+Stage 0 is a **free, local** run — though in practice it runs on **RunPod L40S** (~2.5× faster, no laptop upload crashes; [TRAINING.md](../docs/TRAINING.md)), with a `1b` seed alongside. This is **private** (Arcus Code — [0012](0012-arcus-code-boundary.md)). Its output is a saved, uploaded checkpoint
 that becomes the seed the loop grows and teaches.
 
 `val_ppl` says the model is *learning*; it does not say the text is *coherent*. So Stage 0
