@@ -3,12 +3,15 @@
 # (see docs/TRAINING.md "After a pod stop/restart").
 #
 #   pip install -r requirements-pod.txt
+#   pip install --no-deps bitsandbytes>=0.43.0     # then the 8-bit-AdamW lever, separately (see below)
 #
-# torch is intentionally ABSENT: the RunPod PyTorch image already ships a CUDA-matched torch build.
-# NEVER `pip install torch` (or a file that pins it) on the pod — pip upgrades to a CUDA build the
-# pod's driver can't use, and torch silently falls back to device=cpu (the whole run goes to CPU).
+# torch is intentionally ABSENT here (direct AND transitive): the RunPod image already ships a
+# CUDA-matched torch, and pip must never touch it. NEVER `pip install torch` (or a file that pins
+# it) on the pod — pip upgrades to a CUDA build the driver can't use and torch silently falls back
+# to device=cpu (the whole run crawls on CPU).
+#
+# bitsandbytes (the 8-bit-AdamW footprint lever, specs/0007) is deliberately NOT listed below: it
+# DECLARES a torch dependency, so listing it here would let pip upgrade the image torch the day a
+# future bitsandbytes raises its torch floor. Install it SEPARATELY with --no-deps, which guarantees
+# pip cannot touch torch:  pip install --no-deps bitsandbytes>=0.43.0
 -r requirements.txt
-
-# L40S-only footprint lever (specs/0007): 8-bit AdamW optimizer states (~7 GB less VRAM), which
-# enables `--optimizer adamw8bit` to push batch 12-16. Ada sm_89 — do NOT install on the 5080/Blackwell.
-bitsandbytes>=0.43.0

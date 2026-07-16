@@ -5,7 +5,7 @@
 > BoeNet's validated mechanism — for **efficiency**: foundation-model quality at a
 > fraction of the compute, on hardware you actually have.
 
-**Maintainer:** William McKeon · **Status:** v0.4 — sampler shipped (34 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed), seeding the 0.5B→85B self-improving loop · Apache 2.0 License © 2026 William McKeon
+**Maintainer:** William McKeon · **Status:** v0.4 — sampler shipped (42 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed), seeding the 0.5B→85B self-improving loop · Apache 2.0 License © 2026 William McKeon
 
 ---
 
@@ -61,12 +61,16 @@ docs/ · specs/ · tests/ · legacy/ (archived Qwen path)
 
 ```powershell
 python -m venv .venv; .\.venv\Scripts\Activate.ps1
-pip install torch --index-url https://download.pytorch.org/whl/cu128
+pip install torch --index-url https://download.pytorch.org/whl/cu128   # LOCAL 5080 (cu128) — see note
 pip install -e .
 
-python -m pytest -q                                  # 34 tests (model, MoE, MoD, tokenizer, trainer, sampler)
+python -m pytest -q                                  # 42 tests (model, MoE, MoD, tokenizer, trainer, sampler, growth)
 python scripts/train_arcus.py --preset tiny --max_tokens 2000000   # pipeline run on the 5080
 ```
+
+> **Local RTX 5080 only.** On a RunPod **pod**, do NOT run the `pip install torch` line above — the pod
+> image already ships a CUDA-matched torch and reinstalling it silently breaks the GPU (device=cpu).
+> Pod setup is [docs/TRAINING.md](docs/TRAINING.md); never `pip install torch` on a pod.
 
 > Make sure your prompt shows `(.venv)` before `pip install`. If pip prints
 > "Defaulting to user installation," the venv isn't active — activate it first.
@@ -95,7 +99,7 @@ How-to: [docs/TRAINING.md](docs/TRAINING.md).
 
 ## Status & honest gaps
 
-- Tiny preset **built and runtime-validated** (34 tests: lossless@cap=1, causal,
+- Tiny preset **built and runtime-validated** (42 tests: lossless@cap=1, causal,
   gradient to both routers + every expert, end-to-end training, sampler); the `0.5b` fluency
   run + a `1b` seed are **training on RunPod L40S** (Stage 0 of the self-improving loop).
 - Quality is **unproven** — that needs the cloud runs on the alpha dataset.

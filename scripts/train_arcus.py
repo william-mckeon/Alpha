@@ -19,9 +19,12 @@ import argparse
 import json
 import os
 import random
+import sys
 
 import numpy as np
 import torch
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from arcus.tokenizer import get_tokenizer
 from arcus.model_config import get_config, PRESETS

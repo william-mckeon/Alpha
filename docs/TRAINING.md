@@ -165,11 +165,14 @@ restart (see the recovery note below):
 cd /workspace && git clone https://<GITHUB_PAT>@github.com/william-mckeon/Alpha-base.git
 cd Alpha-base
 # 2. deps — the RunPod image already ships a CUDA-matched torch; do NOT install or upgrade torch on
-#    the pod (a mismatched CUDA build makes torch fall back to device=cpu). Both requirements files
-#    are torch-free by design, so this is safe. NEVER run `pip install -r requirements.txt` with a
-#    torch pin, and never `pip install torch` here.
-pip install -r requirements-pod.txt   # base deps + bitsandbytes (8-bit AdamW); leaves torch alone
-pip install -e . --no-deps            # register the arcus package without pulling deps (torch stays)
+#    the pod (a mismatched CUDA build makes torch fall back to device=cpu). requirements-pod.txt is
+#    torch-free (direct AND transitive); bitsandbytes goes in with --no-deps so pip can't touch the
+#    image torch. NEVER `pip install torch` here, or `-r` a file that pins torch.
+pip install -r requirements-pod.txt              # base deps, torch-free
+pip install --no-deps bitsandbytes>=0.43.0       # 8-bit AdamW lever; --no-deps = pip can't touch torch
+pip install -e . --no-deps                       # register the arcus package (no deps; torch stays)
+# CUDA gate — MUST print "cuda OK ...". If it asserts/fails, torch is clobbered: fix it before training.
+python -c "import torch; assert torch.cuda.is_available(), 'torch cannot see the GPU'; print('cuda OK', torch.__version__)"
 # 3. data — pull the 47 GB corpus S3 -> volume (RunPod Cloud Sync is cleanest; or aws s3 sync)
 aws s3 sync s3://arcus-training-wmckeon/alpha-dataset "alpha dataset"
 ```
@@ -178,22 +181,28 @@ Keep everything on the **persistent `/workspace` volume** (a network mount) so a
 is recoverable via `--resume`. It's **region-locked** — replace a dead pod in the *same* region to
 reattach the volume (the HF checkpoint is your cross-region fallback).
 
-**After a pod stop/restart — re-run the deps step.** RunPod persists only the `/workspace` volume;
+**After a pod stop/restart — rebuild the environment.** RunPod persists only the `/workspace` volume;
 the Python environment lives on the **ephemeral container disk** and is **wiped on every restart**
 (that's why `huggingface_hub`/`pytest` go missing and imports fail after a restart — while `torch`
 comes back, because it's baked into the base image). So each time the pod returns:
 
 ```bash
 cd /workspace/Alpha-base
-pip install -r requirements-pod.txt   # reinstall the wiped deps — torch is left untouched
+pip install -r requirements-pod.txt              # reinstall the wiped deps — torch left untouched
+pip install --no-deps bitsandbytes>=0.43.0
 pip install -e . --no-deps
-python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
+python -c "import torch; assert torch.cuda.is_available(), 'no GPU'; print(torch.__version__, torch.cuda.is_available())"
 ```
 
-That last line **must** print `True`. If it prints `False`, torch was replaced with a CUDA build the
-driver can't use (usually a stray `pip install torch`, or `-r` of a file that pins torch) — reinstall
-the image-matched build, e.g. `pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124`.
-The code on `/workspace` survives a restart; only the environment needs rebuilding.
+**If that assert fails** (torch can't see the GPU — usually a stray `pip install torch` clobbered the
+image build), the simplest fix is to **restart the pod**: the ephemeral disk resets to the base image,
+which wipes the bad install and restores the correct torch *for free* (then rebuild deps as above).
+Only if you can't restart, reinstall the exact build **your image originally shipped** — check it with
+`python -c "import torch; print(torch.__version__)"` *before* it gets clobbered. For the current L40S
+template that is `torch 2.4.1+cu124`:
+`pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124`
+— a different template ships a different torch, so match *its* version, not this one. The code on
+`/workspace` survives; only the environment needs rebuilding.
 
 **Run it — inside `tmux`** so it survives a disconnect. These are **pod (bash)** commands: the trailing
 `\` is bash line-continuation and will fail on a local Windows PowerShell prompt — there, put each command

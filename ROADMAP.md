@@ -3,7 +3,7 @@
 > The committed build order and source of truth for what's built and next. No
 > CHANGELOG; history lives here + [docs/DATASHEET.md](docs/DATASHEET.md) § version history.
 
-**Maintainer:** William McKeon · **Status:** v0.6 — growth operator built (39 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed); **tooling pivot** — a Codex-referenced CLI via a three-phase build (specs/0013); model plan status quo · Apache 2.0 © 2026 William McKeon
+**Maintainer:** William McKeon · **Status:** v0.6 — growth operator built (42 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed); **tooling pivot** — a Codex-referenced CLI via a three-phase build (specs/0013); model plan status quo · Apache 2.0 © 2026 William McKeon
 
 ---
 
@@ -129,4 +129,4 @@ under-trained bench runs.
 
 ---
 
-*Status: tiny + grow-params bench built; sampler + growth operator shipped (39 tests); Stage 0 running on RunPod (0.5B fluency + 1B seed); Stage 1 calibration next; the 0.5B→85B loop + public/private split in specs/0009 + 0012. arcus — part of the OpenAgent family*
+*Status: tiny + grow-params bench built; sampler + growth operator shipped (42 tests); Stage 0 running on RunPod (0.5B fluency + 1B seed); Stage 1 calibration next; the 0.5B→85B loop + public/private split in specs/0009 + 0012. arcus — part of the OpenAgent family*

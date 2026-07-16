@@ -13,8 +13,12 @@ arithmetic.
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 
 import torch
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from arcus.tokenizer import get_tokenizer
 from arcus.model_config import get_config

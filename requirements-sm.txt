@@ -9,9 +9,11 @@ huggingface_hub>=0.20
 safetensors>=0.4.0
 tqdm>=4.65
 
-# --- footprint levers (specs/0007), L40S/Ada only; harmless if a lever is left off ---
-# 8-bit AdamW optimizer states (~7 GB less VRAM). Supported on Ada sm_89; do NOT put on the
-# 5080/Blackwell base install (flagged fragile on sm_120).
+# --- footprint lever (specs/0007). Installed in EVERY SageMaker container (this line is not
+# commented out), and only exercised when --optimizer adamw8bit is passed ---
+# 8-bit AdamW optimizer states (~7 GB less VRAM). Works on the g5/A10G default (Ampere sm_86) and
+# g6e/L40S (Ada sm_89). The "fragile on Blackwell sm_120" caveat is about the LOCAL 5080 base
+# install, NOT this cloud container.
 bitsandbytes>=0.43.0
 # Fused linear+cross-entropy (Triton). Optional — arcus/loss.py falls back to a pure-torch
 # chunked path if absent, so leave commented unless it installs cleanly on the container:

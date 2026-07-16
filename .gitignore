@@ -25,6 +25,10 @@ runs/
 *.safetensors
 *.bin
 
+# --- Generated SageMaker staging dir (launch.py stage_source() recreates it from arcus/ every
+# submit; committing it just churns + risks shipping a stale import-crashing copy) ---
+.sm_src/
+
 # --- Data + HuggingFace / tokenizer caches ---
 data/
 .hf_cache/
