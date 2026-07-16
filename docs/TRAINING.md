@@ -156,15 +156,20 @@ Real runs go on **RunPod** — an L40S (48 GB) or A100 by the hour, **no quota w
 spot is quota-blocked for new accounts; see below). The trainer is portable: only `launch.py` is
 SageMaker-specific — `train_arcus.py` + the streaming loader run on any GPU box.
 
-**One-time pod setup** (on the pod, via its JupyterLab terminal or SSH):
+**Pod setup** (on the pod, via its JupyterLab terminal or SSH). The clone + data land on the
+persistent `/workspace` volume (one-time); the **deps do NOT persist** — repeat step 2 after every
+restart (see the recovery note below):
 
 ```bash
 # 1. code — clone the PRIVATE repo (fine-grained PAT, read-only, this repo)
 cd /workspace && git clone https://<GITHUB_PAT>@github.com/william-mckeon/Alpha-base.git
 cd Alpha-base
-# 2. deps — DON'T reinstall torch (the RunPod PyTorch image already has a CUDA-matched build)
-pip install tiktoken zstandard safetensors huggingface_hub tqdm numpy bitsandbytes
-pip install -e . --no-deps
+# 2. deps — the RunPod image already ships a CUDA-matched torch; do NOT install or upgrade torch on
+#    the pod (a mismatched CUDA build makes torch fall back to device=cpu). Both requirements files
+#    are torch-free by design, so this is safe. NEVER run `pip install -r requirements.txt` with a
+#    torch pin, and never `pip install torch` here.
+pip install -r requirements-pod.txt   # base deps + bitsandbytes (8-bit AdamW); leaves torch alone
+pip install -e . --no-deps            # register the arcus package without pulling deps (torch stays)
 # 3. data — pull the 47 GB corpus S3 -> volume (RunPod Cloud Sync is cleanest; or aws s3 sync)
 aws s3 sync s3://arcus-training-wmckeon/alpha-dataset "alpha dataset"
 ```
@@ -172,6 +177,23 @@ aws s3 sync s3://arcus-training-wmckeon/alpha-dataset "alpha dataset"
 Keep everything on the **persistent `/workspace` volume** (a network mount) so a pod stop/interruption
 is recoverable via `--resume`. It's **region-locked** — replace a dead pod in the *same* region to
 reattach the volume (the HF checkpoint is your cross-region fallback).
+
+**After a pod stop/restart — re-run the deps step.** RunPod persists only the `/workspace` volume;
+the Python environment lives on the **ephemeral container disk** and is **wiped on every restart**
+(that's why `huggingface_hub`/`pytest` go missing and imports fail after a restart — while `torch`
+comes back, because it's baked into the base image). So each time the pod returns:
+
+```bash
+cd /workspace/Alpha-base
+pip install -r requirements-pod.txt   # reinstall the wiped deps — torch is left untouched
+pip install -e . --no-deps
+python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
+```
+
+That last line **must** print `True`. If it prints `False`, torch was replaced with a CUDA build the
+driver can't use (usually a stray `pip install torch`, or `-r` of a file that pins torch) — reinstall
+the image-matched build, e.g. `pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124`.
+The code on `/workspace` survives a restart; only the environment needs rebuilding.
 
 **Run it — inside `tmux`** so it survives a disconnect. These are **pod (bash)** commands: the trailing
 `\` is bash line-continuation and will fail on a local Windows PowerShell prompt — there, put each command

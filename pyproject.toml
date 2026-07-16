@@ -11,7 +11,10 @@ requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "William McKeon" }]
 dependencies = [
-    "torch>=2.7.0",
+    # torch is a PLATFORM-SPECIFIC prerequisite — install it FIRST for your GPU/driver, never via
+    # this list. A ">=" pin can't be right for every box and would upgrade a pod's CUDA-matched
+    # torch to an incompatible build (-> silent device=cpu fallback). See requirements.txt.
+    # `pip install -e .` therefore does NOT pull torch; the pod flow also uses `--no-deps`.
     "tiktoken>=0.7.0",
     "zstandard>=0.22.0",
     "tqdm>=4.65",

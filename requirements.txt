@@ -1,9 +1,14 @@
 # Arcus — runtime dependencies for the from-scratch MoDE foundation model.
 #
-# torch: install the CUDA build that matches your GPU FIRST. The dev box is an
-# RTX 5080 (Blackwell / sm_120) → CUDA 12.8 cu128 wheels (PyTorch >= 2.7):
-#     pip install torch --index-url https://download.pytorch.org/whl/cu128
-torch>=2.7.0
+# torch is a PLATFORM-SPECIFIC PREREQUISITE and is deliberately NOT listed here — install the CUDA
+# build that matches YOUR GPU/driver FIRST, then `pip install -r requirements.txt` for the rest.
+# A version pin is a trap: it can't be right for every box, and pip would UPGRADE an already-correct
+# torch to a mismatched CUDA build that the driver can't use — torch then silently falls back to
+# device=cpu and the whole run crawls on CPU. Two known targets:
+#   * RTX 5080 (Blackwell / sm_120): CUDA 12.8 cu128 wheels (torch >= 2.7)
+#       pip install torch --index-url https://download.pytorch.org/whl/cu128
+#   * RunPod L40S pod: the image already ships a CUDA-matched torch — do NOT reinstall it.
+# With torch omitted, this file is safe to `pip install -r` on any box (it never touches torch).
 
 # Tokenizer + data.
 tiktoken>=0.7.0          # cl100k_base / o200k_base BPE (the tokenizer)

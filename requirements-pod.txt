@@ -1,0 +1,14 @@
+# Arcus — RunPod pod install (L40S). Run this AFTER every pod start/restart: deps live on the
+# EPHEMERAL container disk and are wiped on restart, while only the /workspace volume persists
+# (see docs/TRAINING.md "After a pod stop/restart").
+#
+#   pip install -r requirements-pod.txt
+#
+# torch is intentionally ABSENT: the RunPod PyTorch image already ships a CUDA-matched torch build.
+# NEVER `pip install torch` (or a file that pins it) on the pod — pip upgrades to a CUDA build the
+# pod's driver can't use, and torch silently falls back to device=cpu (the whole run goes to CPU).
+-r requirements.txt
+
+# L40S-only footprint lever (specs/0007): 8-bit AdamW optimizer states (~7 GB less VRAM), which
+# enables `--optimizer adamw8bit` to push batch 12-16. Ada sm_89 — do NOT install on the 5080/Blackwell.
+bitsandbytes>=0.43.0
