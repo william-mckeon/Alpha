@@ -1,5 +1,8 @@
 # Stage 0 — pretrain the 0.5B to fluency (Phase 0 of the self-improving loop)
 
+> **Status: Verified with the documented generation limitation · Track A — from scratch.**
+> Donor-derived Alpha begins from an already pretrained model and does not repeat this fluency stage.
+
 > Take the `0.5b` preset from "the pipeline runs" to "the model can talk." Fluency is the
 > prerequisite for everything downstream — SFT ([0006](0006-distillation-student.md)) and the
 > whole loop ([0009](0009-self-improving-loop.md)) build on a base that already generates
@@ -41,13 +44,16 @@ because fluency is a qualitative gate you can only check by reading samples.
 - [x] A sampler exists and is tested: `arcus/generate.py` (`generate` + `load_model`),
       `scripts/sample_arcus.py`, `tests/test_generate.py` — runs, greedy is deterministic, EOT
       stops it, and a saved checkpoint round-trips (head re-tied). Public API exports `generate`.
-- [ ] `scripts/memcheck.py --preset 0.5b` reports the 0.5B **fits 16 GB without spill**.
-- [ ] A fluency run trains `0.5b` streaming on the 5080 over a real token budget (~1 pass),
-      `val_ppl` falls and keeps falling to the end (still improving, not memorizing).
-- [ ] `scripts/sample_arcus.py` on the run's checkpoint produces **coherent** samples
-      (grammatical, on-domain) — not gibberish. Logged to [RESULTS.md](../docs/RESULTS.md).
-- [ ] The trained 0.5B is uploaded to HuggingFace (`Islanderintel/arcus-alpha-0.5b`) and
-      reloads via `load_model` for sampling (upload → download → sample round-trip).
+- [x] `scripts/memcheck.py --preset 0.5b` reports the 0.5B **fits 16 GB without spill** (bench-verified;
+      the real run then moved to the RunPod L40S for throughput).
+- [x] A fluency run trains `0.5b` streaming over a real token budget (12B tokens on the L40S);
+      `val_ppl` falls to a final **56.58** on the diverse held-out set ([RESULTS.md](../docs/RESULTS.md)).
+- [~] `scripts/sample_arcus.py` produces **grammatical** samples — but they **loop / lose coherence**
+      (see [RESULTS.md](../docs/RESULTS.md) "Generation quality"). PARTIAL: the model forms language but
+      is not a coherent generator — and the grown 1B at 15.3 ppl still loops. **Full coherence is an SFT
+      goal (Stage 2/4), not a Stage-0 pass** — the honest boundary of pretraining alone.
+- [x] The trained 0.5B is uploaded to HuggingFace (`Islanderintel/arcus-alpha-v0.5-0.5b`) and reloads
+      via `load_model` for sampling (upload → download → sample round-trip verified).
 
 ## Non-goals (this pass)
 

@@ -1,0 +1,3 @@
+# Arcus runtime adaptation: upstream pins openai==1.96.1 but its litellm==1.76.0
+# requires openai>=1.99.5. Keep upstream source unchanged; record this override.
+openai==1.109.1

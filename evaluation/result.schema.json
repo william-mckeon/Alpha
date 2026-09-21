@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arcus.local/schemas/foundation-evaluation-result-v1.json",
+  "title": "Arcus foundation evaluation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run", "model", "provider", "harness", "generation", "outcome", "artifacts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run": {
+      "type": "object",
+      "required": ["id", "contract_revision", "started_at", "finished_at", "seed", "expected_trials", "completed_trials", "termination_reason"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "contract_revision": {"type": "integer", "minimum": 1},
+        "started_at": {"type": "string"},
+        "finished_at": {"type": "string"},
+        "seed": {"type": "integer"},
+        "expected_trials": {"type": "integer", "minimum": 1},
+        "completed_trials": {"type": "integer", "minimum": 0},
+        "termination_reason": {"type": ["string", "null"]}
+        ,"evidence_kind": {"enum": ["benchmark", "diagnostic"]},
+        "budget_scope": {"enum": ["diagnostic", "final-smoke", "six-model-token-restart"]},
+        "execution_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "launcher_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["candidate_id", "huggingface_repo", "revision", "precision", "parser"],
+      "properties": {
+        "candidate_id": {"type": "string"},
+        "huggingface_repo": {"type": "string"},
+        "revision": {"type": "string"},
+        "precision": {"type": "string"},
+        "parser": {"type": "string"}
+      }
+    },
+    "provider": {
+      "type": "object",
+      "required": ["gateway", "upstream", "provider_slug", "model", "quantization", "price_snapshot_at", "verified"],
+      "properties": {
+        "gateway": {"type": "string"},
+        "upstream": {"type": "string", "minLength": 1},
+        "provider_slug": {"type": "string", "minLength": 1},
+        "model": {"type": "string"},
+        "quantization": {"type": "string", "minLength": 1},
+        "price_snapshot_at": {"type": "string"},
+        "verified": {"type": "boolean"}
+      }
+    },
+    "search": {
+      "type": "object",
+      "required": ["provider", "contract_id", "used", "tool_calls", "credits_upper_bound", "official_bfcl_comparable"],
+      "properties": {
+        "provider": {"const": "tavily"},
+        "contract_id": {"type": "string", "minLength": 1},
+        "used": {"type": "boolean"},
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "credits_upper_bound": {"type": "integer", "minimum": 0},
+        "official_bfcl_comparable": {"const": false}
+      }
+    },
+    "harness": {
+      "type": "object",
+      "required": ["id", "revision", "dataset", "task_subset"],
+      "properties": {
+        "id": {"type": "string"},
+        "revision": {"type": "string"},
+        "dataset": {"type": "string"},
+        "task_subset": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": ["temperature", "top_p", "max_output_tokens", "tool_call_budget", "max_agent_iterations", "wall_time_seconds", "agent_setup_timeout_seconds", "verifier_timeout_seconds", "trial_timeout_seconds", "concurrency", "attempts", "retry_on_provider_error", "retry_on_model_failure", "contract_verified"],
+      "properties": {
+        "temperature": {"type": "number"},
+        "top_p": {"type": "number"},
+        "max_output_tokens": {"type": "integer", "minimum": 1},
+        "tool_call_budget": {"type": "integer", "minimum": 1},
+        "max_agent_iterations": {"type": "integer", "minimum": 1},
+        "wall_time_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "agent_setup_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "verifier_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "trial_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "concurrency": {"type": "integer", "minimum": 1},
+        "attempts": {"type": "integer", "minimum": 1},
+        "retry_on_provider_error": {"type": "integer", "minimum": 0},
+        "retry_on_model_failure": {"type": "integer", "minimum": 0},
+        "contract_verified": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["status", "passed", "score", "failure_class", "tokens", "tool_calls", "latency_seconds", "cost_usd", "attempt"],
+      "properties": {
+        "status": {"enum": ["passed", "failed", "infrastructure_error", "provider_error", "parser_error", "harness_error", "invalid_run", "interrupted"]},
+        "passed": {"type": "boolean"},
+        "score": {"type": "number", "minimum": 0, "maximum": 1},
+        "failure_class": {"type": ["string", "null"]},
+        "tokens": {"type": "integer", "minimum": 0},
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "latency_seconds": {"type": "number", "minimum": 0},
+        "cost_usd": {"type": "number", "minimum": 0}
+        ,"attempt": {"type": "integer", "minimum": 1}
+        ,"valid_tool_calls": {"type": "integer", "minimum": 0}
+        ,"wrong_tool_calls": {"type": "integer", "minimum": 0}
+        ,"missed_tool_calls": {"type": "integer", "minimum": 0}
+        ,"unnecessary_tool_calls": {"type": "integer", "minimum": 0}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["raw_requests", "raw_responses", "tool_events", "verifier_results", "sha256"],
+      "properties": {
+        "raw_requests": {"type": "string"},
+        "raw_responses": {"type": "string"},
+        "tool_events": {"type": "string"},
+        "search_discovery": {"type": "string"},
+        "search_events": {"type": "string"},
+        "fetch_events": {"type": "string"},
+        "budget_stop": {"type": "string"},
+        "gateway_errors": {"type": "string"},
+        "budget_scope": {"type": "string"},
+        "verifier_results": {"type": "string"},
+        "sha256": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

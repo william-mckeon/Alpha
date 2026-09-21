@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "scoped_readiness": {
+    "contract_revision": 9,
+    "status": "six_model_token_limited_sweep_running",
+    "full_smoke_run_id": "phase1-six-full-20260915-01",
+    "previous_stopped_run_id": "phase1-smoke-full-20260915-03",
+    "restart_evidence": "../../docs/PHASE1_SIX_MODEL_RESTART.md",
+    "full_smoke_expected_units": 504,
+    "final_budget_status": "authorized",
+    "manifest": "../runs/suites/phase1-six-full-20260915-01/suite-state.json",
+    "qualification_complete": false,
+    "donor_selected": false
+  },
+  "smoke_repair": {
+    "contract_revision": 5,
+    "stopped_sweep": "phase1-smoke-full-20260913-01",
+    "completed_attempts": 71,
+    "expected_attempts": 420,
+    "historical_false_failures_regraded_diagnostic_only": 6,
+    "qualification_complete": false,
+    "donor_selected": false
+  },
+  "four_harness_orchestration": {
+    "status": "runners_enabled_full_sweep_pending",
+    "manifest": "manifests/2026-09-13-four-harness-orchestration.json",
+    "full_phase1_complete": false,
+    "bounded_probes_qualification_eligible": false
+  },
+  "search_filesystem_integration": {
+    "status": "one_official_mcp_task_passed_bfcl_search_model_failed",
+    "benchmark_scored": false,
+    "manifest": "manifests/2026-09-13-search-filesystem-integration.json",
+    "full_phase1_complete": false
+  },
+  "status": "partial_official_diagnostics_normalized_full_qualification_pending",
+  "official_worker_integration": {
+    "status": "partial_diagnostics_passed_full_qualification_pending",
+    "native_bfcl_ast_candidate_passes": 5,
+    "terminal_qualification_config_audits": 75,
+    "fresh_terminal_official_outcome": "model_failure",
+    "manifest": "manifests/2026-09-12-official-worker-integration.json"
+  },
+  "tavily_diagnostic": {
+    "status": "passed_all_five_candidates",
+    "benchmark_scored": false,
+    "manifest": "manifests/2026-09-12-tavily-validation.json",
+    "contract_id": "arcus-tavily-mcp-v1",
+    "free_only_credit_cap": 1000,
+    "cumulative_reserved_credits_upper_bound": 22,
+    "evidence": "../runs/search/tavily-models-20260912-06/validation.json"
+  },
+  "generated_at": "2026-09-13",
+  "integration_gate": {
+    "status": "frozen_catalogs_partial_live_official_diagnostics_full_suite_callbacks_and_coverage_pending",
+    "smoke_units_per_candidate": 84,
+    "qualification_units_per_candidate": 480,
+    "fresh_native_probe_passes": 5,
+    "fresh_native_probe_cost_usd": 0.00075876,
+    "manifest": "manifests/2026-09-12-integration-gate-validation.json",
+    "remaining_files": "../../docs/PHASE1_NEXT_FILES.md"
+  },
+  "native_tool_parser_smoke": {
+    "status": "passed_all_candidates",
+    "spent_usd": 0.00135487,
+    "manifest": "manifests/2026-09-11-native-tool-smoke.json"
+  },
+  "invalid_runs": [
+    {
+      "run_id": "step-terminal-smoke-scored-v2",
+      "candidate_id": "step-3.5-flash",
+      "status": "invalid_run",
+      "spent_usd": 0.7844523,
+      "cumulative_step_spend_after_run_usd": 0.8291017,
+      "manifest": "manifests/2026-09-12-step-terminal-invalid.json",
+      "score_effect": "excluded"
+    }
+  ],
+  "diagnostic_runs": [
+    {
+      "run_id": "step-3.5-flash-terminal-openssl-selfsigned-cert-attempt-01",
+      "candidate_id": "step-3.5-flash",
+      "status": "diagnostic_not_scored",
+      "reward": 0,
+      "manifest": "manifests/2026-09-12-step-fixed-live-validation.json",
+      "spent_usd_including_strict_proxy_probe": 0.0373661,
+      "reason": "Only one of three attempts; the manual gateway trial label differed from the Harbor job ID. Artifacts were isolated."
+    }
+  ],
+  "scorecard": [],
+  "winner": null,
+  "runner_up": null,
+  "notes": [
+    "All five candidates passed the native tool-call parser smoke; this is not a benchmark score.",
+    "No candidate is selected because complete frozen smoke/qualification coverage and remaining runtime/provenance gates are pending.",
+    "Raw run artifacts remain outside Git; their hashes belong in results/manifests/.",
+    "The stopped Step Terminal-Bench job is invalid configuration evidence, not a zero model score."
+  ],
+  "worker_normalization": {
+    "status": "repository_bfcl_mcp_current_official_imports_live_validated",
+    "benchmark_scored": false,
+    "full_phase1_complete": false,
+    "tests_passed": 159,
+    "manifest": "manifests/2026-09-13-worker-normalization.json",
+    "normalized_current_runs": [
+      "phase1-bfcl-live-20260913-01",
+      "phase1-repository-20260913-04",
+      "phase1-mcpmark-pattern-20260913-01"
+    ],
+    "superseded_normalized_runs": [
+      {
+        "run_id": "phase1-mcpmark-import-20260913-01",
+        "reason": "legacy 300-second verifier; old v1 contract assertion is superseded; raw official pass/cost retained"
+      }
+    ],
+    "cumulative_recorded_openrouter_usd": 1.528425614,
+    "new_recorded_openrouter_usd": 0.6023977,
+    "unreconciled_reserved_upper_bound_usd": 0.0464337,
+    "cumulative_tavily_reserved_credits_upper_bound": 40,
+    "qualification_web_search_variant": "awaiting explicit base versus no-snippet approval"
+  }
+}

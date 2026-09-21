@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "price_snapshot_at": "2026-09-14",
+  "currency": "USD",
+  "aggregate_smoke_cap": 48.0,
+  "providers": [
+    {"candidate_id": "codestral-2508", "openrouter_model": "mistralai/codestral-2508", "upstream": "Mistral", "provider_slug": "mistral", "quantization": "provider-declared-unknown", "prompt_per_million": 0.30, "completion_per_million": 0.90, "smoke_cap": 0, "context_length": 256000, "max_completion_tokens": 204800, "capacity_snapshot_at": "2026-09-15"},
+    {"candidate_id": "kimi-k2.7-code", "openrouter_model": "moonshotai/kimi-k2.7-code", "upstream": "CoreWeave", "provider_slug": "coreweave/int4", "quantization": "int4", "prompt_per_million": 0.71, "completion_per_million": 3.50, "smoke_cap": 0, "context_length": 262144, "max_completion_tokens": 235929, "capacity_snapshot_at": "2026-09-15"},
+    {
+      "candidate_id": "step-3.5-flash",
+      "openrouter_model": "stepfun/step-3.5-flash",
+      "upstream": "SiliconFlow",
+      "provider_slug": "siliconflow",
+      "quantization": "provider-declared-unknown",
+      "prompt_per_million": 0.10,
+      "completion_per_million": 0.30,
+      "smoke_cap": 5.0
+      ,"context_length": 262144,
+      "max_completion_tokens": 65536,
+      "capacity_snapshot_at": "2026-09-14"
+    },
+    {
+      "candidate_id": "qwen3-coder-next",
+      "openrouter_model": "qwen/qwen3-coder-next",
+      "upstream": "Alibaba",
+      "provider_slug": "alibaba",
+      "quantization": "provider-declared-unknown",
+      "prompt_per_million": 0.30,
+      "completion_per_million": 1.50,
+      "pricing_tiers": [{"min_prompt_tokens": 32000, "prompt_per_million": 0.50, "completion_per_million": 2.50}, {"min_prompt_tokens": 128000, "prompt_per_million": 0.80, "completion_per_million": 4.00}],
+      "smoke_cap": 8.0,
+      "context_length": 262144,
+      "max_completion_tokens": 65536,
+      "capacity_snapshot_at": "2026-09-14"
+    },
+    {
+      "candidate_id": "glm-4.7",
+      "openrouter_model": "z-ai/glm-4.7",
+      "upstream": "DeepInfra",
+      "provider_slug": "deepinfra",
+      "quantization": "fp4",
+      "prompt_per_million": 0.40,
+      "completion_per_million": 1.75,
+      "smoke_cap": 15.0,
+      "context_length": 202752,
+      "max_completion_tokens": 131072,
+      "capacity_snapshot_at": "2026-09-14"
+    },
+    {
+      "candidate_id": "deepseek-v4-flash",
+      "openrouter_model": "deepseek/deepseek-v4-flash",
+      "upstream": "DeepInfra",
+      "provider_slug": "deepinfra",
+      "quantization": "fp8",
+      "prompt_per_million": 0.09,
+      "completion_per_million": 0.18,
+      "smoke_cap": 5.0,
+      "context_length": 1048576,
+      "max_completion_tokens": 65536,
+      "capacity_snapshot_at": "2026-09-14"
+    },
+    {
+      "candidate_id": "qwen3-30b-a3b-thinking-2507",
+      "context_length": 81920,
+      "max_completion_tokens": 32768,
+      "capacity_snapshot_at": "2026-09-14",
+      "openrouter_model": "qwen/qwen3-30b-a3b-thinking-2507",
+      "upstream": "Alibaba",
+      "provider_slug": "alibaba",
+      "quantization": "provider-declared-unknown",
+      "prompt_per_million": 0.20,
+      "completion_per_million": 2.40,
+      "smoke_cap": 15.0
+    }
+  ]
+}

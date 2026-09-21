@@ -1,0 +1,26 @@
+name: arcus-visual
+services:
+  visual:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.visual
+    environment:
+      ARCUS_VISUAL_TOKEN: ${ARCUS_VISUAL_TOKEN:?Set a private visual service token}
+    ports: ["127.0.0.1:${ARCUS_VISUAL_PORT:-8896}:8896"]
+    volumes:
+      - type: bind
+        source: ${ARCUS_VISUAL_CONFIG:-../../configs/baby_arcus/visual.container.json}
+        target: /app/config.json
+        read_only: true
+      - type: bind
+        source: ${ARCUS_VISUAL_PARENT:?Set the qualified joint model directory}
+        target: /model
+        read_only: true
+      - type: bind
+        source: ${ARCUS_VISUAL_STATE:?Set the qualified visual adapter directory}
+        target: /visual
+        read_only: true
+    read_only: true
+    tmpfs: ["/tmp"]
+    init: true
+    gpus: all

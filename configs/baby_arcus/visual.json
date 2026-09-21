@@ -1,0 +1,11 @@
+{
+  "parent": "runs/arcus_mode_staircase_v1/capacity-50",
+  "output": "runs/arcus_visual_v3",
+  "updates": 2000,
+  "batch_size": 16,
+  "seed": 2701,
+  "learning_rate": 0.0001,
+  "minimum_accuracy": 0.85,
+  "decision_limit": 30,
+  "interval_seconds": 1.0
+}

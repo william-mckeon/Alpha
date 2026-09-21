@@ -1,0 +1,19 @@
+# Explicit Linux release aligned with the existing Arcus GPU image.
+# An already-built runtime may be supplied for local application-only rebuilds.
+ARG BABY_GPU_RUNTIME=nvidia/cuda:12.8.0-cudnn-runtime-ubuntu22.04@sha256:dab70d0872e15703b3ac7617471206902f6972007a9f514ca2eab8476863fbfd
+FROM ${BABY_GPU_RUNTIME}
+USER root
+ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1
+RUN if ! python3 -m pip --version >/dev/null 2>&1; then apt-get update && apt-get install -y --no-install-recommends python3 python3-pip ca-certificates && rm -rf /var/lib/apt/lists/*; fi
+WORKDIR /app
+COPY requirements-baby-arcus.txt requirements-baby-arcus.lock /app/
+RUN python3 -m pip install --no-cache-dir torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128 && python3 -m pip install --no-cache-dir -r requirements-baby-arcus.txt
+COPY docker/baby-arcus/requirements-linux.lock /app/requirements-linux.lock
+RUN python3 -m pip install --no-cache-dir --no-deps -r /app/requirements-linux.lock && python3 -m pip check
+COPY arcus /app/arcus
+COPY baby_arcus /app/baby_arcus
+COPY configs/baby_arcus /app/configs/baby_arcus
+COPY tests/baby_arcus /app/tests/baby_arcus
+RUN (id baby >/dev/null 2>&1 || useradd --uid 10001 --create-home baby) && mkdir -p /state && chown baby:baby /state
+USER baby
+ENTRYPOINT ["python3", "-m", "baby_arcus.cli"]

@@ -1,5 +1,12 @@
 # Arcus — Results Log
 
+Current Baby Arcus evidence is indexed in [current status](ARCUS_CURRENT_STATUS.md).
+See [Phase 1 results](ARCUS_PATHWAYS_RESULTS.md) and the
+[completed before/after comparison](ARCUS_PHASE1_BEFORE_AFTER_2026-09-21.md):
+no meaningful learning gain was established; measured abilities were retained
+with small mixed rest changes. The entries below retain their original model,
+track and date and must not be attributed to the current embodied checkpoint.
+
 > A running, honest record of measured runs — boenet's reporting discipline (matched
 > comparisons, noise respected, "NOT established" called out). A save point, not a
 > sealed conclusion. Newest first.
@@ -123,6 +130,70 @@ the **old** loader, so the held-out docs were in their training streams — the 
 optimistic (mild memorization of ~1,344 docs seen ~once out of millions); (2) both trained with
 domain-phasing, so neither is converged. A retrain under the interleaved loader should lower both
 absolutes; the grown-1B calibration is the next real measurement.
+
+---
+
+## Stage 1 — growth calibration: the grown 1B (2026-07-20)
+
+Grew the trained 0.5B (4 experts, 56.58) to **8 experts (991.4M)** with `grow_experts` (dormant-margin 8),
+then continued training on the **interleaved** loader for 12B tokens on a RunPod L40S.
+
+**Near-lossless, verified on the REAL model (not just the unit test).** The grown checkpoint, *before any
+continued training*, scored **60.03** on the held-out set vs the seed's 56.58 — a ~6% / ~0.06-nat cost.
+That is the softmax-gate dilution the operator can't avoid (adding experts is near-lossless, not bit-
+identical — see [specs/0010](../specs/0010-growth-operator.md)); a *broken* grow would read in the
+hundreds. So the operator preserves the seed's learning on a real 991M checkpoint, confirming the `tiny`
+unit tests at scale.
+
+**The trained result — the calibration ladder** (all on the same diverse held-out set, via `eval_ppl.py`):
+
+| model | params | experts | honest `val_ppl` |
+|---|---|---|---|
+| 0.5B seed                 | 613.9M  | 4  | 56.58 |
+| 1B from-scratch (control) | 1180.2M | 10 | 44.23 |
+| **grown 1B (v1.5)**       | 991.4M  | 8  | **15.32** |
+
+The grown model **beats the from-scratch 1B by ~3×** (lower ppl). The grow→continue-train loop reaches —
+and far surpasses — the from-scratch baseline: **the 0.5B→85B reuse thesis is validated at the first
+rung.** (The grow started it at 60; the full run drove it to 15.3, well under the training CSV's ~20 at
+~9% of the run.)
+
+*Two honest caveats on 15.32, so the number isn't over-read:* (1) **loader confound** — the 44.23 control
+trained on the *old domain-phasing* loader, so a large part of this gap is the interleave fix, not growth
+alone; a clean attribution needs a from-scratch 1B retrained on the new loader. (2) **corpus
+predictability** — the corpus is 43% math / 27% code, full of highly predictable tokens, so a low absolute
+ppl partly reflects an easy-to-predict corpus, not raw capability. Both wins are real; neither is *pure*
+growth.
+
+### Generation quality — the substrate reality
+
+`val_ppl` says the model learned; the samples say whether the text is coherent, and here they diverge
+sharply. **The grown 1B has excellent perplexity but is not yet a coherent generator.** Reading
+`sample_arcus.py` on the finished checkpoint:
+
+- *"The three branches of the United States government are:"* → a list of `United States President,
+  1999-2000 / 2000-2001 / …` (wrong, and a degenerate loop).
+- *"Let me explain how a computer stores information."* → `…the number of bits in the number of bits is
+  the number of bits in the number of bits…` (repetition collapse).
+- *"The key idea behind gradient descent is"* → one sentence, then repeated LaTeX matrix notation.
+- *"Question: What is 17 + 25? Answer:"* → `17 + 25 = 25 + 17 = 25 + 17 = …` (never reaches 42).
+- *"def is_prime(n):"* → `return n % 2 == 0` repeated verbatim in a loop (wrong, and looped).
+
+Grammatical English forms, but it **loops, loses coherence, drifts off-topic, gets facts/reasoning wrong,
+and reverts to math notation on prose.** This is not a contradiction of 15.3 ppl — perplexity is
+next-token prediction on *real* text; generation is autoregressive and compounds its own errors, so low
+ppl routinely coexists with poor generation. The drivers: (a) a **raw base model with zero SFT** — base
+models at ~1B are expected to be loopy, non-instruction-following, low-knowledge; (b) **under-training**
+(12B tokens < the ~20B Chinchilla floor for a 1B); (c) the **math/code-heavy corpus** pulls generation
+toward notation; (d) the **sampler has no repetition penalty**, which maximizes base-model looping (worst
+at greedy / `temperature 0`).
+
+**The conclusion, plainly: this is a validated *substrate*, not a usable generator.** Judging it on
+knowledge (branches of government) or reasoning (17+25) is the wrong bar — those come from **SFT** (kills
+the loops, teaches prompt-following) and then **RLVR** (reasoning + tools), which was always the plan
+([specs/0009](../specs/0009-self-improving-loop.md) Stages 2/4/5). The generation finding is exactly what
+marks **SFT as the next active stage.** A repetition penalty in `arcus/generate.py` is a cheap decoding
+patch that would reduce the looping now, but it does not substitute for SFT.
 
 ---
 

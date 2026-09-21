@@ -1,5 +1,15 @@
 # The growth operator (Stage 1) — grow a trained checkpoint into a bigger one
 
+> **Baby integration note:** the implemented operator copies expert weights and
+> router rows, while ordinary continuation starts a fresh optimizer. It does not
+> establish simulation retention, task-head compatibility, or useful new-expert
+> activation. Changing expert count also changes MoE dispatch capacity, which can
+> alter overflow independently of softmax dilution. [Baby growth validation](0033-baby-arcus-growth.md)
+> tests those effects; this note does not retroactively expand the historical guarantee.
+
+> **Status: Verified · Track A — from scratch.** The successful growth evidence is preserved.
+> Track B does not change the donor's expert topology during initial conversion.
+
 > The keystone of the ladder ([0009](0009-self-improving-loop.md)): take a trained smaller
 > Arcus and produce a larger one that computes **nearly the same function at the instant it
 > grows** (near-lossless — see the recipe), then keep training. The first and cleanest dial is
@@ -69,9 +79,12 @@ are named here but deferred (harder; see Non-goals).
       margin *before any training*. `tests/test_grow.py` asserts it + shape-correctness on `tiny`.
 - [x] Growing `+1` works (per-revision default); `+6` (`0.5b` 4→`1b` 10) verified end-to-end via
       `scripts/grow_arcus.py`.
-- [ ] A grown `0.5b`(4)→`1b`(10), continued-trained (`train_arcus.py --init_from`), reaches within
-      a **measured, small** `val_ppl` gap of the from-scratch `1b` (already training) — the
-      calibration; waits on the 0.5B finishing ([0009](0009-self-improving-loop.md) Stage 1).
+- [x] A grown `0.5b`(4)→**8 experts (991M)**, continued-trained (`train_arcus.py --init_from`, 12B
+      tokens, interleaved loader), reaches **`val_ppl` 15.32 — *beating* the from-scratch `1b`'s 44.23**,
+      not merely matching it: the calibration succeeded and the reuse thesis holds at the first rung.
+      Real-model near-lossless confirmed **56.58 → 60.03** on the actual 0.5B before training (~6% — the
+      gate dilution, matching the `tiny` unit test at scale). *(Grew to the 8-expert `0.9b` rung, not the
+      full 10; 8→10 is the next grow.)* See [RESULTS.md](../docs/RESULTS.md).
 - [ ] Optimizer moments carry (skip the re-warmup) — a follow-up; the first build uses a fresh
       optimizer on the warm weights.
 

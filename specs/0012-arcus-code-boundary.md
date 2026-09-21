@@ -1,5 +1,8 @@
 # The Arcus Code boundary — public harness, private training (the IP split)
 
+> **Status: Accepted · Shared.** The boundary applies to both tracks. Track B additionally records
+> donor provenance/licenses and explicitly controls router-only versus merged derivative checkpoints.
+
 > One thesis, a boundary that *converges* via the three-phase build ([0013](0013-agent-tooling.md)).
 > **openagent-code** (public) is the staging + showcase for the tooling; **Arcus Code** (private,
 > this repo) becomes the *complete robust system* — the coding CLI + the model + the training. This
@@ -11,7 +14,8 @@
 Keep a **public, portfolio-facing showcase** (openagent-code — the tooling + a generic distillation
 demo) and a **private, complete robust system** (Arcus Code — the Codex-derived CLI + the model +
 the self-improving training) cleanly separated, connected by a data handoff. Commodity capability
-is worth showing openly; the novel methodology (from-scratch student, growth, RLVR) must not be
+is worth showing openly; the novel methodology (from-scratch student, donor conversion, growth,
+router training, RLVR) must not be
 public. The three-phase build ([0013](0013-agent-tooling.md)) migrates the tooling *into* Arcus Code
 (P2) and folds the model in (P3) — so the boundary is a convergence, not a static wall.
 
@@ -35,7 +39,8 @@ public. The three-phase build ([0013](0013-agent-tooling.md)) migrates the tooli
   repo never learns the architecture.
 - **The line: commodity vs. novel.** Keep *generic* capability public (LoRA-SFT of an off-the-shelf
   model is a fine portfolio demo — "I can distil"); keep *novel methodology* private (from-scratch
-  student, growth, RLVR, self-improvement). Commodity → public; novel → private.
+  student, donor adapters, growth, router training, RLVR, self-improvement). Commodity → public;
+  novel → private.
 - **"Arcus Code" = this repo, growing into the whole system.** Currently `Alpha base` (model +
   pretraining + growth); by P2/P3 it also holds the migrated CLI + the robust training — the
   complete private system. (Repo rename `arcus-code` is open; the boundary holds either way.)
@@ -66,7 +71,7 @@ public. The three-phase build ([0013](0013-agent-tooling.md)) migrates the tooli
 - This split is *why* the harness is reusable ([0006](0006-distillation-student.md)) and *why* the
   loop stages ([0009](0009-self-improving-loop.md)) tag each piece public or private: everything that
   *trains* is private; everything that *acts / measures / serves the boundary* is public.
-- The teacher (gpt-oss-120b on Bedrock) is reached through openagent-code's public gateway; its
+- For Track A, the teacher (gpt-oss-120b on Bedrock) is reached through openagent-code's public gateway; its
   *outputs* (trajectories) cross into the private trainer. The teacher is not a weight donor.
 - Keep the trajectory schema **versioned** so the two repos can evolve independently without
   breaking the handoff.

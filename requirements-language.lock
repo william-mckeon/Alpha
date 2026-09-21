@@ -1,0 +1,3 @@
+# Direct dependencies for the separate language worker. Install the appropriate Torch build first.
+tiktoken==0.14.0
+zstandard==0.25.0

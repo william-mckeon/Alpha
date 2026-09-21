@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "diagnostic_passed",
+  "benchmark_scored": false,
+  "contract_id": "arcus-tavily-mcp-v1",
+  "native_delegated_search_candidates_passed": 5,
+  "full_project_tests_passed": 114,
+  "successful_five_model_probe_openrouter_cost_usd": 0.002234034,
+  "free_only_credit_cap": 1000,
+  "cumulative_search_credits_reserved_upper_bound": 22,
+  "credit_measurement_note": "Conservative ledger reservation includes failed probes. Usage snapshots were cached under the 600-second contract; this is not measured billed usage.",
+  "evidence": [
+    {
+      "path": "evaluation/runs/search/tavily-models-20260912-06/validation.json",
+      "sha256": "a867f7ff91ba655be4281390bef4dc58a6b2e1ae1177167b496fa0e2d1901c24",
+      "status": "passed"
+    },
+    {
+      "path": "evaluation/runs/search/tavily-docker-20260912-02/validation.json",
+      "sha256": "42791d3c605696857994ddf8c44d8fd944177a1e65a65f37f5b9f21ee091256c",
+      "status": "passed"
+    }
+  ],
+  "fixed_live_findings": [
+    "Hosted Tavily schema does not expose include_answer; send only advertised optional fields.",
+    "Use native automatic tool selection because forced selection is unsupported on a candidate route.",
+    "Bound and cache authenticated usage checks to avoid throttling; never automatically retry tool execution.",
+    "Close SQLite connections explicitly for Windows cleanup.",
+    "Preflight reporting must not access model-only candidate arguments."
+  ],
+  "remaining_gate": "Verified official worker runtimes, Tavily BFCL wiring, full provenance import, and exact four-harness task-attempt coverage."
+}

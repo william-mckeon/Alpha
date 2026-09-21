@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-13",
+  "status": "partial_phase1_worker_normalization",
+  "benchmark_scored": false,
+  "full_phase1_complete": false,
+  "donor_selected": false,
+  "tests": {
+    "command": ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider",
+    "passed": 159
+  },
+  "control_validation": "passed",
+  "live_preflight": "passed outside restricted process",
+  "credential_audit": {
+    "credential_values_checked": 2,
+    "files_checked": 268,
+    "archives_checked": 1,
+    "archive_members_checked": 304,
+    "leaking_paths": []
+  },
+  "latest_built_images": {
+    "openhands": "sha256:4b0aade5b70ebd94d121ce42a9809fedf6f052a381b47020d3b6962c4f0ddfa1",
+    "mcpmark": "sha256:c4ed83c42cce3d43ed2e8b7d013577cc47a9873da962c42cadc12c7a70692464"
+  },
+  "live_runs": [
+    {
+      "run_id": "phase1-bfcl-multiturn-20260913-01",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "multi_turn_long_context_89",
+      "harness_id": "function_calling",
+      "status": "integration_passed",
+      "official_verdict": {
+        "status": "failed",
+        "passed": false,
+        "score": 0
+      },
+      "image_id": null,
+      "evidence": "evaluation/runs/bfcl/phase1-bfcl-multiturn-20260913-01/validation.json",
+      "sha256": "3dc0b5a290f21763d5bcf8cfdc19fb012fc87a07b6e21967ede08341755a3355",
+      "normalization_status": "raw_diagnostic_only_missing_retained_contract"
+    },
+    {
+      "run_id": "phase1-bfcl-live-20260913-01",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "live_multiple_204-90-6",
+      "harness_id": "function_calling",
+      "status": "integration_passed",
+      "official_verdict": {
+        "status": "passed",
+        "passed": true,
+        "score": 1
+      },
+      "image_id": null,
+      "evidence": "evaluation/runs/bfcl/phase1-bfcl-live-20260913-01/validation.json",
+      "sha256": "aad4c716d220e51e339eae622cb40585b6d0f469c5b4a3e35d1c2a4ecc3401d3",
+      "normalized_evidence": "evaluation/runs/bfcl/phase1-bfcl-live-20260913-01/normalized.json",
+      "normalized_sha256": "b10fbc39fe0a420828308979f3007e01f4c4a38f8efaa778eb64e23de152d5f8",
+      "normalized_outcome": {
+        "status": "passed",
+        "passed": true,
+        "score": 1,
+        "failure_class": null,
+        "tokens": 1331,
+        "tool_calls": 1,
+        "latency_seconds": 18.885372,
+        "cost_usd": 0.0001547,
+        "attempt": 1
+      },
+      "evidence_kind": "diagnostic"
+    },
+    {
+      "run_id": "phase1-mcpmark-import-20260913-01",
+      "candidate_id": "qwen3-coder-next",
+      "task_id": "filesystem/file_property/size_classification",
+      "harness_id": "mcp",
+      "status": "integration_passed",
+      "official_verdict": {
+        "status": "passed",
+        "passed": true,
+        "score": 1
+      },
+      "image_id": "sha256:7ea57a2da935139d80741bf266c7ff9fb4166e5e6d6e375716f6eca095b22bc9",
+      "evidence": "evaluation/runs/mcpmark/phase1-mcpmark-import-20260913-01/validation.json",
+      "sha256": "3e5d3de2b709a64dd5664765e33b8279f07b33a0addf45b0bcc0eff865cf55be",
+      "normalized_evidence": "evaluation/runs/mcpmark/phase1-mcpmark-import-20260913-01/normalized.json",
+      "normalized_sha256": "2f43f6cf6f47b2dce9d827302fee6fdeb2a26f5f972c47ef93cf79315cc83abc",
+      "normalized_outcome": {
+        "status": "passed",
+        "passed": true,
+        "score": 1,
+        "failure_class": null,
+        "tokens": 277863,
+        "tool_calls": 35,
+        "latency_seconds": 82.415211,
+        "cost_usd": 0.0868329,
+        "attempt": 1
+      },
+      "evidence_kind": "diagnostic",
+      "normalization_status": "superseded_unverified_legacy_verifier_deadline",
+      "normalized_record_eligible": false,
+      "reason": "Retain the raw official pass and incurred cost. Its old v1 normalized record incorrectly asserted a verified contract while the worker retained the legacy 300-second verifier. The current importer refuses this run; do not reuse the old normalized record."
+    },
+    {
+      "run_id": "phase1-repository-20260913-01",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "django__django-14170",
+      "harness_id": "repository",
+      "status": "integration_error",
+      "official_verdict": null,
+      "image_id": "sha256:a7f098cd8e66d7e560a907d9b4106610e6d189e34e35617a856309a0223bb501",
+      "evidence": "evaluation/runs/repository/phase1-repository-20260913-01/validation.json",
+      "sha256": "5cb3e03d49bbf48ff475c5f501e02b6b6d7c7f6d475d2f800133d95cc0d7b549"
+    },
+    {
+      "run_id": "phase1-repository-20260913-02",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "django__django-14170",
+      "harness_id": "repository",
+      "status": "integration_error",
+      "official_verdict": null,
+      "image_id": "sha256:364303b843230bc127b0d8e085213b56740a36eed52399037cf394f859d3f4a7",
+      "evidence": "evaluation/runs/repository/phase1-repository-20260913-02/validation.json",
+      "sha256": "c5519607d150fe06541549bb383b81d19b7dafef781c9e692e5043b648bd6be0"
+    },
+    {
+      "run_id": "phase1-repository-20260913-03",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "django__django-14170",
+      "harness_id": "repository",
+      "status": "integration_error",
+      "official_verdict": null,
+      "image_id": "sha256:bc2531aeafcdef7453b62f80bcaf1820f30af399f160943ea5879751f376bce3",
+      "evidence": "evaluation/runs/repository/phase1-repository-20260913-03/validation.json",
+      "sha256": "43536f6be84da92dc540f87246f9135edad364cae08f1ce7b1aa5504d136153f"
+    },
+    {
+      "run_id": "phase1-repository-20260913-04",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "django__django-14170",
+      "harness_id": "repository",
+      "status": "integration_passed",
+      "official_verdict": {
+        "status": "failed",
+        "passed": false,
+        "score": 0
+      },
+      "image_id": "sha256:ce7f43cbd3bfb019d0ba8d3b131721c7e4722ae5a906f86aa765f40609c63162",
+      "evidence": "evaluation/runs/repository/phase1-repository-20260913-04/validation.json",
+      "sha256": "1add29d0af5d41408090d7b3dc79b99bec22dc67ec63fc938bb459421396bafb",
+      "normalized_evidence": "evaluation/runs/repository/phase1-repository-20260913-04/normalized.json",
+      "normalized_sha256": "27ac61fbd6c8048fcf0612992353a5cfa18f7c7030d72adc56b332950b9baf56",
+      "normalized_outcome": {
+        "status": "failed",
+        "passed": false,
+        "score": 0,
+        "failure_class": "model",
+        "tokens": 4816344,
+        "tool_calls": 87,
+        "latency_seconds": 1234.011631,
+        "cost_usd": 0.4885523999999999,
+        "attempt": 1
+      },
+      "evidence_kind": "diagnostic"
+    },
+    {
+      "run_id": "phase1-mcpmark-pattern-20260913-01",
+      "candidate_id": "step-3.5-flash",
+      "task_id": "filesystem/file_context/pattern_matching",
+      "harness_id": "mcp",
+      "status": "integration_passed",
+      "official_verdict": {
+        "status": "passed",
+        "passed": true,
+        "score": 1
+      },
+      "image_id": "sha256:26ac0bb1bf275e3b34ff6b9113efcecb8e551f9f5e403c20a28c6ad0c1640047",
+      "evidence": "evaluation/runs/mcpmark/phase1-mcpmark-pattern-20260913-01/validation.json",
+      "sha256": "ac6b93dab9a7fa5841381b52accbf482b8c2279394f1254f3e823a71ad09db11",
+      "normalized_evidence": "evaluation/runs/mcpmark/phase1-mcpmark-pattern-20260913-01/normalized.json",
+      "normalized_sha256": "95a6a709ac499df3c03b1d8ed1bbac19f5c02ee18fad305235114b0a2d5a7f54",
+      "normalized_outcome": {
+        "status": "passed",
+        "passed": true,
+        "score": 1,
+        "failure_class": null,
+        "tokens": 55787,
+        "tool_calls": 6,
+        "latency_seconds": 330.322252,
+        "cost_usd": 0.0103739,
+        "attempt": 1
+      },
+      "evidence_kind": "diagnostic"
+    }
+  ],
+  "source_sha256": {
+    "evaluation/openhands.py": "c01ece93d3abb68cd0f8e994bf95549da1e661099c213e50ef797cc8f0307ad4",
+    "evaluation/openhands_worker.py": "311300d1348abaf4b5055a3466e58b977ead4ac00c64f8c8aaca04830ececf2a",
+    "evaluation/bfcl.py": "26ddafb60aade3a7b7c95345c4778ce8dfe1774005654203506b2064add33e47",
+    "evaluation/bfcl_worker.py": "25d2875dd5fe15506a148abc575eeaaf9d9054a1d885d917cc5ef32756541255",
+    "evaluation/mcpmark_worker.py": "ae8fe16e172d2364e36a9e709682ab535c5cf2a7e41ab2bfdd456e3bd0a18912",
+    "evaluation/proxy.py": "795bbb879316a86f0cbe581cc0ac5129dcc0fde34ff4e4be5f2f75f2b4e3a838",
+    "evaluation/provider.py": "a34265e9a6d76d7bbc3298d42fccb4e789ad465dffb90979049ae8a8314e4e73",
+    "evaluation/supervision.py": "32bbb3bb01e9b973458303be127cfb12b7587cc9c10c2eece414be61b61b8bb8",
+    "evaluation/worker_adapters.py": "a01330e32f6b5c27afc61d356a3d505aa931ad4c6222943d739175d06c50b650",
+    "evaluation/ingest.py": "7af062ca10e5af0ad78e5b5507d3f35b43653bdf7cfcbf320580ca90c338e32b",
+    "evaluation/result.schema.json": "017de0e5dae29ee7bfdfeb9d97d3c818159d5753d96604e2aca4c95a8d5022ec",
+    "evaluation/scoring.py": "2435b6dc4a15774c7a26fa552c1204777079b666d08c37360488a9fff7ab8437",
+    "evaluation/Dockerfile.workers": "7c25b1e6f0c1d9f79bff3c9d143a2d6d990a0ad0f6897adc72c959eb2cb06a54",
+    "evaluation/requirements-openhands.lock": "25c081defdca63669d7fadb35a5c0e9f06d5224ff2b1a15b7631f6da0dfe1458",
+    "evaluation/requirements-harnesses.lock": "87f42df29eddfa0d0ec0cd3fbcaf32fd7d2415639d5d479d2a2b434a6e00306d",
+    "evaluation/harnesses/openhands.json": "022198721a3ed9d9d847dfbbbd0d1e0c21f2c5070f8b919465ccc0fbfd119aec",
+    "scripts/eval_foundations.py": "cb1dfca94d385805e7e3e2eeb256a2982ff665de530849dd09f994189e8f872f",
+    "tests/evaluation/test_bfcl.py": "e744677f063ae8fbfea0687dfb977ecb52a89aee3f0928cce6f3c87afdac3d0b",
+    "tests/evaluation/test_openhands.py": "32b95f2c0923f6b0d145595bfaeca283df7eedb4ef65d8f725724ed0931af738",
+    "tests/evaluation/test_proxy.py": "1da6094922e9225452f7378389f470777de58c07954f2c97bb215a7bc8640bc1",
+    "tests/evaluation/test_provider.py": "c6ac167ff818ac51b1a9589f3d8d091030c314038727abcc1c56306ea91f4fa5",
+    "tests/evaluation/test_supervision.py": "446baa36437bfe6a7192854dbf7b85c7c51ef137eef6341d567cdb94854709a8",
+    "tests/evaluation/test_worker_ingest.py": "7781b113097e8740915deff59140fb6b8d3ca0b20ff26ad7ca58a273f451b4b8"
+  },
+  "cumulative_openrouter_usd": 1.528425614000001,
+  "new_openrouter_usd": 0.602397700000001,
+  "openrouter_spend_by_candidate": {
+    "deepseek-v4-flash": 0.000302004,
+    "glm-4.7": 0.0019357100000000002,
+    "qwen3-30b-a3b-thinking-2507": 0.0028852,
+    "qwen3-coder-next": 0.08808750000000001,
+    "step-3.5-flash": 1.435215200000001
+  },
+  "unreconciled_reserved_upper_bound_usd": 0.046433699999999994,
+  "fixture_file_context": {
+    "archive_sha256": "d133c03da0ea824a41dbae4ae9af38cf3c4086a0145174aad0ea5666249bbcd8",
+    "source_url": "https://storage.mcpmark.ai/filesystem/file_context.zip",
+    "source_revision": "bc5f8382081eb88d95bb28ffcad9536d681d0426",
+    "size_bytes": 14238
+  },
+  "cumulative_tavily_reserved_credits_upper_bound": 40,
+  "new_tavily_reserved_credits_upper_bound": 0,
+  "scope": "Phase 1 integration files and their regression tests; not a fresh word-by-word audit of every model/training file.",
+  "qualification_web_search_variant": "awaiting explicit base versus no-snippet approval; existing base mapping remains diagnostic-only",
+  "no_cost_isolation_check": {
+    "sdk_workspace_image": "sha256:32ede825e5266fa35a8f6a0e6bfce517c4dc4b66f834aad822f8f5436da65acd",
+    "uid": 10001,
+    "capabilities": "ALL dropped",
+    "no_new_privileges": true,
+    "pids_limit": 512,
+    "memory_gib": 8,
+    "cpus": 2
+  },
+  "repository_diagnostic_extensions_observed": "1bad294d4b9648b14ad335f516edf6f0a6622305",
+  "notes": [
+    "All normalized current records are diagnostic-only and cannot rank candidates.",
+    "Repository runs 01-03 are excluded setup/lifecycle failures, not model scores. Run 04 captured a nonempty patch with agent/conversation errors 0/0 and official model failure.",
+    "Run 03 completed cold setup just under 1200 seconds; it failed on the pinned legacy builder/phased tag mismatch and then lost its controller image reference after a rebuild.",
+    "The repository's post-stop network warning was the SDK destructor deleting an already-removed remote conversation. Future disposable conversations use supported delete_on_close=False; vendor source and grading remain unchanged.",
+    "Latest public-skills pin, resource bounds and cleanup policy still require full-task coverage before qualification. Do not call the older runtime diagnostic a full validation of newer worker policy.",
+    "Gateway shutdown now drains accepted non-daemon request handlers before artifacts are sealed; a real local HTTP regression verifies this. One older unreconciled reservation remains held, not released or counted as known spend.",
+    "The JSON spend ledger now uses an SQLite cross-process mutex, atomic writes and durable reservations. Actual spend history and existing caps are preserved.",
+    "MiMo is excluded. Model architecture and training implementation remain unchanged. No files deleted or commits created."
+  ],
+  "remaining_files": "docs/PHASE1_NEXT_FILES.md"
+}

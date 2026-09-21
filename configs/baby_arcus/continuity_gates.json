@@ -1,0 +1,15 @@
+{
+  "required_depth_capacity": 0.25,
+  "minimum_confirmation_scenes": 256,
+  "minimum_association_precision": 0.95,
+  "minimum_association_recall": 0.85,
+  "minimum_ambiguous_abstention": 0.9,
+  "minimum_search_tasks": 64,
+  "maximum_actions_per_task": 3,
+  "minimum_search_gain_over_random": 0.1,
+  "require_memory_ablation_gain": true,
+  "require_moved_object_evaluation": true,
+  "require_durable_track_evaluation": true,
+  "require_existing_shared_gates": true,
+  "require_native_and_ubuntu_live_checks": true
+}

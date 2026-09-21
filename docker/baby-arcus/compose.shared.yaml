@@ -1,0 +1,35 @@
+services:
+  shared-inference:
+    image: ${ARCUS_SHARED_IMAGE:-sha256:fb4a27993f8d990eea9acf526a88f30a0a15238c5f3ac53504927311291efe61}
+    working_dir: /workspace
+    entrypoint: [python3, -m, baby_arcus.services.shared_continuity_worker]
+    command: [--config, configs/baby_arcus/shared.container.json, --port, '8896']
+    environment:
+      ARCUS_SHARED_TOKEN: ${ARCUS_SHARED_TOKEN:?Set a shared service credential}
+      TIKTOKEN_CACHE_DIR: /workspace/runs/arcus_shared_v3/tokenizer-cache
+      PYTHONDONTWRITEBYTECODE: '1'
+    volumes:
+      - ../..:/workspace:ro
+      - ../../runs/arcus_shared_continuity025_v4:/workspace/runs/arcus_shared_continuity025_v4
+    ports:
+      - '127.0.0.1:8896:8896'
+    gpus: all
+    read_only: true
+    tmpfs: [/tmp]
+    profiles: [shared]
+  shared-training:
+    image: ${ARCUS_SHARED_IMAGE:-sha256:fb4a27993f8d990eea9acf526a88f30a0a15238c5f3ac53504927311291efe61}
+    working_dir: /workspace
+    entrypoint: [python3, -m, baby_arcus.shared_learning]
+    command: [--help]
+    environment:
+      PYTHONDONTWRITEBYTECODE: '1'
+      TIKTOKEN_CACHE_DIR: /workspace/runs/arcus_shared_v3/tokenizer-cache
+    volumes:
+      - ../..:/workspace:ro
+      - ../../runs/arcus_shared_continuity025_v4:/workspace/runs/arcus_shared_continuity025_v4
+    gpus: all
+    read_only: true
+    tmpfs: [/tmp]
+    profiles: [shared-training]
+

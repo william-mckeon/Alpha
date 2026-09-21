@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "run_id": "step-terminal-smoke-scored-v2",
+  "run_type": "openrouter_harbor_terminal_smoke",
+  "date": "2026-09-12",
+  "candidate_id": "step-3.5-flash",
+  "provider": "SiliconFlow",
+  "authorized_budget_usd": 5.0,
+  "spent_usd": 0.7844523,
+  "cumulative_step_spend_after_run_usd": 0.8291017,
+  "result": "invalid_run",
+  "qualification_effect": "Excluded from all model scores and denominators.",
+  "expected_trials": 9,
+  "created_trials": 7,
+  "completed_trials": 6,
+  "invalid_reasons": [
+    "Agent execution stopped at task-native 1200/1800-second limits rather than the frozen 3600 seconds.",
+    "Frozen generation parameters and tool-call budget were not explicitly applied.",
+    "The job was interrupted before all expected trials completed."
+  ],
+  "raw_artifact": "../../runs/harbor/step-terminal-smoke-scored-v2",
+  "contains_benchmark_test_material": true,
+  "sha256": {
+    "config.json": "3512b48e69829f1625b66e4ee36491ced6ee7c1d6427c6f825f1516696981eed",
+    "result.json": "1433680e81a286389c432cd17a0f0170dbaed1baf472d48f7041794a6af4022b",
+    "job.log": "48a709a0d25c240ee753e747d95415ff1f60789d68aca55236d79301b2e134d6"
+  }
+}

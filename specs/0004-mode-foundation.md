@@ -1,5 +1,8 @@
 # MoDE foundation model (from scratch)
 
+> **Status: Verified · Track A — from scratch.** This work remains valid and is not superseded
+> by the donor-derived path introduced in [0015](0015-donor-foundation-selection.md).
+
 Build the Arcus MoDE foundation model — boenet's validated mechanism on a modern
 backbone, from scratch, with a tiktoken tokenizer — and validate the pipeline at the
 `tiny` scale before any cloud run.

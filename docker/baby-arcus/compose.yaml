@@ -1,0 +1,82 @@
+name: baby-arcus
+services:
+  artifacts:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.cpu
+    command: ["serve","artifacts","--host","0.0.0.0","--port","8766","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_ARTIFACTS_PORT:-8766}:8766"]
+    volumes: ["artifacts-state:/state"]
+    init: true
+  simulation:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.cpu
+    command: ["serve","simulation","--host","0.0.0.0","--port","8765","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_SIMULATION_PORT:-8765}:8765"]
+    volumes: ["simulation-state:/state"]
+    init: true
+  inference:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.gpu
+    command: ["serve","inference","--host","0.0.0.0","--port","8767","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770","--device","cuda"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_INFERENCE_PORT:-8767}:8767"]
+    volumes: ["inference-state:/state"]
+    init: true
+    gpus: all
+  training:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.gpu
+    command: ["serve","training","--host","0.0.0.0","--port","8768","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770","--device","cuda"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_TRAINING_PORT:-8768}:8768"]
+    volumes: ["training-state:/state"]
+    init: true
+    gpus: all
+  controller:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.cpu
+    command: ["serve","controller","--host","0.0.0.0","--port","8769","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_CONTROLLER_PORT:-8769}:8769"]
+    volumes: ["controller-state:/state"]
+    init: true
+  evaluator:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.cpu
+    command: ["serve","evaluator","--host","0.0.0.0","--port","8770","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_EVALUATOR_PORT:-8770}:8770"]
+    volumes: ["evaluator-state:/state"]
+    init: true
+  dashboard:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.cpu
+    command: ["serve","dashboard","--host","0.0.0.0","--port","8771","--state-root","/state","--artifact-url","http://artifacts:8766","--simulation-url","http://simulation:8765","--inference-url","http://inference:8767","--training-url","http://training:8768","--controller-url","http://controller:8769","--evaluator-url","http://evaluator:8770","--read-only-network"]
+    environment:
+      BABY_ARCUS_TOKEN: ${BABY_ARCUS_TOKEN:?Set a private Baby service token}
+    ports: ["127.0.0.1:${BABY_DASHBOARD_PORT:-8771}:8771"]
+    volumes: ["dashboard-state:/state"]
+    init: true
+volumes:
+  artifacts-state:
+  simulation-state:
+  inference-state:
+  training-state:
+  controller-state:
+  evaluator-state:
+  dashboard-state:

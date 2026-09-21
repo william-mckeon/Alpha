@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "body_checkpoint": "runs/arcus_approach_v2/postures.pt",
+  "language_root": "runs/arcus_language",
+  "dataset_config": "configs/baby_arcus/language.json",
+  "output": "runs/arcus_mode_025_v1",
+  "capacity": 0.25,
+  "adaptive_target": 0.25,
+  "updates": 500,
+  "seed": 925,
+  "batch_size": 8,
+  "core_lr": 0.00001,
+  "router_lr": 0.0001,
+  "head_lr": 0.00005,
+  "preservation_kl_weight": 2.0,
+  "language_context": 64,
+  "activation": "experiment_only"
+}

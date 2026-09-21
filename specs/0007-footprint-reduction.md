@@ -1,5 +1,9 @@
 # Footprint reduction — same model, smaller memory/disk
 
+> **Status: Verified · Track A — from scratch.** These levers are not assumed compatible with a
+> donor's quantization or serving kernels; Track B measures those paths under
+> [0018](0018-lossless-donor-conversion.md).
+
 Shrink Arcus's memory and storage footprint **at equal capacity and accuracy**, using only
 lossless or negligibly-near-lossless techniques. The parameter count and the model's outputs
 are unchanged — we compress *side state* (optimizer moments, logits, serving weights), not the

@@ -1,0 +1,15 @@
+{
+  "parent": "runs/arcus_mode_staircase_v1/capacity-50",
+  "output": "runs/arcus_navigation_v5",
+  "lesson": "navigation",
+  "updates": 4000,
+  "batch_size": 32,
+  "seed": 6911,
+  "pixel_grounding": false,
+  "initial_adapter": "runs/arcus_navigation_v3/visual.pt",
+  "learning_rate": 0.0001,
+  "minimum_accuracy": 0.9,
+  "decision_limit": 24,
+  "interval_seconds": 0.35,
+  "learned_budget": false
+}

@@ -1,0 +1,11 @@
+{
+  "definition": "baby-evaluation-v2",
+  "practice_episodes_per_family": 50,
+  "evaluation_episodes_per_family": 200,
+  "passing_success_rate": 0.8,
+  "consecutive_batches": 3,
+  "reserved_confirmation": true,
+  "regression_drop": 0.1,
+  "regression_confirmation_batches": 2,
+  "layouts": {"train": [0, 1, 2, 3], "practice": [4, 5], "evaluation": [6, 7], "reserved": [8, 9]}
+}

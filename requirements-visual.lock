@@ -1,0 +1,3 @@
+# Install the platform-specific Torch build and requirements-baby-arcus.txt first.
+-r requirements-language.lock
+pillow==12.1.0

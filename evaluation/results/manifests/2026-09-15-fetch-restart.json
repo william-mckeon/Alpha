@@ -1,0 +1,25 @@
+{
+  "contract_revision": 9,
+  "execution_fingerprint": "d19494739740c078ece844d94ca61205d1a4ed3a5970f2c1aaf78704f65e7ec5",
+  "tests": {"passed": 225, "subtests_passed": 18},
+  "previous_stopped_run": "phase1-smoke-full-20260915-02",
+  "replacement_run": "phase1-smoke-full-20260915-03",
+  "replacement_status_at_handoff": "running",
+  "replacement_started_at": "2026-09-15T08:08:42.067879-04:00",
+  "launch_audit_run": "phase1-fetch-launch-audit-20260915-01",
+  "launch_audit_status": "local_prerequisites_passed",
+  "launch_audit_units": 420,
+  "page_error_policy": "http_3xx_4xx_except_408_429_tool_error",
+  "live_tesla_fetch": {"http_status": 403, "recoverable": true, "historical_cause_proven": false},
+  "final_budget_scope": "final-smoke",
+  "aggregate_cap_usd": 48,
+  "pre_restart_cumulative_spend_usd": 2.654218,
+  "new_diagnostic_spend_usd": 0.043165296,
+  "readiness_evidence": [
+    {"harness": "mcp", "path": "evaluation/runs/normalized/phase1-fetch-mcp-20260915-01.json", "sha256": "88ece44780a6dbdfc170f4703c4dafa9536d58e11ab041ee9d604ed527fea186", "outcome": "passed"},
+    {"harness": "repository", "path": "evaluation/runs/normalized/phase1-fetch-repository-20260915-01.json", "sha256": "ef2d3096174f57b46b2ae3b4e8dbc8a6d4a254296a2196f7b1a82623a350b8e0", "outcome": "passed"},
+    {"harness": "function_calling", "path": "evaluation/runs/normalized/phase1-fetch-bfcl-20260915-01.json", "sha256": "569ab8605b6bbc4eb250a9968ee82f18fec801f2d2a1903b6612b9ddaff613bf", "outcome": "passed"}
+  ],
+  "qualification_complete": false,
+  "donor_selected": false
+}

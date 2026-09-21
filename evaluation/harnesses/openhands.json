@@ -1,0 +1,19 @@
+{
+  "runner_evidence": {
+    "path": "evaluation/runs/normalized/phase1-six-repository-20260915-01.json",
+    "sha256": "9d5a0fe18037402376a469d1b226d0636148a069bbd6b48a7a9a358ed7c2e0a5"
+  },
+  "id": "repository",
+  "revision": "405bae7140d7e961a75f4910a0b2e7069731db96",
+  "dataset": "SWE-bench_Verified",
+  "workspace": "docker",
+  "attempts": 3,
+  "sdk_revision": "43376f1868ffd702746080714a59c16d3f69ec12",
+  "extensions_revision": "1bad294d4b9648b14ad335f516edf6f0a6622305",
+  "dataset_revision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a",
+  "dataset_split": "test",
+  "dataset_file_sha256": "a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd",
+  "dataset_runtime": "local revision-snapshotted JSONL, not mutable Hugging Face latest",
+  "integration_status": "shared proof-gated suite runner enabled; worker-loaded controls, pinned SDK/extensions, retained budget-stop prediction, official grading and current-validator diagnostic import live-validated; full frozen coverage and additional runtime/category cases remain pending",
+  "note": "The Harbor OpenHands 0.56.0 install is not this repository runner's SDK."
+}

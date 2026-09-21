@@ -1,4 +1,6 @@
 # --- Python ---
+# Worker dependencies are reproduced from the committed npm lock.
+evaluation/node-filesystem/node_modules/
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -11,6 +13,9 @@ dist/
 
 # --- Virtual envs ---
 .venv/
+.venv-eval/
+.venv-baby/
+.venv-desktop/
 venv/
 env/
 
@@ -21,6 +26,8 @@ env/
 # --- Model weights, checkpoints, runs (never committed) ---
 checkpoints/
 runs/
+evaluation/runs/
+evaluation/vendor/
 *.pt
 *.safetensors
 *.bin

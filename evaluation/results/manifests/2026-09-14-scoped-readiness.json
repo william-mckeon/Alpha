@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-14T21:36:24.143522+00:00",
+  "contract_revision": 8,
+  "status": "bounded_diagnostics_only",
+  "full_sweep_launched": false,
+  "qualification_complete": false,
+  "donor_selected": false,
+  "execution_fingerprint": "836e588dfb5ae66e3638290aaece788e602379b20f2801bf405f1dc22ece555a",
+  "launcher_sha256": "454b3c551bfa2ad37facf2799ef87ee7e096632f37408bb9b651e4b6a10a5865",
+  "control_sha256": {
+    "protocol.json": "f8772d51edee91836400dfbfa84b918ebe2a71f9eaf3ee0505e0254326418fc4",
+    "providers.json": "917ad030e2eb35c8bc4ae80012cfa43a191a45cdb2925de802ca89c59a7ae6a0",
+    "budgets.json": "4a5cdbda4f0e9e2b65e39d25ccb0bd71d5bffe4dba01ee93decad704c961ad89",
+    "result.schema.json": "5fbcf4519aa9975925bcbc138c8857a84562faec64396f298e5080bb611b2249"
+  },
+  "images": {
+    "arcus-eval-openhands:phase1": {
+      "id": "sha256:70fdd7c8792c184326a2d3b1da69758d9ccee9225622dbed7642eff4934b0fd7",
+      "source_fingerprint": "836e588dfb5ae66e3638290aaece788e602379b20f2801bf405f1dc22ece555a"
+    },
+    "arcus-eval-mcpmark:phase1": {
+      "id": "sha256:6343c5f431077d3afc802ae2203c3c8aab64c7ae16ae6b2825e48af190526194",
+      "source_fingerprint": "836e588dfb5ae66e3638290aaece788e602379b20f2801bf405f1dc22ece555a"
+    }
+  },
+  "registered_runners": [
+    "function_calling",
+    "mcp",
+    "repository",
+    "terminal"
+  ],
+  "lifetime_accounting": {
+    "scopes": {
+      "diagnostic": {
+        "actual_usd": 8.903594003999995,
+        "unknown_reserved_usd": 0.09445670999999999,
+        "status": "authorized"
+      },
+      "final-smoke": {
+        "actual_usd": 0.0,
+        "unknown_reserved_usd": 0,
+        "status": "authorized"
+      }
+    },
+    "actual_usd": 8.903594003999995,
+    "unknown_reserved_usd": 0.09445670999999999
+  },
+  "trials": [
+    {
+      "run_id": "phase1-scopes7-bfcl-name-20260914-01",
+      "folder": "bfcl",
+      "completed_requests": 1,
+      "actual_usd": 0.00010998,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes7-bfcl-name-20260914-01.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes7-bfcl-web-20260914-01",
+      "folder": "bfcl",
+      "completed_requests": 1,
+      "actual_usd": 0.00011268,
+      "gateway_categories": [
+        "provider"
+      ],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-bfcl-name-20260914-01",
+      "folder": "bfcl",
+      "completed_requests": 1,
+      "actual_usd": 0.0001107,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-bfcl-name-20260914-01.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes8-bfcl-name-20260914-02",
+      "folder": "bfcl",
+      "completed_requests": 1,
+      "actual_usd": 0.00011178,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-bfcl-name-20260914-02.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes8-bfcl-name-20260914-03",
+      "folder": "bfcl",
+      "completed_requests": 1,
+      "actual_usd": 0.00010998,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": true,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-bfcl-name-20260914-03.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes8-bfcl-web-20260914-02",
+      "folder": "bfcl",
+      "completed_requests": 4,
+      "actual_usd": 0.002203704,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-bfcl-web-20260914-02.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes7-mcp-20260914-01-u0001",
+      "folder": "mcpmark",
+      "completed_requests": 0,
+      "actual_usd": 0,
+      "gateway_categories": [
+        "provider"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_provider",
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-mcp-size-20260914-01",
+      "folder": "mcpmark",
+      "completed_requests": 9,
+      "actual_usd": 0.002175426,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-mcp-size-20260914-02",
+      "folder": "mcpmark",
+      "completed_requests": 9,
+      "actual_usd": 0.002181348,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-mcp-size-20260914-02.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes8-mcp-size-20260914-03",
+      "folder": "mcpmark",
+      "completed_requests": 7,
+      "actual_usd": 0.00179793,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": true,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-mcp-size-20260914-03.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes7-financial-stop-20260914-01",
+      "folder": "repository",
+      "completed_requests": 0,
+      "actual_usd": 0,
+      "gateway_categories": [
+        "financial_budget"
+      ],
+      "status": "integration_error",
+      "stop_class": "financial_budget",
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "fault_probe": {
+        "fault_injection": true,
+        "qualification_eligible": false,
+        "paid_model_calls": 0,
+        "financial_stop": "financial_budget",
+        "verifier_not_launched": true,
+        "passed": true
+      }
+    },
+    {
+      "run_id": "phase1-scopes7-repository-20260914-01-u0001",
+      "folder": "repository",
+      "completed_requests": 38,
+      "actual_usd": 0.029054862,
+      "gateway_categories": [
+        "provider"
+      ],
+      "status": "operator_interrupted_excluded",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "interruption": {
+        "schema_version": 1,
+        "record_kind": "additive_operator_observation",
+        "status": "operator_interrupted_excluded",
+        "reason": "Provider HTTP 429 invalidated this diagnostic; operator interrupted the continuing worker using Ctrl-C. Original incomplete state and logs are preserved.",
+        "completed_requests_observed": 38,
+        "qualification_eligible": false,
+        "billing_policy": "Unknown in-flight billing remains reserved; no reservation released by this observation."
+      }
+    },
+    {
+      "run_id": "phase1-scopes8-provider-stop-20260914-01",
+      "folder": "repository",
+      "completed_requests": 0,
+      "actual_usd": 0,
+      "gateway_categories": [
+        "control_stop",
+        "provider"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_provider",
+      "qualification_eligible": false,
+      "current_contract_normalized": false,
+      "fault_probe": {
+        "fault_injection": true,
+        "qualification_eligible": false,
+        "paid_model_calls": 0,
+        "stop_class": "gateway_provider",
+        "verifier_not_launched": true,
+        "passed": true,
+        "forward_attempts": 1
+      }
+    },
+    {
+      "run_id": "phase1-scopes8-repository-14855-20260914-01",
+      "folder": "repository",
+      "completed_requests": 33,
+      "actual_usd": 0.018962244,
+      "gateway_categories": [],
+      "status": "integration_passed",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": true,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-repository-14855-20260914-01.json",
+      "outcome": "passed"
+    },
+    {
+      "run_id": "phase1-scopes8-repository-20260914-01-u0001",
+      "folder": "repository",
+      "completed_requests": 15,
+      "actual_usd": 0.012254382,
+      "gateway_categories": [
+        "control_stop",
+        "provider"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_provider",
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-repository-20260914-02",
+      "folder": "repository",
+      "completed_requests": 29,
+      "actual_usd": 0.026547624,
+      "gateway_categories": [
+        "control_stop",
+        "infrastructure"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_infrastructure",
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-terminal-cert-20260914-01",
+      "folder": "harbor",
+      "completed_requests": 0,
+      "actual_usd": 0,
+      "gateway_categories": [
+        "protocol"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_protocol",
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-terminal-cert-20260914-02",
+      "folder": "harbor",
+      "completed_requests": 2,
+      "actual_usd": 0.000797148,
+      "gateway_categories": [
+        "control_stop",
+        "provider"
+      ],
+      "status": "integration_error",
+      "stop_class": "gateway_provider",
+      "qualification_eligible": false,
+      "current_contract_normalized": false
+    },
+    {
+      "run_id": "phase1-scopes8-terminal-cert-20260914-03",
+      "folder": "harbor",
+      "completed_requests": 21,
+      "actual_usd": 0.006084882,
+      "gateway_categories": [],
+      "status": "completed_diagnostic",
+      "stop_class": null,
+      "qualification_eligible": false,
+      "current_contract_normalized": true,
+      "normalized_path": "evaluation\\runs\\normalized\\phase1-scopes8-terminal-cert-20260914-03.json",
+      "outcome": "failed"
+    }
+  ],
+  "diagnostic_trial_cost_usd": 0.10261467,
+  "regressions": {
+    "passed": 213,
+    "subtests_passed": 10,
+    "evidence": "observed full pytest output, 2026-09-14"
+  },
+  "five_native_response_probes": {
+    "passed": 5,
+    "cost_usd": 0.00076501,
+    "benchmark_evidence": false
+  },
+  "unpaid_audits": {
+    "smoke_inputs": 420,
+    "qualification_inputs": 2400,
+    "terminal_resolved_configs": 45
+  },
+  "final_budget_status": "authorized"
+}

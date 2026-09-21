@@ -1,0 +1,21 @@
+.git
+.env
+**/*.local
+.venv
+.venv-eval
+.venv-baby
+venv
+env
+**/__pycache__
+.pytest_cache
+.cache
+.hf_cache
+evaluation/runs
+evaluation/vendor
+**/node_modules
+runs
+checkpoints
+alpha dataset
+*.safetensors
+*.pt
+*.bin

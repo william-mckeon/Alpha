@@ -1,9 +1,25 @@
 # Arcus — Training Runbook
 
+## Baby Arcus training boundary
+
+For current status use [the handoff](ARCUS_CURRENT_STATUS.md). Quiet-time Phase 2
+has not started; fresh integrated training at capacity 0.25 with ReAct and
+LangGraph/LangChain remains a [proposal](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md).
+No new training run or reset has been scheduled. The instructions below describe
+separate historical training paths, not an implementation of that proposal.
+
+The [Baby simulation trainer](../specs/0028-baby-arcus-learning.md) now has a tested
+native PPO pipeline and viewer. The commands below train the original text model;
+use the [Baby runbook](BABY_ARCUS_RUNBOOK.md) for separate simulation commands, artifacts,
+and training snapshots. Overnight endurance is not yet qualified. Each proposed run includes all work
+within 12 hours, has no fixed experiment endpoint, and requires resource preflight.
+Follow [the phase plan](BABY_ARCUS_PHASES.md) before attempting a Baby run.
+
 > How to actually train an Arcus model: the CLI, the presets, will-it-fit, checkpoints,
 > and the laptop-vs-cloud reality. Design/contract live in
 > [ARCUS_MODEL_DESIGN.md](ARCUS_MODEL_DESIGN.md) / [DATASHEET.md](DATASHEET.md); this is the
-> how-to.
+> how-to. Existing commands are **Track A only**. Track B remains documentation-only until
+> its specifications are accepted and implemented.
 
 ---
 
@@ -12,6 +28,9 @@
 `scripts/train_arcus.py` trains a preset from scratch on the alpha dataset. It seeds
 everything (torch/numpy/random) before model + data, so runs reproduce and the MoDE-vs-dense
 pair is seed-matched.
+
+It does not train a pretrained donor. Do not point this command at Step, Qwen, GLM, or DeepSeek
+weights; Track B requires a separate adapter-aware trainer specified below.
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\train_arcus.py --preset 1b `
@@ -155,6 +174,11 @@ All flag-gated, **fp32 defaults preserve the 5080 path**; opt in on the cloud L4
 Real runs go on **RunPod** — an L40S (48 GB) or A100 by the hour, **no quota wall** (AWS SageMaker
 spot is quota-blocked for new accounts; see below). The trainer is portable: only `launch.py` is
 SageMaker-specific — `train_arcus.py` + the streaming loader run on any GPU box.
+
+> **Only *training* needs the pod.** A 1B's ~20 GB of weights + fp32 AdamW states + gradients overflow the
+> 16 GB 5080 (it spills to shared RAM and crawls), so training goes cloud. *Inference / testing*
+> (`eval_ppl.py`, `sample_arcus.py`) is **weights-only (~2 GB for the 1B)** and runs fine on the 5080 — do
+> all testing locally, and **stop the pod when a run finishes** (it bills by the hour).
 
 **Pod setup** (on the pod, via its JupyterLab terminal or SSH). The clone + data land on the
 persistent `/workspace` volume (one-time); the **deps do NOT persist** — repeat step 2 after every
@@ -324,7 +348,30 @@ jobs → **View logs**. Memory note: the **g5 has 24 GB** — the 1B fp32 fits a
 (~18.6 GB, the `launch.py` default); go higher with `--fused_ce` / `--optimizer adamw8bit`, or on
 the 48 GB L40S. `memcheck` is the 16 GB laptop story, not the cloud one.
 
+## Track B — planned donor training (not implemented)
+
+Track B begins only after donor selection and capacity-1 conversion pass. The initial full-weight
+cycle runs on rented multi-GPU infrastructure:
+
+1. Load the immutable official donor checkpoint and Alpha adapter.
+2. Verify donor hashes and capacity-1 equivalence.
+3. Freeze all donor parameters and train only Alpha depth routers.
+4. Reduce capacity conservatively and rerun the pinned coding/tool subset at every rung.
+5. Continue training by explicit token budgets with donor-tokenizer manifests and replay.
+6. Apply native-format coding/tool SFT; begin RLVR only after supervised gates pass.
+
+Sparse activation lowers executed compute but does not remove the need to store all donor weights.
+The laptop is for tiny donor-shaped configurations, adapter tests, data preparation, and small router
+experiments—not full donor training. No executable Track-B command belongs here until the adapter,
+trainer, precision, parallelism, checkpoint, and recovery paths are implemented and verified.
+
+Contracts: [0018](../specs/0018-lossless-donor-conversion.md),
+[0020](../specs/0020-depth-router-training.md),
+[0021](../specs/0021-donor-continued-training.md), and
+[0022](../specs/0022-agentic-sft-rlvr.md).
+
 ---
 
-*Arcus — see [specs/0005-scale-and-training.md](../specs/0005-scale-and-training.md) for the
-build and [ROADMAP.md](../ROADMAP.md) for the scaling plan.*
+*Arcus — see [specs/0005-scale-and-training.md](../specs/0005-scale-and-training.md) for Track A,
+[DONOR_FOUNDATION_STRATEGY.md](DONOR_FOUNDATION_STRATEGY.md) for Track B, and
+[ROADMAP.md](../ROADMAP.md) for build order.*

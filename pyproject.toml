@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "arcus"
 version = "0.1.0"
-description = "Arcus — a from-scratch MoDE (Mixture-of-Depths + Experts) foundation model on a modern transformer backbone, with a tiktoken tokenizer."
+description = "Arcus MoDE research: a preserved from-scratch track and a permissive coding-MoE donor-conversion track."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -25,6 +25,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+baby = [] # Torch is a separate platform prerequisite; CPU services remain stdlib-only.
+desktop = ["PySide6==6.10.2", "Pillow==12.1.0", "windows-capture==2.0.1; sys_platform == 'win32'"]
+evaluation = [
+    "mcp==1.26.0",
+    "httpx==0.28.1",
+    "jsonschema==4.26.0",
+]
 # Footprint levers (specs/0007) for the cloud L40S run: 8-bit AdamW (+ optional fused-CE kernel).
 # Deliberately NOT in base — bitsandbytes/triton are patchy on the 5080/Blackwell (sm_120).
 # Install only on the L40S:  pip install -e ".[cloud]"
@@ -49,8 +56,16 @@ legacy = [
     "safetensors>=0.4.0",
 ]
 
+[project.scripts]
+baby-arcus = "baby_arcus.cli:main"
+arcus-desktop = "baby_arcus.desktop:main"
+
 [tool.setuptools]
-packages = ["arcus"]
+packages = ["arcus", "evaluation", "baby_arcus", "baby_arcus.services"]
+
+[tool.setuptools.package-data]
+baby_arcus = ["web/*.html", "web/*.js", "web/*.css", "web/*.png"]
+evaluation = ["*.json", "harnesses/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

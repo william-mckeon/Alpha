@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcus · The playpen</title><link rel="stylesheet" href="/playroom.css"></head>
+<body>
+<header><a class="brand" href="/">a<span>arcus</span></a><span class="breadcrumb">A LITTLE WORLD TO GROW IN</span><div class="connection"><i id="connection-dot"></i><span id="connection">Connecting</span></div></header>
+<main>
+<section class="intro"><div><p class="eyebrow">ARCUS ALPHA / FIRST WORLD</p><h1>The playpen<span>.</span></h1><p>A space to explore, play, and spend time together.</p></div><div class="session-tag">01 <span>BODY & SPACE</span></div></section>
+<div class="layout"><section class="world-card" aria-label="Interactive playroom">
+<div class="world-toolbar"><span><i class="live-dot"></i> PLAYPEN</span><button id="pause" type="button">Pause session</button></div>
+<canvas id="room" width="1100" height="740" tabindex="0" aria-label="Arcus playroom. Use arrow keys to move Arcus when standing. Click the floor to place your marker."></canvas>
+<p id="desktop-status" class="desktop-note">Browser viewer · start the desktop host to pick up Arcus</p><p id="view-status" class="desktop-note">Arcus sees only the playpen</p><div class="world-caption"><span id="instruction">Click the floor to move your marker.</span><span>↑ top · ↓ bottom · ← left · → right</span></div>
+<div class="status-line" role="status" aria-live="polite"><span class="status-label">ROOM EVENT</span><span id="result">Waiting for the room…</span></div>
+</section>
+<aside>
+<section class="panel"><p class="eyebrow">YOUR COMPANION</p><div class="identity"><div class="avatar"><img src="/arcus-body.png" alt="Blue dragon Arcus"></div><div><h2>Arcus Alpha</h2><span id="posture">Standing</span></div></div><div class="notice">Human control · model not connected</div>
+<div class="posture-buttons"><button id="stand">Stand up</button><button id="lie">Lie down</button></div>
+<div class="posture-buttons"><button id="sleep">Sleep</button><button id="wake">Wake up</button></div>
+<div class="movement"><button data-direction="up" aria-label="Move up">↑</button><button data-direction="left" aria-label="Move left">←</button><span>MOVE</span><button data-direction="right" aria-label="Move right">→</button><button data-direction="down" aria-label="Move down">↓</button></div><p class="hint">Arrow keys work while the room is focused.</p></section>
+<section class="panel"><p class="eyebrow">JOIN HIS WORLD</p><label for="person">Playing as</label><select id="person"><option>You</option><option>Your wife</option></select><div class="interaction-buttons"><button id="call">Call Arcus over</button><button id="encourage">Encourage him</button></div><p class="hint">Your call reaches him through simulated hearing, even outside his visual crop. No speaker or microphone audio is used. Encouragement is recorded for later training.</p></section>
+</aside></div>
+<section class="panel"><h2>Interaction delivery</h2><p id="interaction-status" role="status">Waiting for receiver</p><ol id="interaction-history"></ol></section><section class="panel"><h2>Learned body movements</h2><p>Learned posture and approach actions. Experiences are recorded; weights stay fixed during interaction.</p>
+<button id="policy-start">Stand on his own</button><button id="policy-lie" disabled>Lie down on his own</button><button id="policy-sit" disabled>Sit on his own</button><button id="policy-stop">Stop learned movement</button>
+<p id="policy-status" role="status">Checking controller…</p><p id="policy-checkpoint" class="hint"></p></section>
+<section class="panel"><h2>Learning to look</h2>
+<p>Earlier visual pilot. Its controls are unavailable in shared-only mode. Start the shared model and ask Arcus to look left, look right, or open his eyes.</p>
+<button data-visual="start">Start visual lesson</button><button data-visual="stop">Stop visual lesson</button>
+<button data-visual="navigate">Approach using vision</button>
+<p class="hint">Navigation needs a stable standing body and a nearby visible marker. It stops when Arcus predicts arrival or cannot see the target. This local camera follows his body.</p>
+<p id="visual-status" role="status">Checking visual learner…</p><p id="visual-cost" class="hint"></p>
+<p class="hint">Up to 30 decisions. Human body controls interrupt the lesson. These are learned gaze choices; live experiences are recorded for review without changing weights.</p></section>
+<section class="panel"><h2>Toys and exploration</h2>
+<p>Earlier symbolic toy pilot. Its controls are unavailable in shared-only mode. The shared model can explore views using learned predictions and remembered experiences when awake, unheld and not handling a request.</p>
+<button data-curiosity="add_toys">Add three toys</button><button data-curiosity="start">Enable exploration</button><button data-curiosity="stop">Stop exploration</button>
+<p id="curiosity-status" role="status">Checking exploration…</p>
+<p class="hint">Open eyes and stop rest/movement first. Reset the room to clear toys and discoveries. Pixel-based vision lessons require the empty room until retrained.</p></section>
+<section class="panel"><h2>Rest and alertness</h2>
+<p>The shared model makes rest choices while running. These separate pilot controls are unavailable in shared-only mode. Lying, closed eyes and sleep are separate states.</p>
+<button data-rest="start">Enable rest choices</button><button data-rest="stop">Stop rest choices</button>
+<p id="rest-status" role="status">Checking rest controller…</p><p id="rest-senses"></p>
+<p class="hint">Fatigue and stimulation are simulated. Sleep and wake buttons remain assisted human demonstrations.</p></section>
+<section class="panel"><h2>Listening and early language</h2>
+<p>Arcus can choose to listen, pause, resume, replay, stay silent, or try text. Early text may have no clear meaning.</p>
+<button data-language="start">Enable language learning</button><button data-language="stop">Stop language learning</button>
+<button data-language="pause">Pause the dataset</button><button data-language="resume">Resume the dataset</button><button data-language="restart">Restart the dataset</button>
+<p id="language-status" role="status">Checking language worker…</p><p id="language-counts" class="hint"></p>
+<p class="hint">Start the qualified shared model before using these requests. Listening controls reach Arcus through simulated hearing. Stop holds the shared session. Legacy token totals above describe the earlier language pilot; new shared exposures enter replay for separately qualified training.</p>
+</section>
+<section class="panel"><h2>Talk to Arcus</h2>
+<form id="conversation-form"><label for="message-sender">From</label><select id="message-sender"><option value="you">You</option><option value="wife">Your wife</option></select>
+<label for="message-text">Your message</label><textarea id="message-text" maxlength="2000" required rows="3"></textarea><button type="submit">Send</button></form>
+<p id="message-status" role="status">Messages are saved locally. Shared mode delivers them to Arcus and queues fresh words for candidate training; delivery is not a completed learning update.</p><ol id="conversation-history" aria-label="Conversation history"></ol><h3>Arcus’s text</h3><ol id="arcus-expressions" aria-label="Arcus generated text"></ol></section>
+<section class="panel"><h2>Body sensations and eyes</h2><p id="senses-status"></p>
+<button id="eyes-open">Open eyes</button><button id="eyes-close">Close eyes</button>
+<label for="motor-joint">Leg joint</label><select id="motor-joint"></select><button id="motor-less">Bend slightly</button><button id="motor-more">Extend slightly</button>
+<label for="look-part">Look with</label><select id="look-part"><option value="head">Head</option><option value="gaze">Eyes</option></select>
+<button data-look="-1,0">Look left</button><button data-look="0,0">Look center</button><button data-look="1,0">Look right</button><button data-look="0,-1">Look up</button><button data-look="0,1">Look down</button>
+<p class="hint">Standing buttons demonstrate posture. Joint controls use a simplified balance simulation. Looking selects part of the permitted scene.</p></section>
+<section class="lower"><div><p class="eyebrow">UNDER THE SURFACE</p><p id="body-status">Arcus identity</p><p id="environment-status">Play area identity</p><p class="hint">The picture follows body height and direction. Learned standing uses twelve joints in a simplified balance simulation.</p></div><div class="session-actions"><button id="export">Export session</button><button id="return">Return to playpen</button><button id="reset">Reset play area</button></div></section>
+<details><summary>Body state & interaction history</summary><div class="debug"><pre id="telemetry"></pre><ol id="events"></ol></div></details>
+<section class="panel"><h2>Color perception lesson</h2>
+<label>Floor <input id="color-floor" type="color" value="#e2d2b8"></label>
+<label>Walls <input id="color-wall" type="color" value="#7d9472"></label>
+<label>Rug <input id="color-rug" type="color" value="#c5d1b4"></label>
+<label>First ball <input id="color-ball1" type="color" value="#ed3342"></label>
+<label>Second ball <input id="color-ball2" type="color" value="#3366ed"></label>
+<button id="color-setup">Set up two balls in an empty room</button>
+<button data-visual="perceive">Observe colors</button><button data-visual="stop">Stop observing</button>
+<p class="hint">Reset the room explicitly before adding lesson balls. Observation requires a qualified model and open eyes. Shared mode can use learned red/blue references to choose gaze; the standalone observation lesson does not control movement.</p>
+<canvas id="color-view" width="400" height="280" aria-label="Camera view with predicted ball regions"></canvas>
+<p id="color-status" role="status">No learned observation yet.</p></section>
+<section class="panel"><h2>Shared sensory learner</h2>
+<p>One candidate model receives body, RGB, simulated hearing and internal signals. Starting requires qualification; observation is not proof of learning.</p>
+<p class="hint">Start here to use the single shared learner at 25% depth. Movement and listening buttons send requests for Arcus to respond to. Fresh words and verified action outcomes enter local replay; candidate training happens separately. Earlier standalone lesson controls remain unavailable in shared-only mode.</p>
+<button data-shared="start">Start qualified shared model</button><button data-shared="stop">Stop shared mode</button>
+<p id="shared-status" role="status">Shared model not active.</p>
+<p id="shared-learning-detail">Depth, remembered experiences and prediction results appear here during shared mode.</p>
+<p id="continuity-status" role="status">Object memory and search observations appear here during shared mode.</p></section>
+<p id="error" role="alert"></p>
+<p id="audit-status" role="status">Checking activity logging…</p>
+</main><footer>ARCUS ALPHA <span>Small steps. A world of possibility.</span><span>Body saved locally · interaction log in memory</span></footer>
+<script type="module" src="/playroom.js"></script></body></html>
+
+

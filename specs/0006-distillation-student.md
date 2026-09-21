@@ -1,5 +1,9 @@
 # Arcus as a distillation student (the purpose)
 
+> **Status: Accepted · Track A — from scratch.** The gpt-oss teacher and `o200k` alignment here
+> do not select a Track-B weight donor. A donor-derived model preserves its donor tokenizer and
+> follows [0021](0021-donor-continued-training.md).
+
 Why Arcus exists downstream: it is the **from-scratch student** for
 [openagent-code](https://github.com/william-mckeon)'s distillation flywheel. The harness
 (capture → curate → SFT → eval → serve → swap) is already built there; Arcus is the

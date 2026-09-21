@@ -1,0 +1,10 @@
+{
+  "host": "127.0.0.1",
+  "simulation_port": 8765,
+  "artifact_port": 8766,
+  "artifact_url": "http://127.0.0.1:8766",
+  "state_root": "runs/baby_arcus",
+  "request_timeout": 5.0,
+  "signal_config": "configs/baby_arcus/signals.json",
+  "curriculum_config": "configs/baby_arcus/curriculum.json"
+}

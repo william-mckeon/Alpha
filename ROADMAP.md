@@ -1,9 +1,32 @@
 # Arcus — Roadmap
 
+## Baby Arcus branch plan
+
+Current embodied work is summarized in [current status](docs/ARCUS_CURRENT_STATUS.md)
+and the [consolidated 14-phase roadmap](docs/ARCUS_REMAINING_PHASES.md). The pathway
+experiment and before/after comparison are complete; quiet-time Phase 2 is unstarted.
+Fresh integrated training with ReAct and LangGraph/LangChain is a
+[proposal](docs/ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md), awaiting next direction.
+Full qualification of the changed runtime remains open. The paragraph below is the
+historical service/grid roadmap, not the current shared-model size or phase status.
+
+The Baby simulation experiment follows [its own phase gates](docs/BABY_ARCUS_PHASES.md):
+contracts → world/services → working learning loop/basic viewer → observation →
+human shared play → validated growth → ongoing operation/remote rehearsal.
+Start around 125M with fresh weights and target approximate doubling milestones.
+Runs are bounded to 12 hours, reviewed daily, and have no fixed experiment endpoint.
+The original Phase 2 native model/learning/services/viewer has smoke evidence;
+Ubuntu 22.04 Docker startup later passed, while full overnight qualification remains
+open. See [results](docs/BABY_ARCUS_RESULTS.md)
+and the [next inventory](docs/BABY_ARCUS_NEXT_FILES.md). [Specs 0023–0036](specs/0023-baby-arcus-experiment.md) record
+implemented scope separately from outstanding acceptance gates;
+the following existing-track status remains historical/current evidence for those tracks,
+not evidence of Baby cooperative mastery.
+
 > The committed build order and source of truth for what's built and next. No
 > CHANGELOG; history lives here + [docs/DATASHEET.md](docs/DATASHEET.md) § version history.
 
-**Maintainer:** William McKeon · **Status:** v0.6 — growth operator built (42 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed); **tooling pivot** — a Codex-referenced CLI via a three-phase build (specs/0013); model plan status quo · Apache 2.0 © 2026 William McKeon
+**Maintainer:** William McKeon · **Status:** v0.9 qualification — Track A Stage 0 + Stage 1 done: 0.5B trained to fluency and grown to a 991M 1B (`val_ppl` 15.32). Track B's pinned control layer is implemented and its five-candidate native tool parser smoke passed; Docker-backed benchmarks remain pending. No donor is selected and no donor conversion has started. Apache 2.0 © 2026 William McKeon
 
 ---
 
@@ -18,16 +41,49 @@ not a cluster requirement.
 
 ## Locked decisions
 
-- **From scratch** (not upcycled) — tiktoken rules out reusing Qwen embeddings; mirrors boenet.
-- **Tokenizer:** tiktoken `o200k_base` (latest; shares the gpt-oss-120b teacher's text vocab → enables **logit-KL** distillation; `cl100k_base` stays for small bench runs), tied embeddings.
-- **Backbone:** modern — RoPE / RMSNorm / GQA+QK-norm / SwiGLU; **attention dense** (never routed).
-- **Mechanism:** boenet's validated MoDE — MoD cap 0.5 gating MoE **top-1, grow-params** (wide experts, more of them: 4→8→10), Switch lb-loss, router-LR.
-- **No freeze** — the whole model trains end-to-end.
-- **Matched baseline** — every run read against `--dense` (n_experts=1, capacity=1.0).
-- **Qwen path archived** to `legacy/`.
-- **License:** Apache 2.0, original work.
+- **Two tracks, one MoD mechanism.** Track A remains the original from-scratch experiment;
+  Track B adds the same architecture-agnostic depth routing to a selected pretrained coding MoE.
+- **Track A is preserved.** Its tokenizer, weights, results, growth operator, and ladder are not
+  rewritten or discarded by the donor path.
+- **Track B donor license:** standard Apache-2.0 or unmodified MIT weights only; no custom model
+  license or scale-triggered branding clause.
+- **Track B preserves the donor initially:** attention, expert router, experts, tokenizer, chat/tool
+  format, and cache. Only Alpha depth routers are added and trained first.
+- **Evidence before selection:** reuse pinned Harbor/OpenHands/BFCL/MCPMark evaluations. Step is a
+  hypothesis, not a winner; Kimi is reference-only and MiMo is excluded from this pass.
+- **No up-front MoM requirement.** Model delegation can later be learned as another tool after
+  ordinary coding/tool behavior is reliable.
+- **Track-A tokenizer:** tiktoken `o200k_base` (latest; shares the gpt-oss-120b teacher's text vocab → enables **logit-KL** distillation; `cl100k_base` stays for small bench runs), tied embeddings.
+- **Track-A backbone:** modern — RoPE / RMSNorm / GQA+QK-norm / SwiGLU; **attention dense** (never routed).
+- **Track-A mechanism:** boenet's validated MoDE — MoD cap 0.5 gating MoE **top-1, grow-params** (wide experts, more of them: 4→8→10), Switch lb-loss, router-LR.
+- **Track-A training:** no freeze; the whole original model trains end-to-end.
+- **Track-A baseline:** every run read against `--dense` (n_experts=1, capacity=1.0).
+- **Old Qwen path archived** to `legacy/`; it is reference evidence, not the generic Track-B implementation.
+- **Project/Track-A license:** Apache 2.0, original work. Track B additionally carries its donor's standard Apache-2.0 or MIT notices.
 
-## The ladder (boenet Phase-4 report §7)
+## Track B — donor-derived Alpha (immediate priority)
+
+1. **Documentation gate — DONE FOR PHASE 1.** The strategy and [specs/0015](specs/0015-donor-foundation-selection.md)
+   plus [0016](specs/0016-foundation-evaluation.md) are accepted for implementation. Later-stage
+   specifications remain their own gates.
+2. **Qualification — CURRENT.** The control plane, deterministic subset policy, fixed providers,
+   approved $48 budget ledger, audits, normalization, and scoring are implemented and locally
+   tested. The native tool parser smoke passed for all five candidates for $0.00135487 total. Start
+   Docker, resolve the upstream task IDs, then run the
+   same external harnesses against every eligible candidate and
+   select the donor from coding/tool results, licensing, convertibility, and cost.
+3. **Generic adapter.** Implement the model-neutral MoE-to-MoDE boundary around shared
+   `arcus/mod_core.py`; add a donor-specific adapter only after selection.
+4. **Lossless conversion.** Prove capacity 1.0 on a tiny donor-shaped configuration, then full weights.
+5. **Router training.** Freeze donor weights, train Alpha depth routers, and lower capacity only while
+   the repeated coding/tool suite remains within its declared thresholds.
+6. **Our data.** Continue training by token budget, then native-format coding/tool SFT and RLVR.
+7. **Serving.** Optimize vLLM/SGLang token packing and dispatch only after behavioral preservation.
+
+Full strategy: [docs/DONOR_FOUNDATION_STRATEGY.md](docs/DONOR_FOUNDATION_STRATEGY.md). Candidate
+registry: [docs/FOUNDATION_CANDIDATES.md](docs/FOUNDATION_CANDIDATES.md).
+
+## Track A — the ladder (boenet Phase-4 report §7)
 
 ### tiny — pipeline validation · 5080 / CPU · **DONE**
 Build + runtime-validate the from-scratch model.
@@ -42,16 +98,23 @@ checkpointing). The 1B trains on the 16 GB card with a shared-RAM spill (~10–1
 **Not a quality rung** — these prove the architecture + pipeline scale; real pretraining is
 cloud. See [specs/0005](specs/0005-scale-and-training.md), [docs/TRAINING.md](docs/TRAINING.md).
 
-### Stage 0 — 0.5B to fluency · RunPod L40S · **RUNNING**
-The first **"can it talk?"** run — not just "does the harness work?" Pretrain `0.5b`
-**streaming to fluency**, then read samples via `scripts/sample_arcus.py` (the new
-`arcus/generate.py`). Now on **RunPod L40S** — the 5080 was the bench (~2.5× slower, and the
-flaky-upload crashes forced the move); the **1B seed runs alongside** on a second pod. This is
-the seed the self-improving loop grows and teaches ([specs/0009](specs/0009-self-improving-loop.md)).
-**Gate:** coherent, on-domain generation + a `val_ppl` that keeps falling. See
-[specs/0008](specs/0008-fluency-pretraining.md), [docs/TRAINING.md](docs/TRAINING.md).
+### Stage 0 — 0.5B to fluency · RunPod L40S · **DONE**
+The first **"can it talk?"** run. Pretrained `0.5b` **streaming to fluency** (final honest `val_ppl`
+**56.58**), with a `1b` from-scratch control alongside (**44.23**). Read samples via
+`scripts/sample_arcus.py` (`arcus/generate.py`). The 0.5B is the seed the self-improving loop grows and
+teaches ([specs/0009](specs/0009-self-improving-loop.md)). See [docs/RESULTS.md](docs/RESULTS.md),
+[specs/0008](specs/0008-fluency-pretraining.md).
 
-### alpha-0.1 — ~1.3B · cloud · **NEXT (in parallel)**
+### Stage 1 — growth calibration (grow 0.5B → 1B) · RunPod L40S · **DONE**
+Grew the trained 0.5B (4 experts) → **8 experts (991M)**, near-lossless on the real model (56.58 → 60.03
+before training), then continued-trained 12B tokens on the interleaved loader: **grown 1B `val_ppl`
+15.32**, ~3× better than the from-scratch 44.23 — the reuse thesis holds at the first rung. **But the
+generations loop / lose coherence** — a validated *substrate*, not a generator. Next is **SFT**
+(coherence + prompt-following), then RLVR. Full read: [docs/RESULTS.md](docs/RESULTS.md); operator
+[specs/0010](specs/0010-growth-operator.md); the growth *rule* is [specs/0014](specs/0014-growth-policy.md).
+*Tooling gap surfaced: the sampler needs a repetition penalty (a cheap decoding patch).*
+
+### alpha-0.1 — ~1.3B · cloud · **OPTIONAL IN PARALLEL**
 The first real quality finding. Train from scratch on the alpha dataset; compare MoDE
 against the matched dense baseline (`--dense`) at equal settings.
 **Gate:** MoDE matches dense quality at ~half compute on real data; both routers coexist.
@@ -85,7 +148,7 @@ continued training. Size the **token budget** to the rung you actually deploy.
 until you have usage history). At ~$13–16 per billion tokens on an L40S the seed rungs are cheap;
 the ~120 GB corpus is not the bottleneck — time is. See [docs/TRAINING.md](docs/TRAINING.md).
 
-## Downstream purpose
+## Track-A downstream purpose
 
 Arcus is the **from-scratch student** for openagent-code's distillation flywheel — taught by
 gpt-oss-120b, served via vLLM, swapped in behind `CODE_API_BASE`. Pretrain to fluency **first**
@@ -98,7 +161,13 @@ operator, an o200k chat template + tool tokens, masked-SFT, a vLLM shim, RL) is 
 harness) public and portfolio-facing while **Arcus Code** — this repo, the model + the training
 loop — stays private, proprietary IP.
 
-## Tooling — the three-phase build (specs/0013)
+## Tooling and evaluation
+
+Donor qualification reuses Harbor/Terminal-Bench, OpenHands, BFCL, and MCPMark under
+[specs/0016](specs/0016-foundation-evaluation.md); a new general evaluation harness is not a
+prerequisite. The product coding CLI remains the separate three-phase build in [specs/0013](specs/0013-agent-tooling.md).
+
+### Product tooling — the three-phase build (specs/0013)
 
 The agent *body* is **referenced** from OpenAI Codex (Apache-2.0) and reimplemented as our own,
 adopting Codex's tool-call format (`function_call` / `custom_tool_call` / `apply_patch` + rollout
@@ -129,4 +198,4 @@ under-trained bench runs.
 
 ---
 
-*Status: tiny + grow-params bench built; sampler + growth operator shipped (42 tests); Stage 0 running on RunPod (0.5B fluency + 1B seed); Stage 1 calibration next; the 0.5B→85B loop + public/private split in specs/0009 + 0012. arcus — part of the OpenAgent family*
+*Status: Track A Stage 0 + Stage 1 DONE — grown 1B `val_ppl` 15.32; Track B Phase 1 control plane and native parser smoke complete, Docker-backed qualification pending. No donor selected. arcus — part of the OpenAgent family*

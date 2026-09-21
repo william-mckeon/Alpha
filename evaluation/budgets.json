@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "scopes": {
+    "six-model-token-restart": {
+      "status": "authorized",
+      "ledger": "evaluation/runs/budgets/six-model-token-restart.json",
+      "aggregate_cap": 128.17,
+      "caps": {"deepseek-v4-flash": 4.27, "qwen3-30b-a3b-thinking-2507": 11.96, "codestral-2508": 14.61, "qwen3-coder-next": 40.92, "glm-4.7": 20.15, "kimi-k2.7-code": 36.26},
+      "token_caps": {
+        "deepseek-v4-flash": {"input": 44975217, "output": 1233877},
+        "qwen3-30b-a3b-thinking-2507": {"input": 44975217, "output": 1233877},
+        "codestral-2508": {"input": 44975217, "output": 1233877},
+        "qwen3-coder-next": {"input": 44975217, "output": 1233877},
+        "glm-4.7": {"input": 44975217, "output": 1233877},
+        "kimi-k2.7-code": {"input": 44975217, "output": 1233877}
+      }
+    },
+    "diagnostic": {
+      "status": "authorized",
+      "ledger": "evaluation/runs/budget-ledger.json",
+      "aggregate_cap": 48.0,
+      "caps": {"step-3.5-flash": 5.0, "qwen3-coder-next": 8.0, "glm-4.7": 15.0, "deepseek-v4-flash": 5.0, "qwen3-30b-a3b-thinking-2507": 15.0}
+    },
+    "final-smoke": {
+      "status": "authorized",
+      "ledger": "evaluation/runs/budgets/final-smoke.json",
+      "aggregate_cap": 48.0,
+      "caps": {"step-3.5-flash": 5.0, "qwen3-coder-next": 8.0, "glm-4.7": 15.0, "deepseek-v4-flash": 5.0, "qwen3-30b-a3b-thinking-2507": 15.0}
+    }
+  }
+}

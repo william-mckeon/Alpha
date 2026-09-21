@@ -1,5 +1,8 @@
 # o200k chat template + tool special tokens (Stage 2 prerequisite)
 
+> **Status: Draft · Track A — from scratch.** A donor-derived model initially preserves its native
+> tokenizer, chat template, reasoning fields, and tool syntax; see [0022](0022-agentic-sft-rlvr.md).
+
 > Give Arcus a chat/tool *format* so it can be SFT'd on openagent-code's agent trajectories and,
 > later, serve tool-calls behind `CODE_API_BASE`. `o200k_base` ships only `endoftext` — no role
 > or tool tokens — so this is the first thing Stage 2 ([0009](0009-self-improving-loop.md)) needs.

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "contract_revision": 4,
+  "run_id": "phase1-smoke-full-20260913-01",
+  "status": "launched_consult_suite_state_for_current_status",
+  "suite": "smoke",
+  "expected_units": 420,
+  "state_path": "evaluation/runs/suites/phase1-smoke-full-20260913-01/suite-state.json",
+  "command": ".venv-eval/Scripts/python.exe scripts/eval_foundations.py run-suite --suite smoke --candidate all --run-id phase1-smoke-full-20260913-01 --confirm-budget 48",
+  "aggregate_openrouter_cap_usd": 48,
+  "tavily_free_credit_cap": 1000,
+  "tests": {"passed": 187, "subtests_passed": 10},
+  "qualification_complete": false,
+  "donor_selected": false,
+  "winner": null,
+  "model_architecture_changed": false,
+  "mimo_excluded": true,
+  "note": "Launch record only, not a completion or scorecard. Live mutable state and per-attempt evidence are retained at state_path. Model failures remain scored failures; infrastructure errors stop execution."
+}

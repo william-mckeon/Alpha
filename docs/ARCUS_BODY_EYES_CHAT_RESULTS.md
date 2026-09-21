@@ -1,0 +1,15 @@
+# Body, eyes and text implementation results — September 16, 2026
+
+Delivered: independent normalized leg controls and body sensations; separate head/gaze/eyelid/sleep state; gaze-dependent source-restricted images; durable text input with sender labels, queued sleeping messages and literal rendering; native and browser controls; versioned body migration and backup; a separate reward-only standing pilot and bounded checkpoint-driven HTTP controller.
+
+Focused automated coverage: 40 body/desktop/message tests plus two Torch policy/checkpoint/controller tests passed (42 distinct tests). JavaScript syntax and Python compilation checks passed. The native and learned HTTP qualifications are separate from that count. Test corrections changed the old derived-radian knee expectation to the new normalized-extension contract and extended tool discovery to five tools. A heartbeat was also corrected so it no longer overwrites the last human interaction result.
+
+The native app replaced the older browser-only backend. Original entity ID 8c56a20d864e45ea948635ff97864334 was verified unchanged after migration to body version 2. The old in-memory session was exported to runs/arcus_desktop/pre-upgrade-session.json before restart. Live UI checks submitted a clearly labelled interface-test message and closed eyes successfully. The desktop host remains running; current eyes are closed.
+
+Native qualification includes WebChannel, actual desktop capture (metadata only), playpen image generation, gaze crops, boundary return, identity preservation, forbidden source override, eyes-closed sensations and sleeping-message release. Evidence: runs/arcus_desktop/qualification.json.
+
+Standing pilot evidence: runs/arcus_standing_pilot/report.json and live-qualification.json. 200 updates, 48,351 parameters; 0/8 before and 8/8 after, followed by 16/16 fresh starts. Real HTTP execution reached height .990625 with only joint actions and closed eyes. Optimizer reload and an additional optimizer step were tested. This diagnostic is separate from the preserved 125M grid checkpoint and is not running autonomously on the user's body.
+
+Implementation differs from the broad proposed file map: embodied learning is isolated in body_policy.py, body_learning.py, body_vocabulary.py, standing_environment.py and services/body_controller.py rather than modifying every grid training service. This avoids silently replacing grid contracts. The initial dynamics need no new package dependency. The two JSON configuration files document current contract constants; they are not runtime tuning inputs.
+
+Outstanding from the broader plan: production seven-service embodied training integration, the other curriculum stages, lifecycle/model-status reporting for a persistent autonomous controller, learned language/pixel understanding, egocentric camera calibration, articulated/closed-eye artwork and physical drag/multi-monitor verification. The textbox provides input transport, not conversational understanding. No original training checkpoints or grid evaluation results were changed.

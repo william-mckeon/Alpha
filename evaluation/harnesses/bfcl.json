@@ -1,0 +1,20 @@
+{
+  "id": "function_calling",
+  "revision": "f7cf7359b7ac615a0b294831c5ba2bc95ee4a000",
+  "package": "bfcl-eval==2025.12.17",
+  "dataset": "BFCL V4",
+  "attempts": 3,
+  "integration_status": "shared proof-gated suite runner enabled; repeated native BFCL attempts, official grading and normalized imports live-validated; snippet-enabled Tavily adaptation frozen under revision 4 with retained search-credit evidence; full frozen category coverage remains pending",
+  "search_adapter": "evaluation.search_adapter.BFCLSearchAdapter",
+  "synchronous_search_adapter": "evaluation.search_adapter.SyncBFCLSearchAdapter",
+  "worker_search_adapter": "evaluation.search_service.RemoteSearchAPI",
+  "search_contract_id": "arcus-tavily-mcp-v1",
+  "benchmark_variant": "BFCL V4 / Arcus Tavily MCP adaptation",
+  "official_bfcl_comparable": false,
+  "bfcl_web_search_variant": "web_search_base",
+  "runner_evidence": {
+    "path": "evaluation/runs/normalized/phase1-six-bfcl-20260915-03.json",
+    "sha256": "5f729bb2c005e39ac33d237758fe479e4bb6b320359e365f4c899ff26845711b"
+  },
+  "external_requirement": "TAVILY_API_KEY; free-plan-only usage preflight and persistent shared credit cap."
+}

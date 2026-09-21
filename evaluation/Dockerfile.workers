@@ -1,0 +1,25 @@
+FROM python:3.12.14-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea AS mcpmark
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 PYTHON_DOTENV_DISABLED=1 PYTHONPATH=/app:/app/evaluation/vendor/mcpmark
+RUN apt-get update && apt-get install -y --no-install-recommends git nodejs npm && rm -rf /var/lib/apt/lists/*
+COPY evaluation/requirements-mcpmark.lock /tmp/requirements.lock
+RUN pip install --no-cache-dir -r /tmp/requirements.lock
+COPY evaluation/node-filesystem /app/evaluation/node-filesystem
+RUN cd /app/evaluation/node-filesystem && npm ci --ignore-scripts --omit=dev
+RUN git init evaluation/vendor/mcpmark && git -C evaluation/vendor/mcpmark fetch --depth=1 https://github.com/eval-sys/mcpmark.git bc5f8382081eb88d95bb28ffcad9536d681d0426 && git -C evaluation/vendor/mcpmark checkout --detach FETCH_HEAD
+COPY evaluation /app/evaluation
+RUN useradd --uid 10001 --create-home worker && mkdir /work && chown worker:worker /work
+USER worker
+ENTRYPOINT ["python", "-m", "evaluation.mcpmark_worker"]
+
+FROM python:3.12.14-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea AS openhands
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 PYTHON_DOTENV_DISABLED=1 PYTHONPATH=/app:/app/evaluation/vendor/openhands
+RUN apt-get update && apt-get install -y --no-install-recommends git docker-cli docker-buildx build-essential && rm -rf /var/lib/apt/lists/*
+RUN git init evaluation/vendor/openhands && git -C evaluation/vendor/openhands fetch --depth=1 https://github.com/OpenHands/benchmarks.git 405bae7140d7e961a75f4910a0b2e7069731db96 && git -C evaluation/vendor/openhands checkout --detach FETCH_HEAD && git -C evaluation/vendor/openhands submodule update --init vendor/software-agent-sdk
+COPY evaluation/requirements-openhands.lock /tmp/requirements.lock
+RUN pip install --no-cache-dir uv==0.12.13 && uv pip install --system --no-cache -r /tmp/requirements.lock
+COPY evaluation /app/evaluation
+RUN mkdir /work
+ENV EXTENSIONS_REF=1bad294d4b9648b14ad335f516edf6f0a6622305 IMAGE_TAG_PREFIX=43376f1
+ENTRYPOINT ["python", "-m", "evaluation.openhands_worker"]

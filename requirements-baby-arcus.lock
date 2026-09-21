@@ -1,0 +1,5 @@
+# Direct non-Torch dependency pins, not a complete transitive/environment lock.
+# Windows tested: Python 3.13.14 / NumPy 2.5.0 / Torch 2.11.0+cu128.
+# Ubuntu 22.04 supplies Python 3.10; its NumPy pin awaits container testing.
+numpy==2.2.6; python_version < '3.12'
+numpy==2.5.0; python_version >= '3.12'

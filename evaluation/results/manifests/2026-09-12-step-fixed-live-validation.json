@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "run_id": "step-3.5-flash-terminal-openssl-selfsigned-cert-attempt-01",
+  "run_type": "repair_live_validation",
+  "date": "2026-09-12",
+  "candidate_id": "step-3.5-flash",
+  "provider": "SiliconFlow",
+  "result": "diagnostic_not_scored",
+  "harbor_complete": true,
+  "harbor_exceptions": 0,
+  "reward": 0.0,
+  "verifier_checks_passed": 5,
+  "verifier_checks_total": 6,
+  "model_miss": "check_cert.py imported cryptography, unavailable to the verifier interpreter.",
+  "harbor_spent_usd": 0.0373229,
+  "direct_strict_proxy_probe_spent_usd": 0.0000432,
+  "qualification_effect": "None. This was one diagnostic attempt with a manually different gateway trial label; the controlled launcher now owns identical job and gateway IDs and directly pins tasks.",
+  "artifacts": {
+    "contains_benchmark_test_material": true,
+    "sha256": {
+      "job_result": "b2787822b05d03e942579916b6bf7c17ee0fe861f39c1bd392dde142cde8cff3",
+      "proxy_exchanges": "76de0949b2b0e8d744854644474c455b63b7e59384f4145ce99932d9c486bc60",
+      "verifier_ctrf": "f55413e022d95af5ab68e716d2449744c54a4e5cd938b49697626d1809f04181",
+      "normalized_diagnostic": "37d71152b1e118b15af05da8fe9738bae638701a4772e689e58ede85c6386764"
+    }
+  }
+}

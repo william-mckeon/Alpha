@@ -1,0 +1,6 @@
+{
+  "output": "runs/arcus_rest_v1",
+  "seed": 91741,
+  "interval_ticks": 10,
+  "decision_limit": 600
+}

@@ -1,0 +1,1 @@
+{"schema":"arcus-body-v2","motor_values":16,"shared_eyelid_values":1,"joint_units":"normalized_extension","joint_min":0,"joint_max":1,"maximum_joint_delta":0.15,"timestep_seconds":0.1,"stable_leg_spread":0.22,"fall_leg_spread":0.45,"camera":"source-relative-2d-half-frame","physics":"simplified-support"}

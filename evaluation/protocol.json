@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-15",
+  "contract_revision": 9,
+  "transport_policy": {
+    "bfcl_client_timeout": "trial_timeout_seconds",
+    "provider_request_deadline": "wall_time_seconds",
+    "unproven_timeout_classification": "harness_error",
+    "financial_budget_classification": "excluded_control_stop",
+    "context_capacity_check": "known_output_limit_and_nonblocking_utf8_uncertainty_screen",
+    "prompt_truncation": false
+  },
+  "execution_policy": {
+    "budget_scope_required": true,
+    "readiness_source_identity_required": true,
+    "context_rejections_are_excluded": true,
+    "fatal_gateway_errors_stop_new_spend": true
+  },
+  "search": {
+    "page_error_policy": "http_3xx_4xx_except_408_429_tool_error",
+    "contract_id": "arcus-tavily-mcp-v1",
+    "config": "search.json",
+    "bfcl_web_search_variant": "web_search_base",
+    "answer_override": {
+      "path": "evaluation/bfcl_answer_overrides.json",
+      "sha256": "b2f9a22e1dc2128cb71c8e1c79a631748852b5ab1ee2bf7e5da968734109bcea"
+    },
+    "bfcl_variant_approved_at": "2026-09-13",
+    "benchmark_variant": "BFCL V4 / Arcus Tavily MCP adaptation",
+    "official_bfcl_comparable": false,
+    "efficiency_cost_policy": "OpenRouter USD only; report search credits separately under the shared frozen search policy"
+  },
+  "provider": {
+    "gateway": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1",
+    "allow_fallbacks": false,
+    "require_exact_upstream_provider": true
+  },
+  "generation": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "max_output_tokens": 32768,
+    "tool_call_budget": 100,
+    "max_agent_iterations": 100,
+    "wall_time_seconds": 3600,
+    "agent_setup_timeout_seconds": 1200,
+    "verifier_timeout_seconds": 3600,
+    "trial_timeout_seconds": 9000,
+    "concurrency": 1,
+    "attempts": 3,
+    "retry_on_provider_error": 1,
+    "retry_on_model_failure": 0
+  },
+  "harnesses": [
+    {
+      "id": "terminal",
+      "name": "Harbor / Terminal-Bench 2.0",
+      "repository": "https://github.com/harbor-framework/harbor.git",
+      "revision": "191d1b989bbba1d77c2db23e17aec308d7c08046",
+      "dataset": "terminal-bench@2.0",
+      "weight": 0.30
+    },
+    {
+      "id": "repository",
+      "name": "OpenHands / SWE-Bench Verified",
+      "repository": "https://github.com/OpenHands/benchmarks.git",
+      "revision": "405bae7140d7e961a75f4910a0b2e7069731db96",
+      "dataset": "SWE-bench_Verified",
+      "weight": 0.30
+    },
+    {
+      "id": "function_calling",
+      "name": "Berkeley Function Calling Leaderboard V4",
+      "repository": "https://github.com/ShishirPatil/gorilla.git",
+      "revision": "f7cf7359b7ac615a0b294831c5ba2bc95ee4a000",
+      "package": "bfcl-eval==2025.12.17",
+      "dataset": "BFCL V4",
+      "weight": 0.20
+    },
+    {
+      "id": "mcp",
+      "name": "MCPMark",
+      "repository": "https://github.com/eval-sys/mcpmark.git",
+      "revision": "bc5f8382081eb88d95bb28ffcad9536d681d0426",
+      "release": "v1.2.0",
+      "dataset": "MCPMark official task set",
+      "weight": 0.15
+    },
+    {
+      "id": "efficiency",
+      "name": "Cross-harness verified-success efficiency",
+      "repository": "local",
+      "revision": "result-schema-v1",
+      "dataset": "derived from retained run records",
+      "weight": 0.05
+    }
+  ]
+}

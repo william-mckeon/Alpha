@@ -1,0 +1,13 @@
+services:
+  evaluator:
+    build:
+      context: ..
+      dockerfile: evaluation/Dockerfile
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+    volumes:
+      - ./runs:/app/evaluation/runs
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    command: ["python", "scripts/eval_foundations.py", "validate"]

@@ -1,0 +1,23 @@
+{
+  "contract_revision": 8,
+  "execution_fingerprint": "27e5f52899953ce2fe8a2eb2b7d668ac57fbe47624686e3f5b93ac128fe109d2",
+  "tests": {"passed": 221, "subtests_passed": 15, "real_windows_reader_lock": "passed"},
+  "previous_stopped_run": "phase1-smoke-full-20260915-01",
+  "replacement_run": "phase1-smoke-full-20260915-02",
+  "replacement_status_at_handoff": "running",
+  "replacement_started_at": "2026-09-15T06:16:09.493963-04:00",
+  "launch_audit_run": "phase1-ledger-launch-audit-20260915-01",
+  "launch_audit_status": "local_prerequisites_passed",
+  "launch_audit_units": 420,
+  "final_budget_scope": "final-smoke",
+  "aggregate_cap_usd": 48,
+  "pre_restart_cumulative_spend_usd": 2.5834529,
+  "new_diagnostic_spend_usd": 0.035193474,
+  "readiness_evidence": [
+    {"harness": "mcp", "path": "evaluation/runs/normalized/phase1-ledger-mcp-20260915-01.json", "sha256": "360304babaa0241a1c7587b126a5b3f921179f0ecdc67a54ffac7ebe764bdbfb", "outcome": "passed"},
+    {"harness": "repository", "path": "evaluation/runs/normalized/phase1-ledger-repository-20260915-01.json", "sha256": "8786d09c86f3dc27575e467eb7a05e086958277006e0ea952af34dbf640816fd", "outcome": "passed"},
+    {"harness": "function_calling", "path": "evaluation/runs/normalized/phase1-ledger-bfcl-20260915-01.json", "sha256": "a2b5bd3308d4a636d7678db442cf5a36b9f885f250ea6ce98364ec5cd141734d", "outcome": "passed"}
+  ],
+  "qualification_complete": false,
+  "donor_selected": false
+}

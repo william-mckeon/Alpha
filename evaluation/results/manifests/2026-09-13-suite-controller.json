@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "diagnostic",
+  "qualification_complete": false,
+  "winner": null,
+  "validation": {
+    "regression_command": ".venv/Scripts/python.exe -m pytest tests/evaluation tests/test_foundation_eval.py -q -p no:cacheprovider",
+    "tests_passed": 123,
+    "subtests_passed": 8,
+    "control_validation": "passed",
+    "docker_preflight": "passed_outside_restricted_process",
+    "terminal_suite_dry_run": "passed_one_unit",
+    "terminal_dry_run_path": "evaluation/runs/suites/phase1-controller-audit-20260913-02/dry-run.json"
+  },
+  "new_openrouter_cost_usd": 0.00077201,
+  "new_tavily_search_calls": 0,
+  "probes": [
+    {"path": "evaluation/runs/tool-smoke/b6c9b538a60d475583b2823f87ed8d69/step-3.5-flash.json", "sha256": "f41071477e46f9febc3f5ae606ee5190febaba147f52f23c582293e19db7b3c2", "passed": true, "cost_usd": 0.0000493},
+    {"path": "evaluation/runs/tool-smoke/40c423e7e9c24633b4da7c8eccc945de/qwen3-coder-next.json", "sha256": "a1e87867edd2be2988580b4b4fce518cdec60b2d79265f5435560291dd0f716f", "passed": true, "cost_usd": 0.0001311},
+    {"path": "evaluation/runs/tool-smoke/201256e929c346b199033da5fe365ae9/glm-4.7.json", "sha256": "c0ee4ef6443c2dd90f656cac9cbb1e609ae66b5dbdc6f1edeb6651c59ea5cf8b", "passed": true, "cost_usd": 0.00016071},
+    {"path": "evaluation/runs/tool-smoke/b25885717a2e4f91881d67cb66ed79e4/deepseek-v4-flash.json", "sha256": "61c6958361f132deffeeedbb6d51146b9ee559a5c215169336c31cf253c8cf71", "passed": true, "cost_usd": 0.0000351},
+    {"path": "evaluation/runs/tool-smoke/4fc131716be145da80a90a89f6eb0149/qwen3-30b-a3b-thinking-2507.json", "sha256": "5097099bdf61da996bd70dba66b53f5260e1527739000d499331ead1aff99a22", "passed": true, "cost_usd": 0.0003958}
+  ]
+}

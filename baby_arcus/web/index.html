@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Baby Arcus observatory</title><link rel="stylesheet" href="/styles.css"></head>
+<body><header><div class="eyebrow">ARCUS / LEARNING LAB</div><h1>A world shared by two learners.</h1>
+<p>Watch their actions, compare what each can see, and revisit the evidence.</p></header>
+<main><section class="toolbar"><strong id="connection">Connecting…</strong><span id="status">Idle</span>
+<label>View <select id="perspective"><option value="world">Spectator world</option><option value="a">Agent A sees</option><option value="b">Agent B sees</option></select></label>
+<button id="live">Follow live</button></section>
+<div class="layout"><section class="card"><h2 id="episode-title">Waiting for an episode</h2><canvas id="world" width="560" height="560" aria-label="Simulation grid"></canvas>
+<p class="legend">A / B learners · P pressure plate · D door · ◆ parcel · ◎ delivery · R / B markers</p>
+<label>Replay frame <input id="frame" type="range" min="0" max="0" value="0"><output id="frame-label">0</output></label>
+<p id="frame-info"></p></section><aside><section class="card"><h2>Run evidence</h2><dl id="metrics"></dl>
+<p id="reason"></p></section><section class="card"><h2>Agent perspectives</h2><div id="agents"></div></section>
+<section class="card"><h2>Recent episodes</h2><div id="episodes"></div></section></aside></div>
+<section class="card"><h2>Learning and review</h2><label>Report <select id="report"><option value="">Current run</option></select></label><div id="training-panel"></div></section>
+<p class="footnote">World view is for observers. Models receive only their own visible cells and delivered signals. Human participation and model growth are later phases.</p>
+</main><script type="module" src="/app.js"></script></body></html>

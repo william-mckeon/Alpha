@@ -21,6 +21,7 @@ RUN pip3 install --no-cache-dir --upgrade pip && \
 # Install the package (pulls tiktoken, zstandard, numpy, pytest).
 COPY pyproject.toml README.md ./
 COPY arcus ./arcus
+COPY evaluation ./evaluation
 RUN pip3 install --no-cache-dir -e .
 
 COPY scripts ./scripts

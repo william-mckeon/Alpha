@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "policy_id": "arcus-bfcl-key-correction-v1",
+  "harness_revision": "f7cf7359b7ac615a0b294831c5ba2bc95ee4a000",
+  "overrides": [
+    {
+      "task_id": "web_search_37",
+      "original_ground_truth": ["2003"],
+      "ground_truth": ["Delhi University"],
+      "source_url": "https://ir.tesla.com/corporate/vaibhav-taneja",
+      "verified_at": "2026-09-14",
+      "evidence": "Mr. Taneja holds a Bachelors of Commerce degree from Delhi University.",
+      "reason": "Question asks where, but upstream key contains a year; source chain and independent primary source identify Delhi University."
+    }
+  ]
+}

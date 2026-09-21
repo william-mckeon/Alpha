@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "parsers": [
+    {"candidate_id": "codestral-2508", "tool_parser": "openai-tools", "reasoning_field": null},
+    {"candidate_id": "kimi-k2.7-code", "tool_parser": "openai-tools", "reasoning_field": "reasoning_details"},
+    {"candidate_id": "step-3.5-flash", "tool_parser": "openai-tools", "reasoning_field": "reasoning_details"},
+    {"candidate_id": "qwen3-coder-next", "tool_parser": "openai-tools", "reasoning_field": null},
+    {"candidate_id": "glm-4.7", "tool_parser": "openai-tools", "reasoning_field": "reasoning_details"},
+    {"candidate_id": "deepseek-v4-flash", "tool_parser": "openai-tools", "reasoning_field": "reasoning_details"},
+    {"candidate_id": "qwen3-30b-a3b-thinking-2507", "tool_parser": "openai-tools", "reasoning_field": "reasoning_details"}
+  ]
+}

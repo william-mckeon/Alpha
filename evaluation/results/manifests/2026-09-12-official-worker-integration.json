@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "status": "partial_integration_validated",
+  "qualification_complete": false,
+  "donor_selected": false,
+  "full_project_tests_passed": 129,
+  "new_openrouter_spend_usd_including_failed_diagnostics": 0.03771717,
+  "new_tavily_search_calls": 0,
+  "terminal": {
+    "qualification_configs_audited": 75,
+    "qualification_tasks_audited": 25,
+    "audit_evidence": "evaluation/runs/suites/phase1-qualification-all-audit-20260912-01/dry-run.json",
+    "audit_sha256": "9c521634f404090e19f83b45c70f2571f8277b962f2bd2a0eb33b26c7477a877",
+    "live_run_id": "phase1-terminal-integration-20260912-01",
+    "outcome": "failed",
+    "official_reward": 0.0,
+    "verifier_tests_passed": 5,
+    "verifier_tests_total": 6,
+    "failure": "Generated solution imported cryptography without installing it. Model failure, no harness exception; verifier unchanged.",
+    "normalized_evidence": "evaluation/runs/normalized/phase1-terminal-integration-20260912-01.json",
+    "normalized_sha256": "69cf07d36ca8c5f966f1a88a9ebf264337e51f9d7d5e38320c4936ab006dce53"
+  },
+  "bfcl": {
+    "task_id": "simple_python_272",
+    "scope": "one frozen AST task per candidate; native generation and official grading; diagnostic only",
+    "candidates_passed": 5,
+    "evidence": [
+      {"run_id":"phase1-bfcl-integration-20260912-03","candidate_id":"step-3.5-flash","sha256":"21ae902a07e70474cdd09e6af547695a244fb8c9e2b7334f60c0b01ab793728a"},
+      {"run_id":"phase1-bfcl-integration-20260912-04","candidate_id":"qwen3-coder-next","sha256":"0a504b0fc1011b22bbf35b36d894cc11addd2c2d4b1a2fad549b6fa2401690a3"},
+      {"run_id":"phase1-bfcl-integration-20260912-05","candidate_id":"glm-4.7","sha256":"28b89b734538309eac5fd1b9dbf8a94911d379f66ad755c38cc4f65d47f2943d"},
+      {"run_id":"phase1-bfcl-integration-20260912-06","candidate_id":"deepseek-v4-flash","sha256":"4bedba5e37851210b140802d22635b739ba97d7a0b6557d35446233e2f998578"},
+      {"run_id":"phase1-bfcl-integration-20260912-07","candidate_id":"qwen3-30b-a3b-thinking-2507","sha256":"db536f04133fe06f2f78b117ecb7d191eb50be10c65ca7ef5463dec00c1a7fbc"}
+    ],
+    "evidence_path_template": "evaluation/runs/bfcl/{run_id}/validation.json",
+    "worker_dotenv_isolation_rerun": {"run_id":"phase1-bfcl-integration-20260912-08","status":"passed","sha256":"c290af2b140ca228e51b1cf4e4890f17f682aacadeeb545c430151485a162d3f"},
+    "failed_runs_retained": ["phase1-bfcl-integration-20260912-01","phase1-bfcl-integration-20260912-02"],
+    "fixes": ["Missing soundfile dependency locked explicitly.","Singleton latency standard deviation convention changed only in process-local reporting; official task checker unchanged.","Workers cannot implicitly reload project .env credentials."]
+  },
+  "mcpmark": {
+    "isolated_dependency_install": "passed with documented openai==1.109.1 override",
+    "official_command_help": "passed",
+    "explicit_proxy_route": "passed",
+    "actual_upstream_loop_fault_injection": "passed; exactly one failed completion, num_retries=0; zero external requests",
+    "loop_source_sha256": "f2264f1af21cf6d616de38a87561b1b4c0f61539f369202305ee09b6dcab5736",
+    "loop_overlay_sha256": "6405ca4c49b157e51fae9b50fa7b392834306987c91ddcdce3965be9a8945c6b",
+    "isolated_task_execution": "pending"
+  },
+  "repository": {
+    "exact_sdk_submodule_initialized": true,
+    "dependency_lock_resolution": "passed; full runtime install pending",
+    "snapshot_instances": 500,
+    "parquet_sha256": "a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd",
+    "jsonl_sha256": "f61cd55ceb35b61ad592f645abcbfc8ea4d294c6c9f3c8f15e83211a8e8db98c",
+    "official_task_execution": "pending"
+  },
+  "next_files": "docs/PHASE1_INTEGRATION_REMAINING.md"
+}

@@ -1,0 +1,2 @@
+# Imported unconditionally by the resolved qwen-agent handler loaded by BFCL.
+soundfile==0.13.1

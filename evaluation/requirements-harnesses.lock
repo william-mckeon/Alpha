@@ -1,0 +1,28 @@
+{
+  "format": "arcus-separated-harness-lock-index-v1",
+  "note": "JSON index, not a pip requirements file. Install each referenced lock in its own environment, from repository root. Source revision checks are required in addition to dependency hashes.",
+  "harnesses": {
+    "function_calling": {
+      "source_revision": "f7cf7359b7ac615a0b294831c5ba2bc95ee4a000",
+      "requirements": "evaluation/requirements-bfcl.lock",
+      "sha256": "400fd9c79baa95bb225d8b2196c67bb990d5f917ce26b5aa5f54f1db278e31ad",
+      "adaptation": "evaluation/requirements-bfcl-extras.txt",
+      "validation": "isolated install and one-task native official generation/grading diagnostic; not full suite"
+    },
+    "mcp": {
+      "source_revision": "bc5f8382081eb88d95bb28ffcad9536d681d0426",
+      "requirements": "evaluation/requirements-mcpmark.lock",
+      "sha256": "486e59eef4cae23f438dd3e12217a8a62f147ca4a6292cf5ee022fca589f92b9",
+      "adaptation": "evaluation/requirements-mcpmark-overrides.txt",
+      "validation": "isolated install, audited proxy/retry/verifier overlays and official container filesystem diagnostics passed; full frozen coverage pending"
+    },
+    "repository": {
+      "source_revision": "405bae7140d7e961a75f4910a0b2e7069731db96",
+      "sdk_revision": "43376f1868ffd702746080714a59c16d3f69ec12",
+      "requirements": "evaluation/requirements-openhands.lock",
+      "sha256": "25c081defdca63669d7fadb35a5c0e9f06d5224ff2b1a15b7631f6da0dfe1458",
+      "adaptation": "SWE-bench-only lock excludes unrelated broken multi-swe-bench 1.1.2 wheel; uv installs the universal lock because pip evaluates a WSL platform marker incorrectly",
+      "validation": "full isolated dependencies and pinned Linux controller image build passed; one official SWE-bench inference/grading diagnostic and report import completed; full frozen coverage pending"
+    }
+  }
+}

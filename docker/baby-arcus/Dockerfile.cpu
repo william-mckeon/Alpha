@@ -1,0 +1,11 @@
+FROM ubuntu:22.04@sha256:829f6df217bcbae2b371026e81711d1a787c61b2967ad09d015063663ebafbf7
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends python3 ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1
+COPY baby_arcus /app/baby_arcus
+COPY configs/baby_arcus /app/configs/baby_arcus
+COPY tests/baby_arcus /app/tests/baby_arcus
+RUN useradd --uid 10001 --create-home baby && mkdir /state && chown baby:baby /state
+USER baby
+ENTRYPOINT ["python3", "-m", "baby_arcus.cli"]

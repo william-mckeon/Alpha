@@ -1,5 +1,9 @@
 # Scale presets + the real training pipeline
 
+> **Status: Verified · Track A — from scratch.** These presets govern the original Arcus model;
+> a pretrained donor retains its topology and follows [0020](0020-depth-router-training.md) and
+> [0021](0021-donor-continued-training.md).
+
 Take the validated `tiny` mechanism to **real model sizes** and a **production-shaped
 trainer**: grow-params expert ladder (0.5B → 0.9B → 1B), a batched MoE dispatch that makes
 many experts cheap, a 128k context window decoupled from the training length, and an

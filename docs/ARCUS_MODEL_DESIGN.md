@@ -1,5 +1,27 @@
 # Arcus MoDE Foundation Model — Design
 
+For the current 151,946,954-parameter embodied shared learner and its qualification
+limits, read [current status](ARCUS_CURRENT_STATUS.md). The proposed fresh integrated
+training, ReAct loop and LangGraph/LangChain boundaries are in
+[the discussion record](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md). They have not
+changed the implementation described by the dated evidence below.
+
+## Baby Arcus extension (native implementation)
+
+The simulation experiment uses fresh weights, a compact structured vocabulary,
+and task-specific action, signal, value, and prediction outputs around the existing
+`ArcusMoDE.trunk()` interface. Its measured 125,388,431-parameter configuration and
+separate agent histories are in [0027](../specs/0027-baby-arcus-model-and-memory.md).
+Its growth targets are approximate total-parameter doublings, not automatic expert
+doublings or guaranteed capability gains. The following text-model design and
+tokenizer choices continue to describe the original experiment. The GPU AdamW probe
+reserved 2.701 GiB at microbatch eight and context 512; see [results](BABY_ARCUS_RESULTS.md).
+
+> **Scope: Track A — original from-scratch model.** This validated design remains the
+> independent Arcus research path. The pretrained-donor Track B reuses the same
+> architecture-agnostic MoD mechanism without replacing this model; see
+> [DONOR_FOUNDATION_STRATEGY.md](DONOR_FOUNDATION_STRATEGY.md).
+
 > A from-scratch Mixture-of-Depths-and-Experts model **built on top of BoeNet**, on a
 > modern backbone. Purpose: **efficiency** — foundation-model-quality results at a
 > fraction of the dense compute, on accessible hardware. boenet's *mechanism*
@@ -68,4 +90,6 @@ the matched dense-vs-MoDE comparison.
 
 ---
 
-*Arcus — see [DATASHEET.md](DATASHEET.md) for the contract and [../ROADMAP.md](../ROADMAP.md) for the ladder.*
+*Arcus — see [DATASHEET.md](DATASHEET.md) for both identities,
+[DONOR_FOUNDATION_STRATEGY.md](DONOR_FOUNDATION_STRATEGY.md) for Track B, and
+[../ROADMAP.md](../ROADMAP.md) for build order.*

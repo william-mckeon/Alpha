@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "status": "partial_phase1_integration",
+  "benchmark_scored": false,
+  "donor_selected": false,
+  "tests": {"command": ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider", "passed": 139},
+  "live_runs": [
+    {"run_id": "phase1-bfcl-tavily-20260913-01", "status": "excluded_setup_error", "reason": "Host page-fetch dependencies missing; cost retained."},
+    {"run_id": "phase1-bfcl-tavily-20260913-02", "status": "excluded_verifier_selection_error", "reason": "Raw catalog web_search category was skipped by official expanded-category selection."},
+    {"run_id": "phase1-bfcl-tavily-20260913-03", "status": "integration_passed_model_failed", "task_id": "web_search_37", "official_task_id": "web_search_base_37", "benchmark_variant": "BFCL V4 / Arcus Tavily MCP adaptation", "evidence": "evaluation/runs/bfcl/phase1-bfcl-tavily-20260913-03/validation.json", "sha256": "8e7cea4925adcc165d83dd2ba3068bac55a39a179d33c8423fa4034480ae8e7b"},
+    {"run_id": "phase1-mcpmark-20260913-01", "status": "excluded_setup_error", "reason": "Upstream source-directory backup failed before model generation. Its initial validation status integration_passed is superseded by this audit; official_verdict was harness_error."},
+    {"run_id": "phase1-mcpmark-20260913-02", "status": "integration_passed_model_passed", "task_id": "filesystem/file_property/size_classification", "evidence": "evaluation/runs/mcpmark/phase1-mcpmark-20260913-02/validation.json", "sha256": "762b10726267124b8502253e05b54901c476ec0d824cdbcf2c26bb1fc32275a4", "image_id": "sha256:7ea57a2da935139d80741bf266c7ff9fb4166e5e6d6e375716f6eca095b22bc9"}
+  ],
+  "fixture": {"category": "file_property", "sha256": "99d5449cef45bfcda6e5260f6ef4cd356bdbae59818d37ffa840054cdee19ec4", "source_revision": "bc5f8382081eb88d95bb28ffcad9536d681d0426"},
+  "cumulative_openrouter_usd": 0.926027914,
+  "new_openrouter_usd": 0.0161169,
+  "cumulative_tavily_reserved_credits_upper_bound": 40,
+  "new_tavily_reserved_credits_upper_bound": 18,
+  "trial_containers_removed": true,
+  "remaining": ["OpenHands pinned runtime and live official SWE-bench grading", "All frozen BFCL categories and explicit qualification web-search variant contract", "Repository/BFCL/MCP normalized gateway provenance import", "Full smoke and qualification coverage within approved caps"]
+}

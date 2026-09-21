@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "contract_revision": 4,
+  "approved_variant": "web_search_base",
+  "evidence_kind": "diagnostic",
+  "qualification_complete": false,
+  "winner": null,
+  "tests_passed": 128,
+  "subtests_passed": 8,
+  "new_recorded_openrouter_cost_usd": 0.0058703,
+  "runs": [
+    {"path": "evaluation/runs/bfcl/phase1-base-contract4-20260913-01/validation.json", "sha256": "b4112a0c699dd1c2468092d0e45138550433c843e170ad44305d1533fcfdd146", "status": "integration_error", "cost_usd": 0.0033496, "note": "Windows cp1252 decoding failed on UTF-8 page-fetch subprocess output; retained and excluded."},
+    {"path": "evaluation/runs/bfcl/phase1-base-contract4-utf8-20260913-01/validation.json", "sha256": "6f8f3a93d75734c881f3078fcd369df6b4d4976a6b7b1c478d857b36ab709c97", "status": "integration_passed", "official_model_outcome": "failed", "cost_usd": 0.0025207, "normalized_path": "evaluation/runs/normalized/phase1-base-contract4-utf8-20260913-01.json", "note": "Official generation, grading and diagnostic import completed after explicit UTF-8 subprocess fix."}
+  ],
+  "remaining": "Complete frozen category coverage, remaining harness callbacks, supervision/provenance validation and repeated five-candidate qualification."
+}

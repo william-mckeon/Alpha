@@ -1,0 +1,18 @@
+{
+  "lesson": "perception",
+  "decision_limit": 30,
+  "interval_seconds": 1.0,
+  "parent": "/workspace/runs/arcus_mode_staircase_v1/capacity-50",
+  "output": "/workspace/runs/arcus_object_perception_v3",
+  "architecture": "spatial",
+  "seed": 48191,
+  "train_examples": 1200,
+  "validation_examples": 200,
+  "final_examples": 1000,
+  "updates": 1600,
+  "batch_size": 8,
+  "learning_rate": 0.001,
+  "minimum_count_accuracy": 0.9,
+  "minimum_ball_iou": 0.75,
+  "minimum_color_accuracy": 0.9
+}

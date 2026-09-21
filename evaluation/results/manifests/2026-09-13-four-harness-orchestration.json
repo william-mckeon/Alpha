@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "contract_revision": 4,
+  "status": "four_harness_runners_enabled_full_sweep_pending",
+  "qualification_complete": false,
+  "donor_selected": false,
+  "winner": null,
+  "benchmark_mode_probes_qualification_eligible": false,
+  "tests": {"command": ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider", "passed": 187, "subtests_passed": 10},
+  "registered_harnesses": ["terminal", "repository", "function_calling", "mcp"],
+  "frozen_coverage": {"five_candidate_smoke_units": 420, "five_candidate_qualification_units": 2400, "smoke_local_and_terminal_config_audit": "passed", "qualification_local_input_audit": "passed"},
+  "full_smoke_dry_run": "evaluation/runs/suites/phase1-full-smoke-dryrun-20260913-01/dry-run.json",
+  "qualification_local_audit": "evaluation/runs/integration-suites/phase1-qualification-local-audit-20260913-03/dry-run.json",
+  "worker_images": {"openhands": "sha256:bf52e3cc37f6df19f48e20189c0da4a50427cc8ae0a516e7b62f3ddb4c1ef51a", "mcpmark": "sha256:5ce8000c69f422c9f9fad33d37a24ef3769dc31414bdbe257639f25f814d9309"},
+  "new_openrouter_cost_usd": 2.9291005,
+  "cumulative_recorded_openrouter_cost_usd": 4.464168424,
+  "unreconciled_reservation_usd": 0.0464337,
+  "aggregate_openrouter_cap_usd": 48,
+  "new_tavily_search_calls": 0,
+  "cumulative_conservative_tavily_credits": 52,
+  "tavily_credit_cap": 1000,
+  "live_checks": [
+    {"run_id": "phase1-integrated-bfcl-20260913-01-u0001", "outcome": "passed", "model_calls": 1, "cost_usd": 0.0000898},
+    {"run_id": "phase1-integrated-bfcl-20260913-01-u0002", "outcome": "passed", "model_calls": 1, "cost_usd": 0.0000784},
+    {"run_id": "phase1-integrated-bfcl-20260913-01-u0003", "outcome": "passed", "model_calls": 1, "cost_usd": 0.0000979},
+    {"run_id": "phase1-integrated-mcp-20260913-01-u0001", "outcome": "passed", "model_calls": 7, "cost_usd": 0.0159491},
+    {"run_id": "phase1-repository-controls4-20260913-01", "outcome": "excluded_budget_termination_prediction_loss_before_fix", "model_calls": 100, "cost_usd": 0.5505496, "manifest_sha256": "05b3bfa852cd7b34d2843e50bcfd1a752185223a0915ff222367fe696495d926"},
+    {"run_id": "phase1-integrated-repository-20260913-01-u0001", "outcome": "official_model_failure_budget_exhausted", "model_calls": 100, "cost_usd": 2.3444389, "manifest_sha256": "db771cdedaa6a4b50ad4c6414e17d3700754f76ac4c9b6982ef08971e9cbad44", "normalization": "fresh_import_under_fixed_validator_no_model_replay"},
+    {"run_id": "phase1-bfcl-benchmark-path-20260913-01-u0001", "outcome": "passed", "model_calls": 1, "cost_usd": 0.0000778},
+    {"run_id": "phase1-mcp-benchmark-path-20260913-01-u0001", "outcome": "passed", "model_calls": 7, "cost_usd": 0.017819}
+  ],
+  "readiness_proofs": [
+    {"path": "evaluation/runs/integration-suites/phase1-integrated-bfcl-20260913-01/phase1-integrated-bfcl-20260913-01-u0001.json", "sha256": "c862cac535b1719f5732cdc2f54f5c3ef059d72d4fbc46ba22198ce1883a1a43"},
+    {"path": "evaluation/runs/integration-suites/phase1-integrated-mcp-20260913-01/phase1-integrated-mcp-20260913-01-u0001.json", "sha256": "6979e3926994be1cf94f0fbd787e16997a2d521bab2a4b6526606a9a034215f9"},
+    {"path": "evaluation/runs/normalized/phase1-integrated-repository-20260913-01-u0001-current-validator.json", "sha256": "70ef5831ff913723bbfab59375f3a5ff7c402dd9d8d7458ecf3db0f69499a73d"}
+  ],
+  "fixture_audit": {"path": "evaluation/runs/fixture-audit-20260913-01/manifest.json", "sha256": "98cfde4ef9a464abf3b8479c117d089d5d0d722775d0df3a5b76e148f6d8a262", "archives_passed": 6, "paid_model_calls": 0},
+  "budget_fault_probes": {"run_ids": ["phase1-repository-budget-fault-20260913-01", "phase1-repository-budget-fault-20260913-02"], "passed": 2, "paid_model_calls": 0, "qualification_eligible": false},
+  "search_accounting_reimport": {"path": "evaluation/runs/normalized/phase1-base-contract4-utf8-20260913-01-search-accounting.json", "sha256": "5094d8f8a2997d1539cf6e40265aa6ab1f03c31e19c0acad907f7870350348ea", "retained_search_calls": 3, "retained_credits_upper_bound": 6, "new_search_calls": 0},
+  "architecture_changed": false,
+  "mimo_excluded": true
+}

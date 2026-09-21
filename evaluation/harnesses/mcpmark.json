@@ -1,0 +1,18 @@
+{
+  "runner_evidence": {
+    "path": "evaluation/runs/normalized/phase1-six-mcp-20260915-01.json",
+    "sha256": "ec72d0fffff1e39b0d4d0cc8223a9df7fbdec2a572dc38a6610790c9505c1511"
+  },
+  "id": "mcp",
+  "revision": "bc5f8382081eb88d95bb28ffcad9536d681d0426",
+  "release": "v1.2.0",
+  "dataset": "MCPMark Verified",
+  "attempts": 3,
+  "service_scope": "filesystem only; no user account services",
+  "integration_status": "shared proof-gated suite runner enabled; isolated task grading and normalized worker-control/fixture provenance live-validated; all six retained archives passed Linux extraction/timestamp/ordinary-permission audit; full frozen runtime/verifier coverage remains pending",
+  "known_upstream_contract_gaps": [
+    "Unknown-model fallback omits base_url_var, leaving ModelConfig.base_url null.",
+    "Agent loop retries failed completions up to three consecutive failures, beyond Arcus's gateway retry policy.",
+    "Filesystem fixture URLs are mutable; retained archive hashes are required."
+  ]
+}

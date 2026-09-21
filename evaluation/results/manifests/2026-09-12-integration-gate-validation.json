@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-12",
+  "status": "diagnostic_native_parser_smoke_not_benchmark",
+  "probes": [
+    {
+      "path": "evaluation/runs/tool-smoke/f4e5d0e52ef746f48d1ef67f99518a44/step-3.5-flash.json",
+      "sha256": "e0d54d24cfc19be6eb40315f96a13e74c2f4a0755db810597050df737b49b3e0",
+      "candidate_id": "step-3.5-flash",
+      "passed": true,
+      "cost_usd": 0.0000448
+    },
+    {
+      "path": "evaluation/runs/tool-smoke/41cde1b50841462eaf3b5295eb084478/qwen3-coder-next.json",
+      "sha256": "7043a71f6416605e5cbd6b1e2a98a90950a3e38b4478514a803bc3171e465a07",
+      "candidate_id": "qwen3-coder-next",
+      "passed": true,
+      "cost_usd": 0.0001311
+    },
+    {
+      "path": "evaluation/runs/tool-smoke/39c7bf8df4ed45abac60538f492fe49d/glm-4.7.json",
+      "sha256": "7990e66950410a01190a3bbcc066676cee2119d3493ceacaed3ae235894420a9",
+      "candidate_id": "glm-4.7",
+      "passed": true,
+      "cost_usd": 0.00015196
+    },
+    {
+      "path": "evaluation/runs/tool-smoke/7da73a76ff98455c98bf841c9586721f/deepseek-v4-flash.json",
+      "sha256": "2a42bcca15f9e2c025c0d36b7ffd89a6a5b1b1ab1f2123cbea6675820ce52759",
+      "candidate_id": "deepseek-v4-flash",
+      "passed": true,
+      "cost_usd": 0.0000351
+    },
+    {
+      "path": "evaluation/runs/tool-smoke/179ce11db6014d2596d63b173825606b/qwen3-30b-a3b-thinking-2507.json",
+      "sha256": "1d2b630414d10f33a8e01a69dd5ccad526bec78cee81be278190225c74d2c68a",
+      "candidate_id": "qwen3-30b-a3b-thinking-2507",
+      "passed": true,
+      "cost_usd": 0.0003958
+    }
+  ],
+  "spent_usd": 0.00075876,
+  "swebench_dataset": {
+    "revision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a",
+    "path": "evaluation/runs/swebench-verified-c104f840.parquet",
+    "sha256": "a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd",
+    "task_count": 500
+  },
+  "suite_config_sha256": "8f9b9496543568ec9bd8985bcef8f6963890fddfc6657ae43620fb2552cf7d13",
+  "terminal_catalog": {
+    "revision": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "source": "https://api.github.com/repos/laude-institute/terminal-bench-2/git/trees/69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "qualification_task_count": 25
+  }
+}

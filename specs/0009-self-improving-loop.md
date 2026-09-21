@@ -1,5 +1,15 @@
 # The self-improving loop — 0.5B → 85B (the north star)
 
+> **Baby Arcus extension:** [0023](0023-baby-arcus-experiment.md) defines a separate
+> fresh-weight simulation experiment beginning around 125M. It does not require
+> this text/distillation path's language-first stages. Growth evidence below remains
+> historical text-training evidence, not proof of simulation learning or unlimited
+> scaling. Baby growth uses [0033](0033-baby-arcus-growth.md).
+
+> **Status: Accepted · Track A — from scratch.** The growth ladder remains valid research, but
+> is no longer the universal route to Alpha. Track B starts from a selected coding MoE and follows
+> [0015](0015-donor-foundation-selection.md) through [0022](0022-agentic-sft-rlvr.md).
+
 > The plan to grow Arcus from a fluent 0.5B into a large, capable coding agent through a
 > developmental loop: pretrain a reasoning core, teach it to use tools, let it learn from
 > *doing* (verifier-filtered), earn calibrated judgment via RL, and climb a growth ladder —
@@ -70,15 +80,18 @@ Each stage is tagged **public** (openagent-code) or **private** (Arcus Code) per
 [0012](0012-arcus-code-boundary.md): everything that *trains* is private; the harness that
 *acts / measures / serves the boundary* is public.
 
-- **Stage 0 — babble** · *running (private).* Pretrain `0.5b` to fluency — now on **RunPod L40S**
-  (the 5080 was the bench; the L40S is ~2.5× faster and drops the flaky-upload crashes). Tooling
-  built: the sampler ([0008](0008-fluency-pretraining.md)) makes fluency *checkable*. *Prerequisite
-  for all of the below.*
-- **Stage 1 — build + validate the growth operator** · *spec'd (0010), next (private).* Add experts
-  by **appending an exact copy + its router row** → output invariant to top-1's pick → **lossless@grow**
-  regardless of tie-breaking; incremental (+1/revision). Buildable + unit-testable on `tiny` *now*,
-  independent of the runs. Calibration — grow the real 0.5B→1B, compare `val_ppl` to a from-scratch
-  1B — waits for the 0.5B. The one rung where from-scratch is an affordable control.
+- **Stage 0 — babble** · *done (private).* Pretrained `0.5b` to fluency (honest `val_ppl` **56.58**) on
+  **RunPod L40S** (the 5080 was the bench; the L40S is ~2.5× faster and drops the flaky-upload crashes),
+  with a from-scratch `1b` control alongside (**44.23**). Tooling: the sampler
+  ([0008](0008-fluency-pretraining.md)) makes fluency *checkable*. *Prerequisite for all of the below.*
+- **Stage 1 — build + validate the growth operator** · *done (private).* Add experts by appending a
+  **warm copy + its router row with a dormant bias** → **near-lossless@grow** (NOT bit-identical: the
+  softmax gate dilutes — measured **56.58 → 60.03** on the real 0.5B, ~6%); incremental (+k/revision).
+  **Calibration succeeded:** grew the 0.5B → 8-expert 991M, continued-trained on the interleaved loader →
+  **`val_ppl` 15.32 vs the from-scratch 44.23** — the reuse thesis holds. The growth *rule* (when/how much)
+  is [0014](0014-growth-policy.md). *Caveat:* the generations still loop / lose coherence (a validated
+  substrate, not a generator) — which puts **Stage 2/4 SFT** on the critical path next.
+  See [RESULTS.md](../docs/RESULTS.md).
 - **Stage 2 — talk in the agent's format** · *chat template spec'd (0011); masked-SFT not built (private).*
   Minimal o200k chat/tool tokens + the **embedding-resize that reuses the growth operator**; JSON tool
   mode first; **masked-SFT** (completion-only loss). openagent-code (**public**) captures trajectories
@@ -103,9 +116,11 @@ Each stage is tagged **public** (openagent-code) or **private** (Arcus Code) per
 ## Acceptance (checkable)
 
 - [x] Stage 0 sampler shipped ([0008](0008-fluency-pretraining.md)).
-- [ ] Stage 0: `0.5b` pretrained to fluency, uploaded ([0008](0008-fluency-pretraining.md)).
-- [ ] Stage 1: growth operator built; grown-1B within a measured, small `val_ppl` gap of a
-      from-scratch 1B (the operator preserves quality).
+- [x] Stage 0: `0.5b` pretrained to fluency (`val_ppl` 56.58), uploaded ([0008](0008-fluency-pretraining.md)).
+- [x] Stage 1: growth operator built; grown-1B (8 experts, 991M) continued-trained to `val_ppl`
+      **15.32**, *beating* the from-scratch 44.23 — the operator preserves quality and the reuse thesis
+      holds (near-lossless on the real model: 56.58 → 60.03). Generation is substrate-level (loopy) →
+      SFT next. See [RESULTS.md](../docs/RESULTS.md).
 - [ ] Stage 2: o200k chat template + tool tokens defined; masked-SFT trains ArcusMoDE
       (completion-only loss verified against a hand-checked row).
 - [ ] Stage 3: Arcus serves behind `CODE_API_BASE` and answers a tool-call probe; `compare.py`

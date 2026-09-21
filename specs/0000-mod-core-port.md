@@ -1,5 +1,9 @@
 # Port the MoD core (Phase 1)
 
+> **Status: Verified · Shared.** This mechanism is used by both the original from-scratch
+> model (Track A) and pretrained-donor conversion (Track B); donor integration is specified
+> separately in [0017](0017-generic-moe-mode-adapter.md).
+
 Lift boenet's validated Mixture-of-Depths mechanism into `arcus/mod_core.py` as
 architecture-agnostic tensor ops, so the Qwen wrapper can call it without knowing
 anything about Qwen.

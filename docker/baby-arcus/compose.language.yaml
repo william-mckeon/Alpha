@@ -1,0 +1,25 @@
+name: arcus-language
+services:
+  language:
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.language
+    environment:
+      ARCUS_LANGUAGE_TOKEN: ${ARCUS_LANGUAGE_TOKEN:?Set a private language service token}
+    ports: ["127.0.0.1:${ARCUS_LANGUAGE_PORT:-8895}:8895"]
+    volumes:
+      - type: bind
+        source: ${ARCUS_DATASET_ROOT:?Set the DatasetForge corpus path}
+        target: /dataset
+        read_only: true
+      - type: bind
+        source: ${ARCUS_MOTOR_CHECKPOINT:?Set the qualified motor checkpoint path}
+        target: /model/postures.pt
+        read_only: true
+      - type: bind
+        source: ${ARCUS_LANGUAGE_STATE:?Set the qualified language state directory}
+        target: /state
+    read_only: true
+    tmpfs: ["/tmp"]
+    init: true
+    gpus: all

@@ -61,6 +61,7 @@ class MoDEBlock(nn.Module):
         self.last_compute_fraction = 1.0
         self.last_p_soft = None
         self.last_expert_fraction = None
+        self.last_expert_overflow = None
 
     def forward(self, x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
         x = x + self.attn(self.norm1(x), cos, sin)       # dense attention
@@ -72,16 +73,20 @@ class MoDEBlock(nn.Module):
             delta, aux, frac, _ovf = self.moe(normed)    # pure MoE (lossless reduction)
             self.last_compute_fraction = torch.ones((), device=x.device)
             self.last_expert_fraction = frac
+            self.last_expert_overflow = _ovf
             return x + delta, aux
 
         _B, T, _C = x.shape
         sel = mod_select(p_soft, self.capacity)
         self.last_compute_fraction = sel.keep.float().mean().detach()
         packed = pack_kept(normed, sel)                  # gather kept tokens
-        delta_p, aux, frac, _ovf = self.moe(packed)      # experts on kmax < T tokens
+        # Unfilled MoD buffer slots are padding, not real tokens for expert routing/loss.
+        valid = torch.arange(sel.kmax, device=x.device)[None, :] < sel.keep.sum(dim=1)[:, None]
+        delta_p, aux, frac, _ovf = self.moe(packed, valid_mask=valid)
         delta = unpack_kept(delta_p, sel, seq_len=T)     # scatter back (0 for skipped)
         gate = straight_through_gate(p_soft, sel.keep)
         self.last_expert_fraction = frac
+        self.last_expert_overflow = _ovf
         return x + gate * delta, aux
 
 
@@ -134,7 +139,14 @@ class ArcusMoDE(nn.Module):
         if T > self.cfg.max_seq_len:
             raise ValueError(f"sequence length {T} exceeds max_seq_len {self.cfg.max_seq_len}")
 
-        h = self.token_embed(input_ids)
+        return self.trunk_embedded(self.token_embed(input_ids))
+
+    def trunk_embedded(self, h: torch.Tensor) -> torch.Tensor:
+        """Shared transformer with an explicitly separate input vocabulary."""
+        if h.ndim != 3 or h.shape[-1] != self.cfg.dim:
+            raise ValueError('Expected embedded input [batch, time, dim]')
+        T=h.shape[1]
+        if T>self.cfg.max_seq_len:raise ValueError('Embedded context too long')
         cos = self.rope_cos[:T].to(h.dtype)
         sin = self.rope_sin[:T].to(h.dtype)
 

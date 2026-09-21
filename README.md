@@ -1,17 +1,61 @@
 # arcus
 
-> A from-scratch **MoDE** foundation model — Mixture-of-Depths + Mixture-of-Experts
-> on a modern transformer backbone, with a tiktoken tokenizer. Built **on top of**
-> BoeNet's validated mechanism — for **efficiency**: foundation-model quality at a
-> fraction of the compute, on hardware you actually have.
+## Baby Arcus — native learning and viewer
 
-**Maintainer:** William McKeon · **Status:** v0.4 — sampler shipped (42 tests); **Stage 0 running on RunPod L40S** (0.5B fluency + 1B seed), seeding the 0.5B→85B self-improving loop · Apache 2.0 License © 2026 William McKeon
+Start with [current status and handoff](docs/ARCUS_CURRENT_STATUS.md). The current
+embodied learner has 151,946,954 parameters including experts, with capacity fixed
+at 0.25. The Phase 1 pathway experiment and subsequent behavioral comparison are
+complete; meaningful learning improvement was not established. Phase 2 quiet-time
+learning is unstarted, and the revised runtime still needs full release qualification.
+The [fresh integrated-training and ReAct/LangGraph proposal](docs/ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md)
+is documented for discussion, not implemented or scheduled.
+
+The historical Baby grid experiment started a fresh approximately 125M model and
+studied cooperative learning through simulated experience, later human shared play,
+and reviewed growth. The following paragraph describes that earlier foundation.
+It is a Track-A experiment with separate services and artifacts; it does not replace
+the existing text-training or donor-evaluation results. The CPU world, two cooperative
+lesson families, simulation/artifact services, and diagnostic tests are implemented.
+The native seven-service pipeline, tiny PPO update, basic viewer/replay and 125M GPU
+capacity probe pass. This is engineering evidence, not cooperative mastery. Ubuntu
+22.04 container startup and the 52-test Linux GPU suite now pass; overnight qualification remains open. See the
+[measured results](docs/BABY_ARCUS_RESULTS.md) and [next file inventory](docs/BABY_ARCUS_NEXT_FILES.md).
+Use the [runbook](docs/BABY_ARCUS_RUNBOOK.md). Start with the [phase plan](docs/BABY_ARCUS_PHASES.md),
+[decisions](docs/BABY_ARCUS_DECISIONS.md), and
+[experiment contract](specs/0023-baby-arcus-experiment.md).
+
+An earlier refinement added a separately named `baby-125m-cap4` routing experiment,
+per-layer diagnostics, richer evaluation reports and interrupted-update recovery.
+The original preset remains available; capacity changes are not model growth.
+
+Phase 1 update (2026-09-14): the first full smoke sweep stopped at 71/420.
+Contract revision 8 adds scoped accounting, current-source readiness evidence and
+nonblocking context uncertainty checks, retaining the shared 32,768-token ceiling.
+Fatal gateway failures stop new spending and supervised workers.
+Full smoke/qualification and donor selection remain pending. See
+[current validation](docs/PHASE1_SCOPED_VALIDATION.md) and
+[evaluation commands](evaluation/README.md). Model and training architecture are unchanged.
+
+> A **MoDE** foundation-model project — Mixture-of-Depths + Mixture-of-Experts.
+> Track A preserves the original from-scratch model and growth research; Track B,
+> now the immediate priority, converts a permissively licensed coding MoE by adding
+> Arcus depth routing, then continues training it on data we control.
+
+**Maintainer:** William McKeon · **Status:** v0.9 qualification — Track A Stage 1 growth calibration done; Track B's five-candidate native parser, Tavily delegated-search and one-task official BFCL diagnostics passed. Full qualification remains pending, no donor is selected, and donor-conversion code has not started. Apache 2.0 License © 2026 William McKeon
 
 ---
 
 ## What this is
 
-Arcus is an original, **from-scratch** MoDE language model:
+Arcus has two complementary tracks built around the same depth-routing mechanism:
+
+- **Track A — from scratch.** The original Arcus model, `o200k_base` tokenizer,
+  expert-growth ladder, checkpoints, and completed 0.5B→1B calibration remain intact.
+- **Track B — donor conversion.** Qualify a standard Apache-2.0/unmodified-MIT coding
+  MoE, preserve its learned attention/experts/tokenizer/tool format, add the Arcus MoD
+  router, prove capacity-1 equivalence, and continue training it on our data.
+
+Across both tracks:
 
 - **MoD** (Mixture-of-Depths) skips the expensive FFN for easy tokens — "only turn on
   the compute you need."
@@ -19,19 +63,30 @@ Arcus is an original, **from-scratch** MoDE language model:
 
 The mechanism comes from the **BoeNet** research project (validated at toy scale: MoDE
 *matches* dense quality at ~half the per-token compute). Arcus modernizes the substrate
-(**RoPE · RMSNorm · GQA+QK-norm · SwiGLU**), tokenizes with tiktoken **`o200k_base`**,
+(**RoPE · RMSNorm · GQA+QK-norm · SwiGLU**) in Track A, tokenizes that model with tiktoken **`o200k_base`**,
 and chases boenet's *efficiency* thesis — foundation-model quality at a fraction of the
 dense compute, on accessible hardware. It trains from scratch on the
 **alpha dataset** (a ~120 GB STEM/code corpus).
 
-The earlier Qwen upcycle/wrapper exploration is archived under [`legacy/`](legacy/).
+The earlier Qwen upcycle/wrapper exploration is archived under [`legacy/`](legacy/) and
+serves as evidence for the new generic donor adapter; it is not the production implementation.
+The donor strategy is [docs/DONOR_FOUNDATION_STRATEGY.md](docs/DONOR_FOUNDATION_STRATEGY.md),
+with the controlled registry in [docs/FOUNDATION_CANDIDATES.md](docs/FOUNDATION_CANDIDATES.md).
 
 ---
 
 ## Architecture
 
+Track A:
+
 ```
 input_ids → token embed → [ dense GQA/RoPE attention + MoD-gated MoE FFN ] × N → RMSNorm → tied head → logits
+```
+
+Track B:
+
+```text
+donor embedding → [ donor attention + Alpha depth router → donor MoE router/experts ] × N → donor head
 ```
 
 MoD selects ~`capacity` of tokens per block; the MoE runs on the kept tokens only;
@@ -75,12 +130,36 @@ python scripts/train_arcus.py --preset tiny --max_tokens 2000000   # pipeline ru
 > Make sure your prompt shows `(.venv)` before `pip install`. If pip prints
 > "Defaulting to user installation," the venv isn't active — activate it first.
 
-The `tiny` preset is the 5080 / pipeline check. Real Alpha models (~1.3B+) are
-from-scratch and run on **cloud** — see the ladder below.
+The `tiny` preset is the Track-A 5080 / pipeline check. Larger Track-A models are
+from scratch and run on **cloud** — see that ladder below. Track B has its own donor hardware plan.
 
 ---
 
-## Scale ladder (boenet Phase-4 §7)
+## Immediate priority — donor-derived Alpha
+
+Before donor-specific code, the project reuses Harbor/Terminal-Bench, OpenHands,
+BFCL, and MCPMark to qualify Step-3.5-Flash, Qwen3-Coder-Next, GLM-4.7,
+DeepSeek-V4-Flash, and a smaller Qwen reasoning control. Step is the leading hypothesis,
+not a selected winner. Kimi is behavioral-reference only; MiMo is deliberately excluded.
+
+Phase 1's machine-readable candidates, provider/budget policy, deterministic suites, harness pins,
+audit records, normalized results, and scoring logic live in [`evaluation/`](evaluation/). Validate
+them with `python scripts/eval_foundations.py validate` and check external prerequisites with
+`python scripts/eval_foundations.py preflight`. All five candidates passed the native structured
+tool-call parser smoke for $0.00135487 total. That is a format preflight, not a model ranking;
+Full Docker-backed qualification remains pending, so no donor is selected. On
+2026-09-13, official filesystem diagnostics passed for Step and Qwen3-Coder-Next;
+Step passed BFCL live multiple and failed a long-context multi-turn diagnostic.
+Repository/BFCL/MCP official imports are live-validated and diagnostic-only. All
+159 tests passed. The pinned OpenHands Django diagnostic completed and officially
+graded as model failure, without gateway or verifier error. These are not complete
+qualification scores. See [remaining files](docs/PHASE1_NEXT_FILES.md).
+
+The implementation gate is specifications [0015](specs/0015-donor-foundation-selection.md)
+through [0022](specs/0022-agentic-sft-rlvr.md). Model-to-model delegation is deferred;
+ordinary coding and tool reliability come first.
+
+## Track A scale ladder (boenet Phase-4 §7)
 
 | Preset | Size | Where | Role |
 |---|---|---|---|
@@ -99,14 +178,18 @@ How-to: [docs/TRAINING.md](docs/TRAINING.md).
 
 ## Status & honest gaps
 
-- Tiny preset **built and runtime-validated** (42 tests: lossless@cap=1, causal,
-  gradient to both routers + every expert, end-to-end training, sampler); the `0.5b` fluency
-  run + a `1b` seed are **training on RunPod L40S** (Stage 0 of the self-improving loop).
+- Tiny preset **built and runtime-validated** (42 tests: lossless@cap=1, causal, gradient to both
+  routers + every expert, end-to-end training, sampler). **Stage 0 + Stage 1 done:** the 0.5B trained to
+  fluency (`val_ppl` 56.58), grown to an 8-expert 991M **1B** and continued-trained to **15.32** — ~3×
+  better than the from-scratch 1B (44.23); the growth reuse thesis holds.
+- **Honest gap: it's a substrate, not a generator.** Perplexity is strong, but the samples loop and lose
+  coherence — expected for a raw base model with no SFT. **SFT is the next stage** (coherence + prompt-
+  following), then RLVR. See [docs/RESULTS.md](docs/RESULTS.md).
 - Quality is **unproven** — that needs the cloud runs on the alpha dataset.
 - Win condition (boenet): MoDE **matches** dense at lower compute, not beats — read
   every run against the `--dense` matched baseline.
 
-**Downstream purpose:** Arcus is the from-scratch *student* for openagent-code's distillation
+**Track-A downstream purpose:** the original Arcus remains the from-scratch *student* for openagent-code's distillation
 flywheel (teacher: gpt-oss-120b) — pretrain to fluency, then SFT/distil, then a self-improving
 grow-and-RLVR loop to climb 0.5B→85B ([specs/0009](specs/0009-self-improving-loop.md)). A
 **public/private wall** ([specs/0012](specs/0012-arcus-code-boundary.md)) keeps the harness
@@ -119,9 +202,14 @@ in three phases and converging into Arcus Code ([specs/0013](specs/0013-agent-to
 ## License & provenance
 
 Apache 2.0 © 2026 William McKeon (see [LICENSE](LICENSE)). Arcus is an **original,
-from-scratch** model (not a derivative). The archived [`legacy/`](legacy/) code wraps
-Qwen3 (Apache 2.0); see [NOTICE](NOTICE).
+from-scratch** model in Track A. A Track-B checkpoint will be clearly identified as a
+derivative of its selected standard Apache-2.0 or unmodified-MIT donor and will preserve
+all required notices. No donor is selected or incorporated yet. The archived
+[`legacy/`](legacy/) code wraps Qwen3 (Apache 2.0); see [NOTICE](NOTICE).
 
 ---
 
 *arcus — part of the OpenAgent family*
+## Arcus body, eyes and text
+
+The native desktop host now supports independent normalized leg controls, body sensations, separate eye/sleep state, scoped gaze and a durable Talk to Arcus input. A small reward-only standing pilot has separate checkpoints and live HTTP evidence. The 125M grid learner remains unchanged. See [implementation and validation](docs/ARCUS_BODY_EYES_CHAT_RESULTS.md) and [standing lesson](docs/ARCUS_STANDING_CURRICULUM.md).

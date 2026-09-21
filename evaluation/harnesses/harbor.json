@@ -1,0 +1,20 @@
+{
+  "id": "terminal",
+  "revision": "191d1b989bbba1d77c2db23e17aec308d7c08046",
+  "dataset": "terminal-bench@2.0",
+  "agent": "openhands",
+  "agent_version": "0.56.0",
+  "environment": "docker",
+  "dataset_revision": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+  "smoke_task_ids": ["path-tracing", "caffe-cifar-10", "openssl-selfsigned-cert"],
+  "qualification_task_ids": ["sqlite-db-truncate", "code-from-image", "distribution-search", "polyglot-rust-c", "regex-log", "feal-linear-cryptanalysis", "sam-cell-seg", "mteb-leaderboard", "mteb-retrieve", "torch-pipeline-parallelism", "extract-moves-from-video", "gpt2-codegolf", "fix-code-vulnerability", "build-cython-ext", "feal-differential-cryptanalysis", "pytorch-model-recovery", "chess-best-move", "winning-avg-corewars", "git-leak-recovery", "constraints-scheduling", "break-filter-js-from-html", "extract-elf", "schemelike-metacircular-eval", "financial-document-processor", "kv-store-grpc"],
+  "execution_unit": "one task attempt per isolated proxy",
+  "command": "python scripts/eval_foundations.py run-harbor --candidate {candidate_id} --task {task_id} --attempt {attempt} --run-id {run_id} --confirm-budget 48",
+  "required_agent_kwargs": {
+    "version": "0.56.0",
+    "temperature": "0.0",
+    "top_p": "1.0",
+    "max_iterations": 100,
+    "num_retries": 0
+  }
+}

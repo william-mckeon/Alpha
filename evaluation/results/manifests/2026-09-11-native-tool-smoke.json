@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-09-11-native-tool-smoke",
+  "run_type": "openrouter_native_tool_parser_smoke",
+  "date": "2026-09-11",
+  "authorized_budget_usd": 48.0,
+  "spent_usd": 0.00135487,
+  "result": "passed_all_candidates",
+  "qualification_effect": "The native OpenAI-compatible tool-call parser gate passed for every candidate. This is a format preflight only; Harbor, OpenHands, BFCL, and MCPMark scores remain unset.",
+  "candidates": [
+    {
+      "candidate_id": "step-3.5-flash",
+      "provider": "SiliconFlow",
+      "status": "passed",
+      "raw_artifact": "../../runs/tool-smoke/step-3.5-flash.json",
+      "sha256": "1c7ae868c31bbab452ad56c91baea85959459e9c104d98c5710a44e35603dbd2",
+      "cumulative_ledger_spend_usd": 0.0000493
+    },
+    {
+      "candidate_id": "qwen3-coder-next",
+      "provider": "Alibaba",
+      "status": "passed",
+      "raw_artifact": "../../runs/tool-smoke/qwen3-coder-next.json",
+      "sha256": "74c443c05dd2cd94482c38df86c3367fe6f44c93a558c2a1198e87e917117c2e",
+      "cumulative_ledger_spend_usd": 0.0001311
+    },
+    {
+      "candidate_id": "glm-4.7",
+      "provider": "DeepInfra",
+      "status": "passed_after_declared_retry",
+      "raw_artifact": "../../runs/tool-smoke/glm-4.7.json",
+      "sha256": "37449fa7690a083446506b3f8286165f45da4d236a28eee66dd83974f232762f",
+      "cumulative_ledger_spend_usd": 0.00031267,
+      "note": "The first request received an upstream HTTP 429. The protocol-permitted retry succeeded; provider fallback remained disabled."
+    },
+    {
+      "candidate_id": "deepseek-v4-flash",
+      "provider": "DeepInfra",
+      "status": "passed",
+      "raw_artifact": "../../runs/tool-smoke/deepseek-v4-flash.json",
+      "sha256": "1c3596b143b90e5cd3d821a2e0bc87b471cbe4d056fb7c50fb2e7ad1b7726dd5",
+      "cumulative_ledger_spend_usd": 0.0000702
+    },
+    {
+      "candidate_id": "qwen3-30b-a3b-thinking-2507",
+      "provider": "Alibaba",
+      "status": "passed",
+      "raw_artifact": "../../runs/tool-smoke/qwen3-30b-a3b-thinking-2507.json",
+      "sha256": "bf893640fa992430ed9b07d418d8c6dd127708ae51391cbb2cc8ebd1b0f2100f",
+      "cumulative_ledger_spend_usd": 0.0007916
+    }
+  ]
+}

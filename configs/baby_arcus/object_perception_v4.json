@@ -1,0 +1,9 @@
+{
+  "lesson":"perception", "decision_limit":30, "interval_seconds":1.0,
+  "parent":"runs/arcus_mode_staircase_v1/capacity-50",
+  "output":"runs/arcus_object_perception_v4_retry1", "architecture":"multiscale",
+  "seed":48291, "train_examples":2400, "validation_examples":200, "final_examples":1000,
+  "updates":4000, "batch_size":8, "learning_rate":0.001,
+  "class_weights":[1,1,2,8],
+  "minimum_count_accuracy":0.9,"minimum_ball_iou":0.75,"minimum_color_accuracy":0.9
+}

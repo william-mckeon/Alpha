@@ -104,7 +104,7 @@ class MoELayer(nn.Module):
     def _capacity(self, T: int) -> int:
         return max(1, int(math.ceil(self.capacity_factor * T / self.n_experts)))
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, valid_mask: torch.Tensor | None = None):
         B, T, C = x.shape
         E = self.n_experts
         cap = self._capacity(T)
@@ -113,11 +113,17 @@ class MoELayer(nn.Module):
         probs = F.softmax(logits, dim=-1)
         gate, idx = probs.max(dim=-1)                 # [B, T], [B, T]
         onehot = F.one_hot(idx, E).to(x.dtype)        # [B, T, E]
+        if valid_mask is not None:
+            if valid_mask.shape != (B, T) or valid_mask.dtype != torch.bool:
+                raise ValueError('Expert validity mask must be boolean [B,T]')
+            onehot = onehot * valid_mask.unsqueeze(-1)
 
         # position-within-expert via exclusive causal cumsum (overflow drop is causal)
         excl = torch.cumsum(onehot, dim=1) - onehot
         pos_in_expert = (excl * onehot).sum(dim=-1)   # [B, T]
         keep = pos_in_expert < cap
+        if valid_mask is not None:
+            keep = keep & valid_mask
         slot = pos_in_expert.long().clamp(max=cap - 1)
         keep_f = keep.to(x.dtype).unsqueeze(-1)
 
@@ -133,10 +139,17 @@ class MoELayer(nn.Module):
         delta = gathered * gate.unsqueeze(-1) * keep_f          # gate -> router gradient
 
         # Switch load-balance: lb = E * sum_e f_e * P_e, minimized (=1) at uniform usage.
-        f_e = onehot.mean(dim=(0, 1))                 # [E]
-        P_e = probs.mean(dim=(0, 1))                  # [E]
+        if valid_mask is None:
+            f_e = onehot.mean(dim=(0, 1))             # [E]
+            P_e = probs.mean(dim=(0, 1))              # [E]
+        else:
+            valid = valid_mask.to(x.dtype)
+            count = valid.sum().clamp_min(1)
+            f_e = onehot.sum(dim=(0, 1)) / count
+            P_e = (probs * valid.unsqueeze(-1)).sum(dim=(0, 1)) / count
         aux = self.lb_loss_weight * E * torch.sum(f_e * P_e)
 
         expert_fraction = f_e.detach()
-        overflow_fraction = (~keep).to(x.dtype).mean().detach()
+        overflow_fraction = ((~keep).to(x.dtype).mean() if valid_mask is None else
+                             ((~keep) & valid_mask).to(x.dtype).sum() / count).detach()
         return delta, aux, expert_fraction, overflow_fraction

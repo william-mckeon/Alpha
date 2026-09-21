@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "encoding": "o200k_base",
+  "tiktoken_version": "0.14.0",
+  "dataset_root": "alpha dataset",
+  "source_patterns": ["HuggingFaceFW_fineweb-edu_sample-100BT/*.jsonl.zst", "wikimedia_wikipedia_20231101.en/*.jsonl.zst"],
+  "text_dim": 128,
+  "passage_tokens": 64,
+  "context_tokens": 128,
+  "session_training_tokens": 4096,
+  "decision_interval_seconds": 5,
+  "max_expression_tokens": 12,
+  "body_checkpoint": "runs/arcus_approach_v2/postures.pt",
+  "language_root": "runs/arcus_language"
+}

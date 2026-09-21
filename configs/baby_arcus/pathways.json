@@ -1,0 +1,14 @@
+{
+  "shared_config": "configs/baby_arcus/shared.json",
+  "depth_capacity": 0.25,
+  "discovery_examples_per_task": 32,
+  "confirmation_examples_per_task": 64,
+  "top_fraction_per_expert": 0.1,
+  "random_controls": 5,
+  "random_seed": 2192026,
+  "update_norm": 0.01,
+  "update_examples": 8,
+  "bootstrap_replicates": 1000,
+  "tasks": ["commands", "color_reference", "rest"],
+  "output_root": "runs/arcus_shared_pathways025"
+}

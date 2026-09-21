@@ -1,10 +1,16 @@
 # Agent tooling — the Codex-referenced coding CLI (the three-phase build)
 
+> **Status: Accepted for product tooling; revised for evaluation · Shared.** Donor qualification
+> reuses Harbor, OpenHands, BFCL, and MCPMark under [0016](0016-foundation-evaluation.md); it does
+> not require a new evaluation harness. Model-to-model delegation is deferred until ordinary tool
+> use is reliable.
+
 > The plan for the *tooling* half of the system: a coding-agent CLI whose design is *referenced*
 > from OpenAI Codex (Apache-2.0) and reimplemented as our own, adopting Codex's tool-call format
 > for interop. Built in three phases — upgrade openagent-code, migrate + harden into Arcus Code as
-> a genuine (less-Python-dependent) CLI, then converge with the model. This spec is the contract;
-> the model half is unaffected and stays status quo.
+> a genuine (less-Python-dependent) CLI, then converge with the model. This is the product-tooling
+> contract; Track A remains intact and Track B is governed by [0015](0015-donor-foundation-selection.md)
+> through [0022](0022-agentic-sft-rlvr.md).
 
 ## Goal
 
@@ -53,9 +59,9 @@ tooling and the (private) training evolve independently across a data seam.
   ~5 IP training files) into Arcus Code, and harden it into a real coding CLI — porting the
   systems/concurrency parts out of Python (Go/Rust). The training methodology becomes robust +
   Arcus-specific here (masked-SFT for ArcusMoDE, growth hooks, RLVR).
-- **Phase 3 — the model converges.** Throughout P1–P2, the Arcus alpha model family develops in
-  parallel (0.5B → fluency; the 0.5B→1B upgrade with the documented goals; [0008](0008-fluency-pretraining.md),
-  [0010](0010-growth-operator.md)). Phase 3 folds the model + its training into Arcus Code, so
+- **Phase 3 — the model converges.** Throughout P1–P2, Track A remains available and Track B qualifies,
+  converts, and trains a donor under [0015](0015-donor-foundation-selection.md) through
+  [0022](0022-agentic-sft-rlvr.md). Phase 3 folds the promoted model + its training into Arcus Code, so
   Arcus Code becomes the **complete robust system**: CLI + model + training.
 
 ## Acceptance (checkable)
