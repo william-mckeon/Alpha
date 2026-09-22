@@ -1,0 +1,6 @@
+{
+  "infrastructure": ["fresh_initialization", "capacity_025", "shared_gradient", "resume", "action_deduplication", "acknowledged_hearing", "run_isolation", "live_service", "linux_parity"],
+  "learning": {"heldout_accuracy_min": 0.9, "maximum_regression": 0.02, "seeds_required": 3},
+  "efficiency": {"metric": "seconds_per_successful_task", "minimum_relative_improvement": 0.05},
+  "production_promotion": false
+}

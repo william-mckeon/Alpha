@@ -68,11 +68,12 @@ def main():
     parser.add_argument('--config', default='configs/baby_arcus/pathways.json')
     parser.add_argument('--output', help='New report path; existing reports cannot be overwritten')
     parser.add_argument('--device', choices=('cpu', 'cuda'), default='cuda')
+    parser.add_argument('--manifest', choices=('active.json', 'candidate.json', 'initial.json'), default='active.json')
     args = parser.parse_args()
     cfg = json.loads(Path(args.config).read_text())
     shared = json.loads(Path(cfg['shared_config']).read_text())
-    if cfg['depth_capacity'] != .25:
-        raise ValueError('Depth must remain 0.25')
+    if cfg['depth_capacity'] != shared.get('depth_capacity', .25):
+        raise ValueError('Pathway depth must match the checkpoint experiment')
     if cfg['tasks'] != ['commands', 'color_reference', 'rest']:
         raise ValueError('Unexpected task families')
     if min(cfg['discovery_examples_per_task'], cfg['confirmation_examples_per_task']) < 16 or cfg['random_controls'] < 3:
@@ -85,7 +86,7 @@ def main():
     if output.exists():
         raise FileExistsError(output)
     root = Path(shared['root'])
-    active_bytes = (root/'active.json').read_bytes()
+    active_bytes = (root/args.manifest).read_bytes()
     manifest = json.loads(active_bytes)
     started = time.perf_counter()
     torch.set_num_threads(2)
@@ -169,7 +170,7 @@ def main():
         print(json.dumps({'stage': 'transfer_complete', 'source_task': source}), flush=True)
     restored = evaluate(model, tokenizer, confirmation)
     verify_depth(model, shared)
-    unchanged = (root/'active.json').read_bytes() == active_bytes and digest(root/(manifest['generation']+'.pt')) == manifest['sha256']
+    unchanged = (root/args.manifest).read_bytes() == active_bytes and digest(root/(manifest['generation']+'.pt')) == manifest['sha256']
     if restored != baseline or not unchanged:
         raise RuntimeError('Restoration/active checkpoint preservation failed')
     sources = ['baby_arcus/shared_pathways.py', 'scripts/evaluate_arcus_shared_pathways.py',
@@ -178,7 +179,7 @@ def main():
     hashes = source_snapshot() | {path: digest(path) for path in sources}
     report = {'schema': 'arcus-pathways-v1', 'candidate': manifest, 'config': cfg,
               'device': args.device, 'platform': platform.platform(), 'torch': torch.__version__,
-              'parameters': sum(p.numel() for p in model.parameters()), 'depth_capacity': .25,
+              'parameters': sum(p.numel() for p in model.parameters()), 'depth_capacity': cfg['depth_capacity'],
               'selection_sha256': digest(selection_path), 'profiles_sha256': digest(profiles_path),
               'sources': hashes, 'cohorts': {split: {task: [sample[2] for sample in samples] for task, samples in tasks.items()}
                                           for split, tasks in cohorts.items()},

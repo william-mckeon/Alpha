@@ -56,7 +56,7 @@ class SharedModel(nn.Module):
     def core(self):return self.body.core
 
     def forward(self,rows,tokenizer,requested=None):
-        if self.version>=5 and requested and set(requested)<= {'body','lying','sitting'}:
+        if self.version>=5 and not getattr(self,'integrated_motor',False) and requested and set(requested)<= {'body','lying','sitting'}:
             for row in rows:validate(row)
             goals={'body':'standing','lying':'lying','sitting':'sitting'}
             return {key:self.body([row['senses'] for row in rows],goals[key]) for key in requested}
@@ -122,7 +122,7 @@ class SharedModel(nn.Module):
                 object_tokens=self.object_input(torch.tensor([[o['features'] for o in object_rows]],device=device,dtype=torch.float32))
                 parts.insert(-1,object_tokens)
             sequence=torch.cat(parts,dim=1)
-            if self.version>=9 and row.get('executed_action') and row.get('memory'):
+            if self.version>=9 and (row.get('executed_action') or getattr(self,'integrated_motor',False)) and row.get('memory'):
                 memories=row['memory'][-8:]
                 memory=torch.tensor([m['features'] for m in memories],device=device,dtype=torch.float32).mean(0,keepdim=True)
                 sequence=sequence.clone();sequence[:,-1]+=self.memory_input(memory)
@@ -143,7 +143,7 @@ class SharedModel(nn.Module):
             # An unconstrained context residual overturned working joint sequences.
             def motor(head):
                 logits=head(body_hidden)
-                if self.version<5:logits=logits+self.body_context(hidden)
+                if self.version<5 or getattr(self,'integrated_motor',False):logits=logits+self.body_context(hidden)
                 return logits.masked_fill(~allowed,-torch.inf)
             object_values=torch.full((1,32),-1e9,device=device)
             if object_rows:object_values[:,:len(object_rows)]=self.curiosity(object_tokens+hidden[:,None]).squeeze(-1)
@@ -156,6 +156,9 @@ class SharedModel(nn.Module):
                 'text':nn.functional.linear(text_features,self.language.embedding.weight) if requested is None or 'text' in requested else torch.empty((1,0),device=device),
                 'hidden':hidden,'aux':self.core.last_aux_loss}
             if self.version>=2:result['gaze_choice']=self.gaze_choice(hidden)
+            if getattr(self,'integrated_motor',False):
+                relative=torch.tensor([row.get('hearing_relative',[0.,0.])],device=device,dtype=hidden.dtype)
+                result['approach']=self.body.approach_actor(torch.cat((torch.nn.functional.normalize(hidden,dim=-1)*.01,relative),dim=-1))
             if self.version>=3:result['perception']=perception
             if self.version>=8:
                 result.update(future_body=self.future_body(hidden),future_rgb=self.future_rgb(hidden),action_quality=self.action_quality(hidden))

@@ -78,3 +78,88 @@ class LanguageStream:
 
     def close(self):
         if self.iterator:self.iterator.close()
+
+
+class AcknowledgedLanguageStream:
+    """Single-owner offer/ack wrapper; legacy eager streams remain unchanged.
+
+    Acceptance receipt must already be durable in the consumer journal. A crash
+    before ack repeats the same offer, never skips it. Consumer deduplicates ID.
+    """
+    def __init__(self, manifest, tokenizer, state_path):
+        self.manifest, self.tokenizer = manifest, tokenizer
+        self.path = Path(state_path)
+        self.pending = self.path.with_suffix('.offer.json')
+        self.scratch = self.path.with_suffix('.scratch.json')
+        self.playing = True
+
+    def offer(self, limit=65):
+        state = json.loads(self.path.read_text()) if self.path.exists() else None
+        if state and not state.get('playing', True):
+            return None
+        if state and state.get('replay_requested') and state.get('last'):
+            return state['last']
+        if self.pending.exists():
+            pending = json.loads(self.pending.read_text())
+            if (not state or state.get('epoch', 0) == pending['passage'].get('epoch', 0)) and (not state or state.get('accepted_id') != pending['passage']['id']):
+                return pending['passage']
+            self.pending.unlink()
+        # Scratch progress is never the acknowledged cursor.
+        if state:
+            atomic_json(self.scratch, state)
+        elif self.scratch.exists():
+            self.scratch.unlink()
+        stream = LanguageStream(self.manifest, self.tokenizer, self.scratch)
+        try:
+            passage = stream.next(limit)
+            if passage:
+                passage['epoch'] = stream.state.get('epoch', 0)
+                passage['id'] = hashlib.sha256(json.dumps({k: v for k, v in passage.items() if k not in ('id', 'text')}, sort_keys=True).encode()).hexdigest()
+                stream.state['last'] = passage
+                atomic_json(self.pending, {'passage': passage, 'after': stream.state})
+            return passage
+        finally:
+            stream.close()
+
+    def ack(self, passage_id, receipt):
+        if receipt.get('source_id') != passage_id or receipt.get('durable') is not True:
+            raise ValueError('A durable matching consumer receipt is required')
+        state = json.loads(self.path.read_text()) if self.path.exists() else {}
+        if state.get('accepted_id') == passage_id:
+            if state.get('replay_requested'):
+                state['replay_requested'] = False
+                atomic_json(self.path, state)
+            return False
+        pending = json.loads(self.pending.read_text())
+        if pending['passage']['id'] != passage_id:
+            raise ValueError('Acknowledgement does not match offered passage')
+        atomic_json(self.path, {**pending['after'], 'control_receipts': state.get('control_receipts', {}),
+                               'playing': state.get('playing', pending['after']['playing']), 'accepted_id': passage_id})
+        return True
+
+    def control(self, action, request_id=None):
+        if action not in ('pause', 'resume', 'restart', 'replay'):
+            raise ValueError('Unknown hearing control')
+        stream = LanguageStream(self.manifest, self.tokenizer, self.path)
+        try:
+            receipts = stream.state.setdefault('control_receipts', {})
+            if request_id in receipts:
+                if receipts[request_id] != action:
+                    raise ValueError('Hearing control identity conflict')
+                return
+            if action == 'replay':
+                stream.state['replay_requested'] = True
+            if action == 'restart':
+                stream.state.update(file=0, document=0, token=0, eof=False, last=None)
+                stream.state['epoch'] = stream.state.get('epoch', 0) + 1
+                stream.state.pop('accepted_id', None)
+                stream.state['replay_requested'] = False
+            if action != 'replay':
+                stream.state['playing'] = action != 'pause' and not stream.state['eof']
+            if request_id:
+                receipts[request_id] = action
+            atomic_json(self.path, stream.state)
+        finally:
+            stream.close()
+        if action == 'restart' and self.pending.exists():
+            self.pending.unlink()

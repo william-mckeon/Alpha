@@ -1,10 +1,15 @@
 # Fresh integrated Arcus training — discussion record
 
-Date: September 21, 2026. **Status: proposal; not implemented or scheduled.**
-This records the caregiver's hypothesis and the assistant's recommendations. It
-does not replace the accepted roadmap, choose a new starting size, authorize a
-reset, or establish a new specification number. Current evidence and deployment
-limits are in [current status](ARCUS_CURRENT_STATUS.md).
+Date: September 21, 2026. **Status: accepted experiment; implementation and smoke
+training underway; scientific acceptance remains open.** This discussion record
+explains the hypothesis. Current implementation is governed by
+[spec 0048](../specs/0048-fresh-integrated-arcus.md), with measured results in
+[Test 2 results](ARCUS_TEST2_RESULTS.md). The existing learner was not reset.
+
+The requested branch `baby-arcus-test-2` now exists. Its
+[file-level implementation plan](ARCUS_TEST2_FILE_PLAN.md) maps this proposal to
+existing and proposed files; consolidated implementation boundaries are recorded
+in [the implementation inventory](ARCUS_TEST2_IMPLEMENTATION.md).
 
 ## Caregiver hypothesis
 
@@ -115,19 +120,20 @@ automatically interchangeable. Include training cost as well as inference cost.
 The current model has a different history, so its comparison is a practical
 restart decision, not by itself a causal proof of joint-training benefit. A fresh
 staged-training control would be needed to isolate that claim more cleanly.
-These controls and their budgets are proposals requiring the final experiment
-design, not additional work already authorized or completed.
+These controls remain required comparative research work. The completed smoke
+runs do not substitute for matched data/compute budgets or independent seeds.
 
 Measure skill acquisition, unseen-task success, cross-task transfer, forgetting,
 rest behavior, tool validity, recovery, and total cost per successful outcome.
 Separate ReAct model training from the framework used to execute the same policy.
 Library adoption, extra traces or more shared channels alone are not improvements.
 
-Open decisions include starting parameter count, precise architecture, data mix,
-curriculum and training objectives, ReAct introduction point, resource budgets,
-framework versions, acceptance thresholds, and whether this experiment precedes
-or incorporates the planned quiet-time phase. Preserve the current learner and
-all positive, negative and inconclusive evidence whichever direction is chosen.
+The accepted first implementation retains 151,946,954 parameters, fixes capacity
+at .25, and introduces the graph from initialization. Configs pin framework
+versions, bounded mixed lessons, quotas and learning gates. Quiet-time delivery
+and learning are implemented inside this isolated experiment; production release,
+larger comparative budgets and growth remain unqualified. Preserve all positive,
+negative and inconclusive evidence.
 
 ## Research and framework references
 

@@ -1,6 +1,12 @@
 # Arcus current status and handoff — September 21, 2026
 
 This is the current entry point for the Baby Arcus embodied/shared-learner work.
+Latest completed work: [full-depth continuation to exactly 37,000 updates](ARCUS_DEPTH100_37000_RESULTS.md).
+The integrated learner improved substantially, but approach and color gaps remain.
+The earlier [three-model comparison](ARCUS_THREE_WAY_8204_RESULTS.md) remains preserved.
+Latest experiment: the caregiver requested a fresh **1.0-capacity** repeat with
+a matched fresh .25 control. See [full-depth results](ARCUS_DEPTH100_RESULTS.md).
+Older .25 checkpoint identities below remain preserved baseline records.
 Older dated reports remain evidence of their own releases. Their phase numbers,
 model sizes and statements such as "ready to start" are not current deployment
 instructions. Track B donor/coding-model work is a separate research track.
@@ -58,9 +64,10 @@ Other open items include bounded shared replay/session storage, rest generalizat
 readiness. The new compressed playroom audit stream is capped at 4 GiB, but this
 does not cap all system storage or delete the accumulated historical logs.
 
-Consolidated **Phase 2, quiet-time DatasetForge learning, has not started**. Its
-remaining design includes acknowledged delivery, idempotent token receipts,
-human-interaction priority, bounded candidate training and retention gates.
+Consolidated **Phase 2 quiet-time delivery and bounded learning are now implemented
+inside isolated Test 2**. Acknowledged passages, training receipts and caregiver
+priority have been live tested. Sustained learning, retention and production
+release remain open; this is not an automatic promotion of the fresh model.
 See the [remaining roadmap](ARCUS_REMAINING_PHASES.md) and
 [Phase 2 file inventory](ARCUS_PATHWAYS_NEXT_FILES.md).
 
@@ -69,15 +76,16 @@ See the [remaining roadmap](ARCUS_REMAINING_PHASES.md) and
 The caregiver proposed a fresh experiment that integrates the added senses,
 tools and shared learning from initialization, at capacity 0.25, with ReAct-style
 interaction. LangChain and LangGraph were discussed as infrastructure for it.
-These are documented in the
-[fresh integrated-training proposal](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md).
-They are hypotheses and proposed design choices, not installed integrations,
-an accepted implementation specification, or authorization to discard/reinitialize
-the current learner. The existing model remains the comparison baseline.
+The approved implementation is now [spec 0048](../specs/0048-fresh-integrated-arcus.md).
+LangGraph and LangChain core are installed and used with Arcus itself. The
+efficiency hypothesis remains unproven. The existing model is preserved as baseline.
 
-The latest instruction is to document the work and wait for the caregiver's next
-direction. This documentation update does not begin Phase 2, reset weights, add
-dependencies, change runtime configuration, deploy, or start training.
+Branch `baby-arcus-test-2` contains a randomly initialized 151,946,954-parameter
+learner and separate learner/viewer services. Native and Ubuntu 22.04 smoke runs
+have each committed 12 updates. The native viewer uses port 8900 and starts paused.
+Live tests passed, but fresh skill mastery and superior efficiency are not established.
+See [results](ARCUS_TEST2_RESULTS.md), [runbook](ARCUS_TEST2_RUNBOOK.md),
+[actual files](ARCUS_TEST2_IMPLEMENTATION.md) and [remaining files](ARCUS_TEST2_NEXT_FILES.md).
 
 Standing constraints remain: one shared learner; fixed capacity 0.25; no fixed
 14-day endpoint; measured growth rather than growth triggered by token count alone;

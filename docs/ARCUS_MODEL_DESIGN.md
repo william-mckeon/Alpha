@@ -1,10 +1,14 @@
 # Arcus MoDE Foundation Model — Design
 
+Latest capacity experiment: [full-depth repeat](ARCUS_DEPTH100_RESULTS.md). The
+new isolated run uses 1.0; existing .25 experiments and checkpoints are preserved.
+
 For the current 151,946,954-parameter embodied shared learner and its qualification
-limits, read [current status](ARCUS_CURRENT_STATUS.md). The proposed fresh integrated
-training, ReAct loop and LangGraph/LangChain boundaries are in
-[the discussion record](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md). They have not
-changed the implementation described by the dated evidence below.
+limits, read [current status](ARCUS_CURRENT_STATUS.md). The fresh Test 2 model uses
+random initialization, active sensory bridges, shared-context motor heads and one
+coordinated optimizer at capacity .25. LangGraph sequences its interactions;
+LangChain wraps Arcus inference. See [spec 0048](../specs/0048-fresh-integrated-arcus.md)
+and [results](ARCUS_TEST2_RESULTS.md). Dated evidence below remains historical.
 
 ## Baby Arcus extension (native implementation)
 

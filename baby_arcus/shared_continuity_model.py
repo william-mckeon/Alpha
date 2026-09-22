@@ -61,5 +61,6 @@ def load_candidate(root, manifest, device='cpu'):
     body = BodyPolicy(ModelConfig(**data['body_config']), lying=True, sitting=True, approach=True)
     model = ContinuityModel(body, LanguageAdapter(body.cfg.dim, data['vocab_size'], data['text_dim']), int(data['schema'].rsplit('v', 1)[1]))
     model.load_state_dict(data['model'])
+    model.integrated_motor = data.get('integrated_motor', False)
     verify_depth(model)
     return model.to(device), data

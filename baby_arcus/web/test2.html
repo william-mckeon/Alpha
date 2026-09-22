@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Baby Arcus · Test 2</title><link rel="stylesheet" href="/playroom.css"></head>
+<body class="experiment-test2"><main><h1>Baby Arcus · Test 2</h1><p>Fresh learner · isolated playpen · capacity <span id="capacity">—</span>. A model decision is not yet a learned skill.</p>
+<canvas id="room" width="1100" height="740" aria-label="Arcus's actual simulated body"></canvas>
+<section><button id="start">Explore and learn · 10 cycles</button><button id="pause">Pause</button><button id="step">Observe and choose an action</button><button id="hear">Offer a dataset passage</button><button id="learn">Learn one queued experience</button><button id="train">Train five curriculum steps</button></section>
+<form id="message"><label>Caregiver <select id="sender"><option value="you">You</option><option value="wife">Wife</option></select></label><label>Simulated hearing <input id="text" maxlength="2000" required></label><button>Speak to Arcus</button><button type="button" id="call">Come here, Arcus</button></form>
+<p id="result" role="status"></p><p id="summary"></p><details><summary>Learning diagnostics</summary><pre id="status"></pre></details><ul id="messages"></ul><p id="expression"></p>
+<p>Click the playpen floor to move your caregiver marker. Arcus receives the changed scene and chooses his response.</p><button id="objects">Add red and blue balls</button>
+</main><script type="module" src="/learning-status.js"></script></body></html>

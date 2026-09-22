@@ -1,0 +1,13 @@
+# Experiment graph dependencies; torch remains a platform prerequisite.
+langgraph==1.0.5
+langchain-core==1.0.7
+langgraph-checkpoint==3.0.1
+langgraph-prebuilt==1.0.2
+langgraph-sdk==0.3.15
+langsmith==0.4.59
+jsonpatch==1.33
+jsonpointer==3.1.1
+orjson==3.12.0
+ormsgpack==1.12.2
+requests-toolbelt==1.0.0
+uuid-utils==0.17.1

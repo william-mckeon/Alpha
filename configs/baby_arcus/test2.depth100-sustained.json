@@ -1,0 +1,20 @@
+{
+  "schema": "arcus-test2-v1",
+  "initialization": "random",
+  "root": "runs/test2/depth100-seed-2101",
+  "seed": 2101,
+  "preset": "baby-125m-cap4",
+  "text_dim": 128,
+  "depth_capacity": 1.0,
+  "encoding": "o200k_base",
+  "tiktoken_version": "0.14.0",
+  "learning_rate": 1E-05,
+  "training_updates": 12,
+  "max_job_updates": 4096,
+  "max_storage_bytes": 137438953472,
+  "max_graph_records": 10000,
+  "dataset_config": "configs/baby_arcus/language.json",
+  "curriculum": "configs/baby_arcus/test2_curriculum.json",
+  "port": 8910,
+  "learner_port": 8911
+}

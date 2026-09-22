@@ -5,7 +5,7 @@
 > inventory. Start with [current status](ARCUS_CURRENT_STATUS.md), the
 > [remaining readiness files](ARCUS_READINESS_PROGRESS_2026-09-21.md) and the
 > [planned quiet-time inventory](ARCUS_PATHWAYS_NEXT_FILES.md). The fresh-training
-> proposal has not authorized another implementation phase. Paths below are
+> experiment is now implemented separately; see [Test 2 files](ARCUS_TEST2_IMPLEMENTATION.md). Paths below are
 > repository-relative; historical entries are preserved as evidence.
 
 ## Phase 2 implementation mapping

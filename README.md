@@ -2,13 +2,18 @@
 
 ## Baby Arcus — native learning and viewer
 
+Latest experiment: [fresh repeat at depth capacity 1.0](docs/ARCUS_DEPTH100_RESULTS.md),
+with a separate matched .25 control. Earlier .25 results below remain baseline evidence.
+
 Start with [current status and handoff](docs/ARCUS_CURRENT_STATUS.md). The current
 embodied learner has 151,946,954 parameters including experts, with capacity fixed
 at 0.25. The Phase 1 pathway experiment and subsequent behavioral comparison are
-complete; meaningful learning improvement was not established. Phase 2 quiet-time
-learning is unstarted, and the revised runtime still needs full release qualification.
-The [fresh integrated-training and ReAct/LangGraph proposal](docs/ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md)
-is documented for discussion, not implemented or scheduled.
+complete; meaningful learning improvement was not established. A separate fresh
+Test 2 learner now runs with integrated inputs, LangGraph/LangChain orchestration,
+acknowledged dataset hearing and bounded shared training. It has passed native and
+Ubuntu live smoke checks; mastery, sustained retention and efficiency remain open.
+Start with the [Test 2 runbook](docs/ARCUS_TEST2_RUNBOOK.md),
+[results](docs/ARCUS_TEST2_RESULTS.md) and [remaining work](docs/ARCUS_TEST2_NEXT_FILES.md).
 
 The historical Baby grid experiment started a fresh approximately 125M model and
 studied cooperative learning through simulated experience, later human shared play,

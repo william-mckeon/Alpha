@@ -3,10 +3,13 @@
 ## Baby Arcus service boundary
 
 The current embodied shared learner and remaining qualification work are recorded
-in [current status](ARCUS_CURRENT_STATUS.md). Proposed LangGraph orchestration,
-LangChain interfaces and fresh integrated training are described separately in
-[the proposal](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md); they are not current
-architecture. The original grid/service foundation is described below.
+in [current status](ARCUS_CURRENT_STATUS.md). Test 2 uses a separate HTTP learner
+service and simulation/viewer service. LangGraph sequences model proposals, scoped
+tools and observations; durable SQLite node/tool receipts handle retries. LangChain
+wraps Arcus, without an external model choosing actions. The learner serializes
+inference and bounded training and publishes immutable checkpoints. See
+[spec 0048](../specs/0048-fresh-integrated-arcus.md) and the
+[Test 2 runbook](ARCUS_TEST2_RUNBOOK.md). The original grid foundation follows.
 
 [Baby Arcus](BABY_ARCUS_PHASES.md) reuses the Track-A model core through a separate
 `baby_arcus` package. Simulation, inference, training, controller, evaluator,

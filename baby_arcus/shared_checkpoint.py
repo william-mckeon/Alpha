@@ -12,7 +12,7 @@ def digest(path):
     return value.hexdigest()
 
 def save(root,model,optimizer,progress):
-    if model.body.cfg.capacity==.25:
+    if model.body.cfg.capacity==.25 or hasattr(model,'experiment_depth_capacity'):
         from baby_arcus.shared_depth import verify_depth
         verify_depth(model)
     root=Path(root);root.mkdir(parents=True,exist_ok=True)
@@ -22,6 +22,8 @@ def save(root,model,optimizer,progress):
     data={'schema':f'arcus-shared-v{model.version}','body_config':asdict(model.body.cfg),
         'vocab_size':model.language.embedding.num_embeddings,'text_dim':model.language.embedding.embedding_dim,
         'model':model.state_dict(),'optimizer':optimizer.state_dict(),'progress':progress,
+        'integrated_motor':bool(getattr(model,'integrated_motor',False)),
+        'experiment_depth_capacity':getattr(model,'experiment_depth_capacity',None),
         'optimizer_layout':[[names[id(param)] for param in group['params']] for group in optimizer.param_groups],
         'rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []}
     with pending.open('wb') as stream:torch.save(data,stream);stream.flush();os.fsync(stream.fileno())
@@ -49,7 +51,12 @@ def load(root,manifest,device='cpu'):
         from baby_arcus.shared_continuity_model import ContinuityModel
         model=ContinuityModel(body,language,version)
     else:model=SharedModel(body,language,version=version)
-    model.load_state_dict(data['model']);return model.to(device),data
+    model.load_state_dict(data['model']);model.integrated_motor=data.get('integrated_motor',False)
+    if data.get('experiment_depth_capacity') is not None:
+        model.experiment_depth_capacity=data['experiment_depth_capacity']
+        from baby_arcus.shared_depth import verify_depth
+        verify_depth(model)
+    return model.to(device),data
 
 def restore_optimizer(model,data,lr):
     named=dict(model.named_parameters())

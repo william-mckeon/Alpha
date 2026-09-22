@@ -1,0 +1,8 @@
+{
+  "families": ["commands", "color_reference", "rest", "standing", "lying", "sitting", "approach", "language", "causal", "perception", "continuity"],
+  "mastery_threshold": 0.9,
+  "advance_automatically": false,
+  "rehearsal_every": 4,
+  "language_context": 64,
+  "policy_entropy_weight": 0.001
+}

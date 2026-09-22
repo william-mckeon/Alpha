@@ -1,0 +1,8 @@
+{
+  "schema": "arcus-test2-v1", "initialization": "random", "root": "runs/test2/linux-seed-2101",
+  "seed": 2101, "preset": "baby-125m-cap4", "text_dim": 128, "depth_capacity": 0.25,
+  "encoding": "o200k_base", "tiktoken_version": "0.14.0", "learning_rate": 0.00001,
+  "training_updates": 12, "max_job_updates": 64, "max_storage_bytes": 21474836480,
+  "max_graph_records": 10000, "dataset_config": "configs/baby_arcus/test2_dataset.container.json",
+  "curriculum": "configs/baby_arcus/test2_curriculum.json", "port": 8902
+}

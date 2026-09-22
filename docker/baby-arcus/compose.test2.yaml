@@ -1,0 +1,45 @@
+name: arcus-test2
+services:
+  learner:
+    image: arcus-test2:qualification
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.test2
+    command: ["-m", "baby_arcus.services.shared_trainer", "--config", "/app/configs/baby_arcus/test2.container.json", "--host", "0.0.0.0"]
+    environment:
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set an experiment service token}
+      LANGSMITH_TRACING: "false"
+    volumes:
+      - test2-runs:/app/runs/test2
+    gpus: all
+    mem_limit: 12g
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8901/ready',headers={'Authorization':'Bearer '+os.environ['ARCUS_TEST2_TOKEN']}),timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  playroom:
+    image: arcus-test2:qualification
+    command: ["-m", "baby_arcus.services.test2_playroom", "--config", "/app/configs/baby_arcus/test2.container.json", "--learner-url", "http://learner:8901", "--host", "0.0.0.0", "--port", "8902"]
+    environment:
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set an experiment service token}
+      LANGSMITH_TRACING: "false"
+    ports:
+      - "127.0.0.1:8902:8902"
+    volumes:
+      - test2-runs:/app/runs/test2
+      - type: bind
+        source: ${ARCUS_TEST2_DATASET:?Set the read-only corpus directory}
+        target: /dataset
+        read_only: true
+    depends_on:
+      learner:
+        condition: service_healthy
+    mem_limit: 3g
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8902/ready',timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+volumes:
+  test2-runs:

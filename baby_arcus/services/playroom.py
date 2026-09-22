@@ -461,8 +461,8 @@ class PlayroomViewer:
         raise KeyError(path)
 
 
-def viewer_server(port, application, audit=None):
-    server = serve("127.0.0.1", port, application,audit=audit)
+def viewer_server(port, application, audit=None, host="127.0.0.1"):
+    server = serve(host, port, application,audit=audit)
     base = server.RequestHandlerClass
 
     class LocalHandler(base):

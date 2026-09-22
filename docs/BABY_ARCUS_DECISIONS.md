@@ -5,6 +5,18 @@ decisions; earlier scale, two-agent and memory defaults describe the original gr
 experiment and do not override the later single embodied shared learner. See the
 September 21 entries at the end for the latest evidence and discussion boundary.
 
+## Accepted Test 2 implementation — 2026-09-21
+
+The caregiver approved the fresh-training file plan. Retain 151,946,954 total
+parameters for the first isolated random run, fixed expert-token capacity .25,
+one optimizer, integrated motor context and LangGraph/LangChain core orchestration.
+Preserve production weights and use separate run roots, cursors and services.
+Bounded mixed curriculum, model hearing controls and caregiver-priority interaction
+are implemented. The native and Ubuntu smoke tests do not establish superior
+learning, beneficial shared-neuron reuse or frontier performance. Full comparative
+acceptance remains open. This entry supersedes older "proposal only" statements;
+see [results](ARCUS_TEST2_RESULTS.md) and [remaining files](ARCUS_TEST2_NEXT_FILES.md).
+
 ## Implementation evidence — 2026-09-15
 
 The user authorized the Phase 2 slice and required an explicit Linux version for Docker.

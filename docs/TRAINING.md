@@ -2,11 +2,11 @@
 
 ## Baby Arcus training boundary
 
-For current status use [the handoff](ARCUS_CURRENT_STATUS.md). Quiet-time Phase 2
-has not started; fresh integrated training at capacity 0.25 with ReAct and
-LangGraph/LangChain remains a [proposal](ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md).
-No new training run or reset has been scheduled. The instructions below describe
-separate historical training paths, not an implementation of that proposal.
+For current status use [the handoff](ARCUS_CURRENT_STATUS.md). The approved fresh
+Test 2 experiment has native/Linux smoke training at capacity .25, with shared
+losses, acknowledged hearing and graph-controlled interactions. Use its
+[dedicated runbook](ARCUS_TEST2_RUNBOOK.md); scientific acceptance remains open.
+The commands below describe separate historical training paths.
 
 The [Baby simulation trainer](../specs/0028-baby-arcus-learning.md) now has a tested
 native PPO pipeline and viewer. The commands below train the original text model;

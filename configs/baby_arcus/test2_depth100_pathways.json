@@ -1,0 +1,18 @@
+{
+  "shared_config": "configs/baby_arcus/test2.depth100.json",
+  "depth_capacity": 1.0,
+  "discovery_examples_per_task": 16,
+  "confirmation_examples_per_task": 16,
+  "top_fraction_per_expert": 0.1,
+  "random_controls": 3,
+  "random_seed": 2192026,
+  "update_norm": 0.01,
+  "update_examples": 4,
+  "bootstrap_replicates": 1000,
+  "tasks": [
+    "commands",
+    "color_reference",
+    "rest"
+  ],
+  "output_root": "runs/test2/depth100-seed-2101/pathways"
+}

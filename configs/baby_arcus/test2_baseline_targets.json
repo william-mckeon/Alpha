@@ -1,0 +1,27 @@
+{
+  "baseline_root": "runs/arcus_shared_continuity025_v4",
+  "baseline_generation": "b64d758b7b9f4157a24ffceef1471aa1",
+  "baseline_sha256": "cf2d87643f2665f7eb891075279ccf308c855aac1aec1adc89fb13e9fdd54cb9",
+  "motor_episodes": 200,
+  "motor_successes": 200,
+  "decision_examples": 300,
+  "decision_successes": {
+    "paired:commands": 297,
+    "unpaired:commands": 300,
+    "paired:color_reference": 300,
+    "unpaired:color_reference": 300,
+    "paired:rest": 289,
+    "unpaired:rest": 246
+  },
+  "language_examples": 200,
+  "maximum_language_nll": 8.6869118285,
+  "minimum_pixel_count_accuracy": 0.958,
+  "minimum_ball_iou": 0.8282459672639872,
+  "minimum_curiosity_discoveries": 4.96875,
+  "minimum_stationary_precision": 0.998162,
+  "minimum_stationary_recall": 0.891661,
+  "minimum_moving_precision": 0.998685,
+  "minimum_moving_recall": 0.871699,
+  "memory_recoveries": 256,
+  "limits": "Bounded original simulator tasks, externally selected motor goals. Matching these does not establish human-like cognition or frontier capability. Rounded association figures allow 0.000001 numerical tolerance."
+}

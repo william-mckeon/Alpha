@@ -104,3 +104,4 @@ Suggested shape:
 - [0044: Shared causal curiosity at fixed .25 depth](0044-shared-causal-curiosity.md)
 - [0045: Shared object continuity and bounded planning](0045-shared-continuity-planning.md) — qualified and deployed at depth 0.25; bounded stationary 2D survey and search
 - [0046: Shared overlapping neural pathways](0046-shared-overlapping-pathways.md) — controlled neuron reuse, causal interventions and reversible transfer experiment; precedes quiet-time learning
+- [0048: Fresh integrated Arcus experiment](0048-fresh-integrated-arcus.md) — isolated random initialization, shared training, acknowledged hearing and model-owned graph actions at capacity .25; scientific acceptance remains open
