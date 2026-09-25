@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
 $settings = Get-Content -LiteralPath $Config -Raw | ConvertFrom-Json
+if ($settings.preset -ne 'tiny') { throw 'Production Alpha runs in Docker. Use start_alpha_three_stage.ps1.' }
 $runRoot = Join-Path $projectRoot $settings.root
 if (!(Test-Path -LiteralPath (Join-Path $runRoot 'candidate.json'))) { throw 'Initialize Test 2 first.' }
 $viewerPort = if ($settings.port) { [int]$settings.port } else { 8900 }
@@ -12,6 +13,7 @@ foreach ($port in @($viewerPort,$learnerPort)) {
 }
 $env:ARCUS_TEST2_TOKEN = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 $env:LANGSMITH_TRACING = 'false'
+if ($settings.idle_learning) { $env:CUDA_LAUNCH_BLOCKING = '1' }
 $python = Join-Path $projectRoot '.venv/Scripts/python.exe'
 $worker = Start-Process -FilePath $python -ArgumentList @('-m','baby_arcus.services.shared_trainer','--config',('"'+$Config+'"'),'--port',$learnerPort) -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runRoot 'learner.stdout.log') -RedirectStandardError (Join-Path $runRoot 'learner.stderr.log')
 $viewer = Start-Process -FilePath $python -ArgumentList @('-m','baby_arcus.services.test2_playroom','--config',('"'+$Config+'"'),'--port',$viewerPort,'--learner-url',"http://127.0.0.1:$learnerPort") -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runRoot 'viewer.stdout.log') -RedirectStandardError (Join-Path $runRoot 'viewer.stderr.log')

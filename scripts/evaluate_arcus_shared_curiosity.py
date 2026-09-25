@@ -14,7 +14,7 @@ from baby_arcus.shared_experience import capture
 from baby_arcus.services.playroom import PlayroomApplication
 from baby_arcus.language_stream import atomic_json
 
-def exploration(model,tokenizer,seed,policy):
+def exploration(model,tokenizer,seed,policy,evaluation_capacity=None):
     rng=random.Random(seed);app=PlayroomApplication();world=app.world
     world.body.rest_need=.2;world.body.stimulation=.4
     colors={key:'#'+''.join(f'{rng.randrange(64,224):02x}' for _ in range(3)) for key in ('floor','wall','rug')}
@@ -31,7 +31,7 @@ def exploration(model,tokenizer,seed,policy):
             if policy in ('learned','learned_no_memory'):
                 conditioned=deepcopy(row)
                 if policy=='learned_no_memory':conditioned['memory']=[]
-                selected,_=choose_experiment(model,tokenizer,conditioned);action=selected['action'] if selected else None
+                selected,_=choose_experiment(model,tokenizer,conditioned,evaluation_capacity=evaluation_capacity);action=selected['action'] if selected else None
             elif policy=='random':action=rng.choice(experiments(row))
             elif policy=='gaze_coverage':
                 # An explicit scripted baseline; never used by the deployed policy.
@@ -48,8 +48,14 @@ def exploration(model,tokenizer,seed,policy):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);parser.add_argument('--count',type=int,default=384)
     parser.add_argument('--scenes',type=int,default=32);parser.add_argument('--split',choices=('validation','confirmation'),default='confirmation')
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--evaluation-capacity',type=float)
     args=parser.parse_args();cfg=json.loads(Path(args.config).read_text());root=Path(cfg['root']);manifest=json.loads((root/'candidate.json').read_text())
     torch.set_num_threads(2);model,_=load(root,manifest,'cuda' if torch.cuda.is_available() else 'cpu');verify_depth(model,cfg);model.eval().requires_grad_(False)
+    routing = None
+    if args.evaluation_capacity is not None:
+        from scripts.alpha_evaluation_capacity import configure
+        routing = configure(model,args.evaluation_capacity)
     from arcus.tokenizer import get_tokenizer
     tokenizer=get_tokenizer(cfg['encoding']);errors={key:[] for key in ('body','body_persistence','body_shuffled','rgb','rgb_persistence','rgb_shuffled','rgb_no_memory')}
     with torch.no_grad():
@@ -71,17 +77,17 @@ def main():
         results={policy:[] for policy in ('learned','random','no_action','learned_no_memory','gaze_coverage')}
         exploration_seed=582509 if args.split=='confirmation' else 482509
         for i in range(args.scenes):
-            for policy in results:results[policy].append(exploration(model,tokenizer,exploration_seed+i*1009,policy))
+            for policy in results:results[policy].append(exploration(model,tokenizer,exploration_seed+i*1009,policy,evaluation_capacity=args.evaluation_capacity))
             if (i+1)%8==0:print(json.dumps({'exploration_scenes':i+1}),flush=True)
     means={key:sum(value)/len(value) for key,value in errors.items()}
     behavior={key:{metric:sum(item[metric] for item in rows)/len(rows) for metric in ('discoveries','actions','seconds')} for key,rows in results.items()}
     gain=(behavior['learned']['discoveries']-behavior['random']['discoveries'])/5
     from baby_arcus.shared_qualification import source_snapshot
-    report={'candidate':manifest,'split':args.split,'examples':args.count,'scenes':args.scenes,'exploration_seed':exploration_seed,'depth_capacity':.25,
+    report={'candidate':manifest,'split':args.split,'examples':args.count,'scenes':args.scenes,'exploration_seed':exploration_seed,'depth_capacity':args.evaluation_capacity if args.evaluation_capacity is not None else cfg.get('depth_capacity',.25),'evaluation_routing':routing,
         'prediction':means,'exploration':behavior,'discovery_gain_over_random':gain,'training_updates':0,'runtime_sources':source_snapshot(),
         'scope':'Bounded visual information-seeking in rendered rooms; not general reasoning or human-like learning'}
     report['passed']=bool(args.split=='confirmation' and args.count>=256 and args.scenes>=24 and means['body']<=.8*means['body_persistence'] and means['body_shuffled']>=1.25*means['body'] and means['rgb']<=.95*means['rgb_persistence'] and gain>=.1 and behavior['learned']['discoveries']>behavior['no_action']['discoveries'])
-    atomic_json(root/(args.split+'-curiosity.json'),report);print(json.dumps(report),flush=True)
+    atomic_json(args.output or root/(args.split+'-curiosity.json'),report);print(json.dumps(report),flush=True)
     if not report['passed']:raise SystemExit(1)
 
 if __name__=='__main__':main()

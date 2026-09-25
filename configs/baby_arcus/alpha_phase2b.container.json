@@ -1,0 +1,26 @@
+{
+  "schema": "alpha-phase2b-v1",
+  "training_enabled": false,
+  "source_checkpoint": "runs/test2/alpha-idle-fresh-release-20260923/candidate.json",
+  "staging_store": "/review/staging.sqlite",
+  "eligible_review_sources": [
+    "Python",
+    "JavaScript",
+    "Go",
+    "Rust"
+  ],
+  "approved_batches": [],
+  "approved_source_manifests": [],
+  "mixture": null,
+  "token_budget": null,
+  "context_tokens": 512,
+  "resume_after_seconds": 60,
+  "preserve_embodied_schedule": false,
+  "automatic_promotion": false,
+  "source_sha256": "9e6f8e21bc4b5e70d94d92cfcdff2872980e28c6585ebcaabad11a0fbb810520",
+  "exhaustion_policy": "stop",
+  "baseline_policy": "fresh-release",
+  "source_updates": 37000,
+  "gates_file": "configs/baby_arcus/alpha_phase2b_gates.json",
+  "gates_sha256": null
+}

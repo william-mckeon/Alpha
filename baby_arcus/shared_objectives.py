@@ -13,18 +13,21 @@ def loss(model, tokenizer, row, target):
     verify_depth(model)
     supported = {'activity', 'posture_choice', 'gaze_choice', 'language_choice',
                  'rest', 'future_body', 'future_rgb', 'tokens', 'policy', 'perception',
-                 'action_quality', 'curiosity', 'identity_match', 'visual_search', 'identity_risk'}
+                 'action_quality', 'curiosity', 'identity_match', 'visual_search', 'identity_risk', 'sft'}
     if not target or set(target) - supported:
         raise ValueError('Unsupported learning target')
-    heads = set(target) - {'tokens', 'policy'}
+    heads = set(target) - {'tokens', 'policy', 'sft'}
     if 'policy' in target:
         heads.add(target['policy']['head'])
     heads.add('hidden')
+    # Preserve the historical motor-pass auxiliary loss for non-language tasks.
+    # Language/SFT owns the final trunk pass and its auxiliary loss below.
+    if not {'tokens','sft'}.intersection(target):heads.add('aux')
     policy_row = copy.deepcopy(row)
     policy_row.pop('executed_action', None)
     out = model([policy_row if 'policy' in target else row], tokenizer, requested=tuple(heads))
     if 'policy' in target and any(k in target for k in ('future_body', 'future_rgb')):
-        forecast = model([row], tokenizer, requested=('future_body', 'future_rgb'))
+        forecast = model([row], tokenizer, requested=('future_body', 'future_rgb', 'aux'))
         out.update(forecast)
     device = out['hidden'].device
     terms = {}
@@ -48,14 +51,24 @@ def loss(model, tokenizer, row, target):
             torch.tensor(target['perception'], device=device).reshape(-1))
     if 'tokens' in target:
         ids = target['tokens']
-        if not 2 <= len(ids) <= 65 or any(type(i) is not int or not 0 <= i < model.language.embedding.num_embeddings for i in ids):
+        if not 2 <= len(ids) <= model.body.cfg.max_seq_len+1 or any(type(i) is not int or not 0 <= i < model.language.embedding.num_embeddings for i in ids):
             raise ValueError('Expected 2..65 valid language tokens')
         tokens = torch.tensor([ids], device=device)
-        logits = model.language(model.core, tokens[:, :-1])
         # Every next-token position learns; context residual shares body/RGB/hearing.
         residual = model.text_context(out['hidden'])
-        logits = logits + torch.nn.functional.linear(residual, model.language.embedding.weight)[:, None]
-        terms['tokens'] = torch.nn.functional.cross_entropy(logits.flatten(0, 1), tokens[:, 1:].flatten())
+        terms['tokens'] = model.language.loss(model.core,tokens[:,:-1],tokens[:,1:],residual)
+    if 'sft' in target:
+        # Conversation context travels through the same causal language trunk.
+        # The sensory row must not contain the completion or future tool results.
+        if row.get('hearing') or row.get('language_prefix_ids'):
+            raise ValueError('SFT sensory context must not duplicate the target conversation')
+        sequence = target['sft']
+        from baby_arcus.sft_dataset import validate_window
+        validate_window(sequence, model.language.embedding.num_embeddings, model.body.cfg.max_seq_len)
+        ids = torch.tensor([sequence['ids']], device=device)
+        labels = ids[:, 1:].clone()
+        labels[~torch.tensor([sequence['mask'][1:]], device=device)] = -100
+        terms['sft'] = model.language.loss(model.core,ids[:,:-1],labels,model.text_context(out['hidden']))
     if 'policy' in target:
         policy = target['policy']
         if policy['head'] not in ('body', 'lying', 'sitting', 'approach', 'activity', 'gaze_choice'):
@@ -69,7 +82,8 @@ def loss(model, tokenizer, row, target):
     total = sum(terms.values()) + model.core.last_aux_loss * .01
     if not bool(torch.isfinite(total)):
         raise ValueError('Nonfinite joint loss')
-    return total, {key: float(value.detach()) for key, value in terms.items()}
+    values=torch.stack([value.detach() for value in terms.values()]).cpu().tolist() if terms else []
+    return total, dict(zip(terms,values))
 
 
 def step(model, optimizer, tokenizer, row, target):
@@ -81,10 +95,13 @@ def step(model, optimizer, tokenizer, row, target):
     total.backward()
     groups = {'core': model.core, 'rgb': model.rgb, 'language': model.language,
               'body_sensation': model.body_sensation_input, 'internal': model.internal_input}
-    gradients = {name: sum(float(p.grad.detach().square().sum()) for p in module.parameters() if p.grad is not None) ** .5
-                 for name, module in groups.items()}
+    norms=[]
+    for module in groups.values():
+        sums=[p.grad.detach().float().square().sum() for p in module.parameters() if p.grad is not None]
+        norms.append(torch.stack(sums).sum().sqrt() if sums else total.new_zeros(()))
+    gradients = dict(zip(groups,torch.stack(norms).detach().cpu().tolist()))
     torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)
     optimizer.step()
     model.eval()
     return {'loss': float(total.detach()), 'losses': metrics, 'gradient_norms': gradients,
-            'trained_tokens': max(0, len(target.get('tokens', [])) - 1)}
+            'trained_tokens': max(0, len(target.get('tokens', [])) - 1) + sum(target.get('sft', {}).get('mask', [])[1:])}

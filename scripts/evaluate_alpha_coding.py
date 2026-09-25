@@ -1,0 +1,76 @@
+"""Read-only Alpha inference on small held-out task templates; not a SWE benchmark."""
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from baby_arcus.runtime_contract import require_container
+if __name__ == '__main__':
+    require_container()
+from baby_arcus.runtime_contract import model_device
+import torch
+from arcus.tokenizer import get_tokenizer
+from baby_arcus.shared_factory import read_config,verify_run
+from baby_arcus.shared_checkpoint import load,digest
+from baby_arcus.shared_curriculum import example
+from baby_arcus.coding_environment import CodingEnvironment
+from baby_arcus.coding_tools import CodingTools
+from baby_arcus.coding_practice import run_episode
+from baby_arcus.coding_policy import decide
+from baby_arcus.trajectory_store import TrajectoryStore
+from baby_arcus.language_stream import atomic_json
+from baby_arcus.embodiment_store import EmbodimentStore
+
+
+from baby_arcus.gpu_job_control import serialized
+
+@serialized
+def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None):
+    output=Path(output)
+    if output.exists(): raise ValueError('Use a new evaluation output directory')
+    cfg=read_config(config); root=Path(cfg['root'])
+    # Shared GPU ownership already covers this read-only evaluation.
+    store=None
+    try:
+        pointer=json.loads((root/'candidate.json').read_text())
+        model,data=load(root,pointer,model_device(cfg)); verify_run(cfg,data); del data
+        model.eval().requires_grad_(False)
+        routing = None
+        if evaluation_capacity is not None:
+            from scripts.alpha_evaluation_capacity import configure
+            routing = configure(model,evaluation_capacity)
+        tokenizer=get_tokenizer(cfg['encoding']); output.mkdir(parents=True)
+        store=TrajectoryStore(output/'trajectories.sqlite'); results=[]
+        row,_,_=example(0,'training','commands'); row['hearing']=[]
+        started=time.monotonic()
+        for task in ('negative_count','absolute_sum'):
+            tools=CodingTools(CodingEnvironment(output/task,task))
+            def policy(state):
+                return {**decide(model,tokenizer,row,state['messages'],state['definitions'],max_new_tokens),
+                        'generation':pointer['generation']}
+            result=run_episode(task,tools,policy,store,4)
+            events=store.read(task)
+            result['valid_calls']=sum(e.get('kind')=='intent' and e['decision'].get('status')=='call' for e in events)
+            result['tool_search_calls']=sum(e.get('kind')=='intent' and (e.get('decision',{}).get('call') or {}).get('name')=='tool_search' for e in events)
+            result['invalid_decisions']=sum(e.get('kind')=='intent' and e.get('decision',{}).get('status') not in ('call','cancelled') for e in events)
+            result['tool_errors']=sum(e.get('kind')=='outcome' and e.get('result',{}).get('status')=='tool_error' for e in events)
+            result['generated_tokens']=sum(e.get('decision',{}).get('generated_tokens',0) for e in events if e.get('kind')=='intent')
+            results.append(result)
+        report={'complete':True,'cohort':{'evaluator_sha256':digest(Path(__file__)),'tasks':['negative_count','absolute_sum'],'actions':4,'max_new_tokens':max_new_tokens,'context':512},'candidate':pointer,'tasks':results,'solved':sum(r['solved'] for r in results),
+                'total':len(results),'seconds':time.monotonic()-started,
+                'checkpoint_unchanged':digest(root/(pointer['generation']+'.pt'))==pointer['sha256'],
+                'max_new_tokens':max_new_tokens,'mastery_established':False,'evaluation_routing':routing,
+                'limitations':'Two held-out task templates, one seed, four actions each; fixed 512-token context. No training or general superiority claim.'}
+        atomic_json(output/'report.json',report)
+        return report
+    finally:
+        if store: store.close()
+
+
+
+if __name__ == '__main__':
+    p=argparse.ArgumentParser(description=__doc__); p.add_argument('--config',required=True); p.add_argument('--output',required=True)
+    a=p.parse_args(); torch.set_num_threads(2)
+    report=evaluate(a.config,a.output)
+    print(json.dumps({'solved':report['solved'],'total':report['total'],'checkpoint_unchanged':report['checkpoint_unchanged']}))

@@ -93,6 +93,7 @@ class GQAAttention(nn.Module):
         self.n_kv_heads = cfg.n_kv_heads
         self.head_dim = cfg.head_dim
         self.n_rep = cfg.n_heads // cfg.n_kv_heads
+        self.native_gqa = False  # Explicit profiling option; portable path stays default.
 
         self.q_proj = nn.Linear(cfg.dim, cfg.n_heads * cfg.head_dim, bias=False)
         self.k_proj = nn.Linear(cfg.dim, cfg.n_kv_heads * cfg.head_dim, bias=False)
@@ -102,7 +103,7 @@ class GQAAttention(nn.Module):
         self.q_norm = RMSNorm(cfg.head_dim, cfg.norm_eps) if cfg.qk_norm else None
         self.k_norm = RMSNorm(cfg.head_dim, cfg.norm_eps) if cfg.qk_norm else None
 
-    def forward(self, x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor, cache=None, layer=0) -> torch.Tensor:
         B, T, _ = x.shape
         q = self.q_proj(x).view(B, T, self.n_heads, self.head_dim)
         k = self.k_proj(x).view(B, T, self.n_kv_heads, self.head_dim)
@@ -118,11 +119,23 @@ class GQAAttention(nn.Module):
         q = apply_rope(q, cos[:T], sin[:T])
         k = apply_rope(k, cos[:T], sin[:T])
 
-        if self.n_rep > 1:
-            k = k.repeat_interleave(self.n_rep, dim=1)
-            v = v.repeat_interleave(self.n_rep, dim=1)
-
-        y = F.scaled_dot_product_attention(q, k, v, is_causal=True)   # [B, n_heads, T, head_dim]
+        # Store compact KV heads, not repeated query-head copies.
+        if cache is not None:
+            k,v=cache.append(layer,k,v)
+            if self.n_rep > 1 and not self.native_gqa:
+                k=k.repeat_interleave(self.n_rep,dim=1); v=v.repeat_interleave(self.n_rep,dim=1)
+            if cache.length==0:
+                y=F.scaled_dot_product_attention(q,k,v,is_causal=True,enable_gqa=self.native_gqa)
+            elif T==1:
+                y=F.scaled_dot_product_attention(q,k,v,is_causal=False,enable_gqa=self.native_gqa)
+            else:
+                mask=torch.arange(k.shape[-2],device=x.device)[None,:] <= (cache.length+torch.arange(T,device=x.device))[:,None]
+                y=F.scaled_dot_product_attention(q,k,v,attn_mask=mask,enable_gqa=self.native_gqa)
+        else:
+            if self.n_rep > 1 and not self.native_gqa:
+                k=k.repeat_interleave(self.n_rep,dim=1)
+                v=v.repeat_interleave(self.n_rep,dim=1)
+            y = F.scaled_dot_product_attention(q, k, v, is_causal=True,enable_gqa=self.native_gqa)
         y = y.transpose(1, 2).contiguous().view(B, T, self.n_heads * self.head_dim)
         return self.o_proj(y)
 

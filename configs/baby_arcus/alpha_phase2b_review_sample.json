@@ -1,0 +1,45 @@
+{
+  "include_local_logs": false,
+  "hf": [
+    {
+      "repo": "SWE-Gym/OpenHands-SFT-Trajectories",
+      "enabled": true,
+      "revision": "4aaa5a4a4b5861f4799d2336908760c190ac3b17",
+      "license": "MIT",
+      "split": "train.success.oss",
+      "path": "/sources/swegym.parquet",
+      "group": "source:SWE-Gym-conservative-group",
+      "limit": 20
+    },
+    {
+      "repo": "SWE-bench/SWE-smith-trajectories",
+      "enabled": false,
+      "revision": null,
+      "license": "MIT"
+    },
+    {
+      "repo": "nebius/SWE-rebench-openhands-trajectories",
+      "enabled": false,
+      "revision": null,
+      "license": "CC-BY-4.0"
+    },
+    {
+      "repo": "OpenHands/openhands-feedback",
+      "enabled": false,
+      "revision": null,
+      "license": "MIT"
+    }
+  ],
+  "codebases": [
+    {
+      "paths": [
+        "evaluation/scoring.py",
+        "evaluation/streaming.py",
+        "evaluation/retry_policy.py"
+      ],
+      "root": "/bench",
+      "group": "own:alpha-bench-family"
+    }
+  ],
+  "heldout_groups": []
+}

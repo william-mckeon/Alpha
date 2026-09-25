@@ -3,9 +3,10 @@
 For current embodied-model status, start with
 [the handoff](../docs/ARCUS_CURRENT_STATUS.md) and
 [the consolidated roadmap](../docs/ARCUS_REMAINING_PHASES.md). Spec 0046's experiment
-is complete; planned spec 0047/quiet-time Phase 2 is unstarted. The
+is complete; [spec 0047](0047-shared-idle-language-learning.md) now defines
+quiet-time continuation using Alpha-1.0.0's original sustained trainer. The
 [fresh integrated-training proposal](../docs/ARCUS_FRESH_INTEGRATED_TRAINING_PROPOSAL.md)
-is a discussion record, not an accepted numbered specification. Historical release
+led to accepted [spec 0048](0048-fresh-integrated-arcus.md). Historical release
 qualification does not authorize the subsequently changed runtime.
 
 Original service/grid Phase 2 implementation and smoke evidence are recorded in
@@ -105,3 +106,5 @@ Suggested shape:
 - [0045: Shared object continuity and bounded planning](0045-shared-continuity-planning.md) — qualified and deployed at depth 0.25; bounded stationary 2D survey and search
 - [0046: Shared overlapping neural pathways](0046-shared-overlapping-pathways.md) — controlled neuron reuse, causal interventions and reversible transfer experiment; precedes quiet-time learning
 - [0048: Fresh integrated Arcus experiment](0048-fresh-integrated-arcus.md) — isolated random initialization, shared training, acknowledged hearing and model-owned graph actions at capacity .25; scientific acceptance remains open
+
+Three-stage evidence: [results](../docs/ALPHA_THREE_STAGE_RESULTS.md); [remaining files](../docs/ALPHA_THREE_STAGE_FOLLOWUP_FILES.md).

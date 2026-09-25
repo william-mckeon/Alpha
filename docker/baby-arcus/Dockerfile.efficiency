@@ -1,0 +1,8 @@
+ARG BASE_IMAGE=arcus-alpha-context:experimental
+FROM ${BASE_IMAGE}
+WORKDIR /app
+COPY arcus /app/arcus
+COPY baby_arcus /app/baby_arcus
+COPY scripts /app/scripts
+COPY tests /app/tests
+COPY configs /app/configs

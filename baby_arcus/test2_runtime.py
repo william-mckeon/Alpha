@@ -38,17 +38,28 @@ class Test2Runtime:
         self.messages = [json.loads(r[0]) for r in self.db.execute('SELECT payload FROM messages ORDER BY rowid')]
         self.graph = InteractionGraph(self.root / 'graph.sqlite', self.observe, self.infer, self.execute, self.accept, self.cfg['max_graph_records'])
         self.status = {'mode': 'isolated-training', 'depth_capacity': self.cfg['depth_capacity'], 'state': 'paused', 'last': None, 'error': None}
+        self.idle = None
+        if self.cfg.get('idle_learning'):
+            from baby_arcus.shared_idle_learning import IdleLearning
+            self.idle = IdleLearning(self.root, self.cfg['idle_learning'])
         self.graph_lock = threading.Lock()
         self.stream = None
         self.tokenizer = get_tokenizer(self.cfg['encoding'])
         manifest = self.root / 'dataset.json'
         if manifest.exists():
-            self.stream = AcknowledgedLanguageStream(json.loads(manifest.read_text()), self.tokenizer, self.root / 'hearing.json')
+            dataset=json.loads(manifest.read_text())
+            if self.cfg.get('dataset_config'):
+                dataset['root']=json.loads(Path(self.cfg['dataset_config']).read_text())['dataset_root']
+            self.stream = AcknowledgedLanguageStream(dataset, self.tokenizer, self.root / 'hearing.json')
         self.last_human = time.monotonic()
         self.interaction_revision = len(self.messages)
         self.stop_event = threading.Event()
         self.pending_interaction = threading.Event()
         self.remaining_cycles = 0
+        self.practice_active = threading.Event()
+        self.practice_cancel = threading.Event()
+        self.practice_status = {'state':'idle'}
+        self.practice_thread = None
         self.worker = threading.Thread(target=self.run, daemon=True)
         self.worker.start()
 
@@ -58,20 +69,34 @@ class Test2Runtime:
                 if self.pending_interaction.is_set():
                     self.pending_interaction.clear()
                     self.step('human-response-' + uuid.uuid4().hex)
+                elif self.practice_active.is_set():
+                    continue
                 elif self.remaining_cycles > 0:
                     self.remaining_cycles -= 1
                     self.step('explore-' + uuid.uuid4().hex)
-                    if time.monotonic() - self.last_human >= 5 and not self.pending_interaction.is_set():
+                    if not self.idle and time.monotonic() - self.last_human >= 5 and not self.pending_interaction.is_set():
                         (self.root / 'pause-training').unlink(missing_ok=True)
                         self.hear()
                         if not self.pending_interaction.is_set():
                             self.learn_one()
+                elif self.idle:
+                    candidate = json.loads((self.root / 'candidate.json').read_text())
+                    job = self.idle.begin(candidate['updates'], self.pending_interaction.is_set() or self.practice_active.is_set())
+                    if job:
+                        self.status['state'] = 'training'
+                        self.idle.finish(self.client.request('POST', '/train', job))
+                        self.status['state'] = 'paused'
             except Exception as exc:
+                if self.idle:
+                    self.idle.fail(exc)
                 self.remaining_cycles = 0
                 self.status.update(state='error', error=str(exc))
 
     def control(self, action, cycles=10):
+        self.interrupt_idle()
         if action == 'pause':
+            if self.idle:
+                self.idle_control('pause')
             self.remaining_cycles = 0
             (self.root / 'pause-training').touch()
         elif action == 'start':
@@ -81,6 +106,66 @@ class Test2Runtime:
         else:
             raise ValueError('Unknown experiment control')
         return {'remaining_cycles': self.remaining_cycles}
+
+    def idle_control(self, action):
+        if action == 'pause': self.practice_cancel.set()
+        if not self.idle:
+            raise ValueError('Quiet-time continuation is not configured')
+        if action == 'resume' and self.cfg.get('three_stage_config'):
+            from baby_arcus.training_mixture import validate
+            validate(json.loads(Path(self.cfg['three_stage_config']).read_text()))
+        manifest = json.loads((self.root / 'candidate.json').read_text())
+        return self.idle.control(action, manifest['updates'])
+
+    def interrupt_idle(self):
+        self.practice_cancel.set()
+        (self.root/'pause-practice').touch()
+        if self.idle:
+            self.idle.interrupt()
+
+    def start_practice(self, task):
+        if not self.cfg.get('three_stage_config') or task not in ('positive_sum','unique_count'):
+            raise ValueError('Choose an enabled practice task')
+        with self.lock:
+            if self.practice_active.is_set(): raise ValueError('Practice already running')
+            self.interrupt_idle()
+            self.practice_cancel.clear()
+            (self.root/'pause-practice').unlink(missing_ok=True)
+            self.practice_active.set()
+            episode=uuid.uuid4().hex
+            self.practice_status={'state':'running','episode':episode,'task':task}
+        def work():
+            try:
+                from baby_arcus.services.coding_worker import run
+                result=run(self.root/'practice',episode,task,self.client.base_url,self.client.token,
+                           observation=self.observe,cancelled=self.practice_cancel.is_set)
+                import os
+                from baby_arcus.language_stream import atomic_json
+                atomic_json(self.root/'practice'/('episode-'+episode+'.json'),result)
+                batch_id = None
+                review_url = os.environ.get('ALPHA_REVIEW_URL')
+                if review_url:
+                    from baby_arcus.transport import Client
+                    from baby_arcus.trajectory_store import TrajectoryStore
+                    from baby_arcus.practice_staging import examples
+                    trace=TrajectoryStore(self.root/'practice'/'trajectories.sqlite')
+                    try: records=examples(episode,trace.read(episode))
+                    finally: trace.close()
+                    if records:
+                        credential=os.environ['ALPHA_INGEST_TOKEN']
+                        staged=Client(review_url,credential,attempts=1).request('POST','/stage',
+                                          {'credential':credential,'records':records})
+                        batch_id=staged['batch_id']
+                self.practice_status={'state':'cancelled' if self.practice_cancel.is_set() else 'complete',
+                                      'episode':episode,'task':task,'solved':result['solved'],
+                                      'steps':result['steps'],'approved':False,'pending_review_batch':batch_id}
+            except Exception as exc:
+                self.practice_status={'state':'error','episode':episode,'error':str(exc)}
+            finally:
+                self.practice_active.clear()
+        self.practice_thread=threading.Thread(target=work,daemon=True)
+        self.practice_thread.start()
+        return self.practice_status
 
     def observe(self):
         row = capture(self.app)
@@ -108,6 +193,8 @@ class Test2Runtime:
             hearing = decision.get('hearing_action')
             if self.stream and hearing in ('pause', 'resume', 'restart', 'replay'):
                 self.stream.control(hearing, request_id=identity)
+            if self.idle and hearing in ('pause', 'resume'):
+                self.idle.hearing_control(hearing)
             return result
 
     def enqueue(self, identity, row, target, source_id=None):
@@ -158,6 +245,7 @@ class Test2Runtime:
             self.pending_interaction.set()
 
     def human_action(self, identity, action):
+        self.interrupt_idle()
         self.last_human = time.monotonic()
         self.remaining_cycles = 0
         (self.root / 'pause-training').touch()
@@ -202,6 +290,8 @@ class Test2Runtime:
             return {'offered': True, 'source_id': passage['id'], 'observed_tokens': len(passage['tokens']), 'trained': False, 'generation': decision['generation']}
 
     def learn_one(self):
+        if self.idle:
+            raise ValueError('Queued-experience learning is disabled to preserve the sustained training procedure')
         with self.lock:
             items = self.db.execute('SELECT id,payload FROM experiences WHERE trained=0 ORDER BY rowid').fetchall()
         for identity, payload in items:
@@ -218,6 +308,7 @@ class Test2Runtime:
     def message(self, value):
         from baby_arcus.human_messages import validate_message
         validate_message(value)
+        self.interrupt_idle()
         self.last_human = time.monotonic()
         (self.root / 'pause-training').touch()
         with self.lock, self.db:
@@ -240,13 +331,32 @@ class Test2Runtime:
             counts = dict(self.db.execute('SELECT trained,COUNT(*) FROM experiences GROUP BY trained'))
         manifest = json.loads((self.root / 'candidate.json').read_text())
         costs = self.graph.metrics()
-        return {**self.status, 'candidate': manifest, 'queued': counts.get(0, 0),
+        world = self.app.world.snapshot()
+        if self.idle:
+            world['controller'] = self.cfg.get('model_name', 'Alpha shared learner')
+        three_stage = None
+        if self.cfg.get('three_stage_config'):
+            plan = json.loads(Path(self.cfg['three_stage_config']).read_text())
+            report = self.root/'three-stage-progress.json'
+            three_stage = {'enabled':plan['training_enabled'],'eligible_languages':plan['eligible_review_sources'],
+                'approved_batch_count':len(plan['approved_batches']), 'token_budget':plan['token_budget'],
+                'progress':json.loads(report.read_text()) if report.exists() else None}
+        from baby_arcus.runtime_contract import identity
+        return {**self.status, 'runtime':identity(), 'candidate': manifest, 'queued': counts.get(0, 0),
+                'model_name': self.cfg.get('model_name', 'Baby Arcus · Test 2'),
+                'idle_learning': self.idle.snapshot(manifest['updates']) if self.idle else None,
+                'three_stage':three_stage, 'practice':self.practice_status,
                 'learned_experiences': counts.get(1, 0), 'messages': self.messages[-20:],
-                'world': self.app.world.snapshot(), 'dataset_available': self.stream is not None,
+                'world': world, 'dataset_available': self.stream is not None,
                 'remaining_cycles': self.remaining_cycles, 'graph_seconds': costs}
 
     def close(self):
+        self.practice_cancel.set()
+        if self.practice_thread:
+            self.practice_thread.join(timeout=245)
+            if self.practice_thread.is_alive(): raise RuntimeError('Practice is still stopping; storage remains open')
         self.stop_event.set()
+        (self.root / 'pause-training').touch()
         self.worker.join(timeout=310)
         if self.worker.is_alive():
             raise RuntimeError('Wait for the in-flight learner operation before closing storage')

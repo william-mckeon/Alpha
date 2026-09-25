@@ -63,9 +63,19 @@ class MotorStream:
             app.close()
 
 
-def corpus_windows(manifest, tokenizer, cursor):
+def corpus_windows(manifest, tokenizer, cursor, window_tokens=64, *, cache_root=None, tokenizer_identity=None, cancelled=lambda:False, cache_max_bytes=1024**3, cache_reserve=lambda size:None):
     """Checkpoint-owned cursor. Every tenth document stays exclusively held out."""
+    if type(window_tokens) is not int or not 1 <= window_tokens <= 8192:
+        raise ValueError('Invalid corpus context window')
+    if cache_root is not None:
+        if not tokenizer_identity:raise ValueError('Explicit tokenizer identity required')
+        from baby_arcus.indexed_corpus import corpus_windows as indexed_windows
+        yield from indexed_windows(manifest,tokenizer,cursor,window_tokens,cache_root,tokenizer_identity,cancelled,cache_max_bytes,cache_reserve)
+        return
     for file_index, entry in enumerate(manifest['files']):
+        explicit = manifest.get('schema') == 'alpha-coding-corpus-v3'
+        if explicit and entry.get('split') != 'training':
+            continue
         if file_index < cursor.get('file', 0):
             continue
         path = Path(manifest['root']) / entry['path']
@@ -75,11 +85,11 @@ def corpus_windows(manifest, tokenizer, cursor):
         for number, text in documents(path):
             if file_index == cursor.get('file', 0) and number < cursor.get('document', 0):
                 continue
-            if number % 10 == 0:
+            if not explicit and number % 10 == 0:
                 continue
             tokens = tokenizer.encode(text)
             start = cursor.get('token', 0) if (file_index, number) == (cursor.get('file', 0), cursor.get('document', 0)) else 0
-            for offset in range(start, len(tokens)-1, 64):
-                ids = tokens[offset:offset+65]
-                after = {'file': file_index, 'document': number, 'token': offset+64}
+            for offset in range(start, len(tokens)-1, window_tokens):
+                ids = tokens[offset:offset+window_tokens+1]
+                after = {'file': file_index, 'document': number, 'token': offset+window_tokens}
                 yield ids, copy.deepcopy(after)

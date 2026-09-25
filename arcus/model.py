@@ -60,13 +60,14 @@ class MoDEBlock(nn.Module):
         self.last_aux = None
         self.last_compute_fraction = 1.0
         self.last_p_soft = None
+        self.routing_telemetry = True
         self.last_expert_fraction = None
         self.last_expert_overflow = None
 
     def forward(self, x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
         x = x + self.attn(self.norm1(x), cos, sin)       # dense attention
         normed = self.norm2(x)
-        p_soft = self.router(normed)                     # [B, T]
+        p_soft = self.router(normed) if (self.capacity<1.0 or self.training or self.routing_telemetry) else None
         self.last_p_soft = p_soft
 
         if self.capacity >= 1.0:
@@ -129,6 +130,29 @@ class ArcusMoDE(nn.Module):
     def num_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters())
 
+    def supports_cache(self):
+        # At lower capacities, sequence-dependent overflow can change old states.
+        # Do not claim attention caching alone preserves those model semantics.
+        return all(b.capacity==1.0 and b.moe.capacity_factor>=b.moe.n_experts for b in self.blocks)
+
+    def trunk_cached(self,h,cache):
+        if self.training or torch.is_grad_enabled() or not self.supports_cache():
+            raise ValueError('Cached inference requires eval/no_grad and non-dropping full-depth routing')
+        count=h.shape[1]; start=cache.length
+        if start+count>min(self.cfg.max_seq_len,cache.max_tokens): raise ValueError('Context exhausted')
+        cos=self.rope_cos[start:start+count].to(h.dtype)
+        sin=self.rope_sin[start:start+count].to(h.dtype)
+        try:
+            for index,block in enumerate(self.blocks):
+                h=h+block.attn(block.norm1(h),cos,sin,cache=cache,layer=index)
+                delta,_,_,_=block.moe(block.norm2(h))
+                h=h+delta
+            cache.length+=count
+            return self.norm_f(h)
+        except Exception:
+            cache.reset()
+            raise
+
     def trunk(self, input_ids: torch.Tensor) -> torch.Tensor:
         """Embed -> blocks -> final RMSNorm; returns hidden states [B, T, dim] (NO head).
         Records `last_aux_loss` / `last_compute_fraction`. Exposed so callers can project
@@ -162,9 +186,9 @@ class ArcusMoDE(nn.Module):
         self.last_aux_loss = (torch.stack(aux_terms).sum() if aux_terms
                               else torch.zeros((), device=h.device))
         if frac_terms:
-            self.last_compute_fraction = float(torch.stack(
+            self.last_compute_fraction = torch.stack(
                 [f.float() if torch.is_tensor(f) else torch.tensor(float(f)) for f in frac_terms]
-            ).mean().item())
+            ).mean().detach()
         return self.norm_f(h)
 
     def forward(self, input_ids: torch.Tensor) -> torch.Tensor:

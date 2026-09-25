@@ -61,7 +61,7 @@ class Worker:
                 with torch.no_grad():labels=self.model(self.body.core,pixels[None].to(self.device)).argmax(1)[0].cpu().numpy()
                 return {'id':record['id'],'checkpoint_sha256':self.sha,'observation':learned_observation(pixels.numpy(),labels),
                         'resources':{'inference_ms':1000*(time.perf_counter()-started),'input_tokens':36,
-                        'capacity':.5,'expert_routed_fraction':self.body.core.last_compute_fraction,'learned_budget':False}}
+                        'capacity':.5,'expert_routed_fraction':float(self.body.core.last_compute_fraction),'learned_budget':False}}
             if (record.get('lesson','gaze')=='navigation')!=self.navigation:raise ValueError('Visual lesson mismatch')
             pixels,state=tensors(record);torch.cuda.synchronize();torch.cuda.reset_peak_memory_stats();started=time.perf_counter()
             with torch.no_grad():
@@ -72,7 +72,7 @@ class Worker:
                 logits=self.model(self.body.core,pixels,state,budget)[0]
             if not torch.isfinite(logits).all():raise ValueError('Nonfinite visual prediction')
             torch.cuda.synchronize();elapsed=1000*(time.perf_counter()-started)
-            index=int(logits.argmax());fraction=self.body.core.last_compute_fraction
+            index=int(logits.argmax());fraction=float(self.body.core.last_compute_fraction)
             return {'id':record['id'],'action':index,'action_name':self.names[index],
                 'scores':logits.cpu().tolist(),'checkpoint_sha256':self.sha,
                 'resources':{'inference_ms':elapsed,'input_tokens':17,'capacity':budget,'learned_budget':self.budget_policy is not None,

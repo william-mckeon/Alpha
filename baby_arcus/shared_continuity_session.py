@@ -42,15 +42,23 @@ class ContinuitySession:
                 inventory = survey['inventory']
             tracks = self.memory.recall(row)['tracks']
             matrix = []
+            views=[view for track in tracks for view in track['views']]
+            previous=torch.tensor(views,device=device) if views else None
             for region in observation['objects']:
-                observed = torch.tensor([descriptor(region, row['gaze'])], device=device)
+                description=descriptor(region,row['gaze'])
+                observed = torch.tensor([description], device=device)
                 risk = 0.0
                 if self.model.version >= 11:
                     from baby_arcus.shared_identity_context import uncertainty
-                    risk = uncertainty(self.model, hidden, inventory, observed[0].tolist())
-                matrix.append([identity_confidence(max(float(self.model.association_logits(hidden,
-                    torch.tensor([view], device=device), observed).sigmoid()[0]) for view in track['views']), risk)
-                    for track in tracks])
+                    risk = uncertainty(self.model, hidden, inventory, description)
+                scores=self.model.association_logits(hidden.expand(len(views),-1),previous,
+                    observed.expand(len(views),-1)).sigmoid().cpu().tolist() if views else []
+                row_scores=[];offset=0
+                for track in tracks:
+                    count=len(track['views'])
+                    row_scores.append(identity_confidence(max(scores[offset:offset+count]),risk))
+                    offset+=count
+                matrix.append(row_scores)
             state = self.memory.observe(row, observation, matrix, self.manifest['generation'])
             target = None
             if self.plan.state:
@@ -62,9 +70,10 @@ class ContinuitySession:
             if not plan or target is None:
                 return {'objects': state['tracks'], 'plan': self.plan.cancel('No search requested or needed')}
             candidates = []
-            for yaw, pitch in VIEWS:
-                score = float(self.model.search_logits(hidden, torch.tensor([target['views'][-1]], device=device),
-                    torch.tensor([[yaw, pitch]], device=device)).sigmoid()[0])
+            scores=self.model.search_logits(hidden.expand(len(VIEWS),-1),
+                torch.tensor([target['views'][-1]],device=device).expand(len(VIEWS),-1),
+                torch.tensor(VIEWS,device=device)).sigmoid().cpu().tolist()
+            for (yaw,pitch),score in zip(VIEWS,scores):
                 candidates.append({'action': {'kind': 'gaze', 'yaw': yaw, 'pitch': pitch}, 'score': score})
             return {'objects': state['tracks'], 'plan': self.plan.step(row, candidates, target['id'], now)}
 

@@ -5,6 +5,8 @@ import hmac
 import socket
 import time
 import uuid
+import json
+import os
 from baby_arcus.audit import TRACE
 import urllib.error
 import urllib.request
@@ -59,8 +61,8 @@ class Client:
                 last = RemoteError(503,"Service unavailable or request deadline exceeded")
         raise last or RemoteError(504,"Request deadline exceeded")
 
-def serve(host, port, application, token="", readonly_network=False, audit=None):
-    if host not in ("127.0.0.1","localhost","::1") and not token and not readonly_network:
+def serve(host, port, application, token="", readonly_network=False, audit=None, application_auth=False):
+    if host not in ("127.0.0.1","localhost","::1") and not token and not readonly_network and not application_auth:
         raise ContractError("Non-loopback binding requires BABY_ARCUS_TOKEN")
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.0"
@@ -96,6 +98,9 @@ def serve(host, port, application, token="", readonly_network=False, audit=None)
                         raise ContractError("Expected application/json")
                     body = decode(self.rfile.read(length))
                 self.audit_body=body
+                if self.command == 'POST' and os.environ.get('ALPHA_RUNTIME_PROFILE') == 'alpha-container-v1':
+                    print(json.dumps({'event':'http.request','time':time.time(),'trace':trace,
+                        'port':self.server.server_port,'method':self.command,'path':self.path.split('?')[0]}),flush=True)
                 if audit:
                     audit.emit("http.request",{"method":self.command,"path":self.path.split("?")[0],
                                "port":self.server.server_port,
@@ -120,6 +125,10 @@ def serve(host, port, application, token="", readonly_network=False, audit=None)
                 self.reply(500,{"error":"Internal service error"})
 
         def reply(self, status, result):
+            if (self.command == 'POST' or status >= 400) and os.environ.get('ALPHA_RUNTIME_PROFILE') == 'alpha-container-v1':
+                print(json.dumps({'event':'http.response','time':time.time(),'trace':TRACE.get(),
+                    'port':self.server.server_port,'status':status,'exception_type':self.audit_error,
+                    'duration_ms':round((time.monotonic()-self.audit_started)*1000,3)}),flush=True)
             if audit and not self.audit_replied:
                 self.audit_replied=True
                 audit.emit("http.response",{"method":self.command,"path":self.path.split("?")[0],

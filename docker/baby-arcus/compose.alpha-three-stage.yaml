@@ -1,0 +1,189 @@
+name: arcus-alpha-three-stage
+x-alpha-logging: &alpha-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+services:
+  learner:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.test2
+    command: ["-m", "baby_arcus.services.shared_trainer", "--config", "configs/baby_arcus/alpha_three_stage_learner.container.json", "--host", "0.0.0.0", "--port", "8931"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set learner token}
+      LANGSMITH_TRACING: "false"
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_JOB_CONTROL: /control
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset","phase2-coding-v1":"/phase2-dataset/coding"}'
+      ALPHA_EXECUTOR_URL: http://executor:8933
+      ALPHA_EXECUTOR_TOKEN: ${ALPHA_EXECUTOR_TOKEN:?Set executor credential}
+      CUDA_LAUNCH_BLOCKING: "1"
+      ALPHA_RUNTIME_IMAGE: ${ALPHA_RUNTIME_IMAGE:-unqualified}
+      ALPHA_HOST_FINGERPRINT: ${ALPHA_HOST_FINGERPRINT:-unqualified}
+      ALPHA_HOST_QUALIFICATION: /qualification/host.json
+      ALPHA_GPU_QUALIFICATION: /qualification/gpu.json
+      ALPHA_GPU_MODE: ${ALPHA_GPU_MODE:-qualified}
+    volumes:
+      - alpha-job-control:/control
+      - ${ALPHA_QUALIFICATION_ROOT:?Set qualification evidence directory}:/qualification:ro
+      - ${ALPHA_PARENT_ROOT:?Set retained parent directory}:/app/runs/test2/alpha-idle-fresh-release-20260923:ro
+      - ${ALPHA_THREE_STAGE_RUN:?Set isolated prepared run}:/app/runs/test2/alpha-three-stage
+      - ${ALPHA_REVIEW_ROOT:?Set review directory}:/review:ro
+      - ${ARCUS_TEST2_DATASET:?Set original corpus directory}:/dataset:ro
+      - ${ALPHA_PHASE2_DATASET_ROOT:?Set Phase 2 dataset directory}:/phase2-dataset:ro
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8931/health',headers={'Authorization':'Bearer '+os.environ['ARCUS_TEST2_TOKEN']}),timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    gpus: all
+    cpus: 2
+    pids_limit: 256
+    mem_limit: 10g
+    memswap_limit: 10g
+    ports: ["127.0.0.1:8931:8931"]
+  playroom:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    command: ["-m", "baby_arcus.services.test2_playroom", "--config", "configs/baby_arcus/alpha_three_stage_learner.container.json", "--learner-url", "http://learner:8931", "--host", "0.0.0.0", "--port", "8930"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set learner token}
+      ALPHA_REVIEW_URL: http://review:8932
+      ALPHA_INGEST_TOKEN: ${ALPHA_INGEST_TOKEN:?Set ingestion credential}
+      ALPHA_EXECUTOR_URL: http://executor:8933
+      ALPHA_EXECUTOR_TOKEN: ${ALPHA_EXECUTOR_TOKEN:?Set executor credential}
+      LANGSMITH_TRACING: "false"
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_JOB_CONTROL: /control
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset"}'
+    volumes:
+      - alpha-job-control:/control
+      - ${ALPHA_THREE_STAGE_RUN:?Set isolated prepared run}:/app/runs/test2/alpha-three-stage
+      - ${ARCUS_TEST2_DATASET:?Set original corpus directory}:/dataset:ro
+    ports: ["127.0.0.1:8930:8930"]
+    mem_limit: 1g
+    cpus: 1
+    pids_limit: 128
+    depends_on:
+      learner:
+        condition: service_healthy
+      review:
+        condition: service_healthy
+      executor:
+        condition: service_healthy
+  review:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    command: ["-m", "baby_arcus.services.data_review", "--store", "/review/staging.sqlite", "--host", "0.0.0.0", "--port", "8932"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ALPHA_REVIEW_TOKEN: ${ALPHA_REVIEW_TOKEN:?Set separate human credential}
+      ALPHA_INGEST_TOKEN: ${ALPHA_INGEST_TOKEN:?Set separate ingestion credential}
+      LANGSMITH_TRACING: "false"
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_JOB_CONTROL: /control
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset"}'
+    volumes:
+      - alpha-job-control:/control
+      - ${ALPHA_REVIEW_ROOT:?Set review directory}:/review
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8932/health',timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    ports: ["127.0.0.1:8932:8932"]
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 64
+  executor:
+    logging: *alpha-logging
+    image: ${ALPHA_EXECUTOR_IMAGE:-arcus-alpha-executor:qualification}
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.executor
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ALPHA_EXECUTOR_TOKEN: ${ALPHA_EXECUTOR_TOKEN:?Set executor credential}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8933/health',headers={'Authorization':'Bearer '+os.environ['ALPHA_EXECUTOR_TOKEN']}),timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+  gpu-probe:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    profiles: [qualification]
+    command: ["scripts/qualify_alpha_gpu_runtime.py", "--output", "/qualification/gpu.json"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_JOB_CONTROL: /control
+      ALPHA_RUNTIME_IMAGE: ${ALPHA_RUNTIME_IMAGE:-unqualified}
+      ALPHA_HOST_FINGERPRINT: ${ALPHA_HOST_FINGERPRINT:-unqualified}
+      ALPHA_HOST_QUALIFICATION: /qualification/host.json
+    volumes:
+      - alpha-job-control:/control
+      - ${ALPHA_QUALIFICATION_ROOT:?Set qualification evidence directory}:/qualification
+    gpus: all
+    mem_limit: 2g
+    cpus: 1
+    pids_limit: 64
+    network_mode: none
+  prepare:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    profiles: [prepare]
+    command: ["scripts/prepare_alpha_training_data.py", "--help"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      CUDA_VISIBLE_DEVICES: ""
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset"}'
+    volumes:
+      - ${ALPHA_PARENT_ROOT:?Set retained parent directory}:/app/runs/test2/alpha-idle-fresh-release-20260923:ro
+      - ${ALPHA_THREE_STAGE_RUN:?Set isolated prepared run}:/app/runs/test2/alpha-three-stage
+      - ${ALPHA_REVIEW_ROOT:?Set review directory}:/review
+      - ${ARCUS_TEST2_DATASET:?Set original corpus directory}:/dataset:ro
+      - ${ALPHA_SFT_ROOT:?Set structured SFT source directory}:/sft:ro
+    mem_limit: 2g
+    cpus: 1
+    pids_limit: 128
+    network_mode: none
+  worker:
+    logging: *alpha-logging
+    image: ${ALPHA_SERVICE_IMAGE:-arcus-alpha-three-stage:local}
+    profiles: [practice]
+    command: ["-m", "baby_arcus.services.coding_worker", "--help"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONFAULTHANDLER: "1"
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set learner token}
+      ALPHA_EXECUTOR_TOKEN: ${ALPHA_EXECUTOR_TOKEN:?Set executor credential}
+      ALPHA_EXECUTOR_URL: http://executor:8933
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+    volumes:
+      - ${ALPHA_THREE_STAGE_RUN:?Set isolated prepared run}:/app/runs/test2/alpha-three-stage
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    depends_on: [learner, executor]
+
+volumes:
+  alpha-job-control:
+    name: arcus-alpha-job-control

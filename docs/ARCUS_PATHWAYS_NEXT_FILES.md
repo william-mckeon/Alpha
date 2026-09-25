@@ -1,5 +1,11 @@
 # Next phase: quiet-time DatasetForge learning
 
+Superseded September 23: this inventory predates Test 2 and must not drive the
+current implementation. Spec 0047 and ARCUS_IDLE_LEARNING_RUNBOOK.md describe
+quiet-time continuation of Alpha-1.0.0 with its original sustained trainer.
+Existing passage delivery and mixed training are reused; no separate learner,
+language-only curriculum, or .25 capacity switch is authorized by this phase.
+
 Status as of September 21: this is a planned inventory, not an implementation
 receipt. Phase 2 has not started. The caregiver requested the before/after review
 and then documentation of the fresh integrated-training proposal before choosing

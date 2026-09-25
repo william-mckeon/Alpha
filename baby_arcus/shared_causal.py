@@ -43,27 +43,41 @@ def experiments(row):
     return [{'kind':'gaze','yaw':x,'pitch':y} for x,y in ((-.75,0),(.75,0),(0,-.75),(0,.75),(0,0)) if abs(x-yaw)+abs(y-pitch)>.1]
 
 
-def choose_experiment(model,tokenizer,row):
+def choose_experiment(model,tokenizer,row,evaluation_capacity=None):
     """Use learned forecasts to seek unseen sensory outcomes within a small budget."""
     from copy import deepcopy
     import torch
     from baby_arcus.shared_depth import verify_depth
-    verify_depth(model)
+    if evaluation_capacity is None:
+        verify_depth(model)
+    elif (model.training or any(p.requires_grad for p in model.parameters())
+          or model.core.cfg.capacity != evaluation_capacity
+          or any(b.capacity != evaluation_capacity for b in model.core.blocks)):
+        raise ValueError('Read-only evaluation capacity mismatch')
     actions=experiments(row)
     if not actions:return None,[]
     seen=[sensory_features(row)[24:72]]+[m['features'][24:72] for m in row.get('memory',[])[-8:]]
-    scored=[]
-    with torch.no_grad():
+    scored=[]; predictions=[]
+    from baby_arcus.observation_pixels import reuse_pixels
+    with torch.no_grad(),reuse_pixels():
         for action in actions:
             conditioned=deepcopy(row);conditioned['executed_action']=action;conditioned['prediction_horizon']=3
             out=model([conditioned],tokenizer,requested=('future_body','future_rgb','uncertainty','curiosity'))
-            rgb=out['future_rgb'][0];previous=torch.tensor(seen,device=rgb.device)
-            novelty=float((previous-rgb).square().mean(-1).min())
-            uncertainty=float(out['uncertainty'][0,0])
-            progress=float(out['curiosity'][0,0])
+            predictions.append(out)
+        # Keep independent forwards: batching changes MoE capacity competition.
+        # Transfer results once, rather than synchronizing every scalar/head.
+        rgb=torch.cat([out['future_rgb'] for out in predictions])
+        previous=torch.tensor(seen,device=rgb.device)
+        novelty=(previous[None]-rgb[:,None]).square().mean(-1).min(-1).values
+        values=torch.cat((novelty[:,None],torch.cat([out['uncertainty'] for out in predictions]),
+                          torch.cat([out['curiosity'] for out in predictions]),
+                          torch.cat([out['future_body'] for out in predictions]),rgb),-1).cpu().tolist()
+        body_size=predictions[0]['future_body'].shape[-1]
+        for action,value in zip(actions,values):
+            novelty,uncertainty,progress=value[:3]
             # Small uncertainty bonus; high error alone cannot dominate indefinitely.
             score=novelty*(.25+.75*progress)+min(uncertainty,.001)*.1
             scored.append({'action':action,'score':score,'predicted_novelty':novelty,'expected_learning_progress':progress,'uncertainty':uncertainty,
-                'future_body':out['future_body'][0].cpu().tolist(),'future_rgb':rgb.cpu().tolist()})
+                'future_body':value[3:3+body_size],'future_rgb':value[3+body_size:]})
     best=max(scored,key=lambda item:item['score'])
     return (best if best['score']>1e-5 else None),scored

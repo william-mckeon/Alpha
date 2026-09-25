@@ -1,0 +1,8 @@
+{
+  "schema": "alpha-phase2b-benchmarks-v1",
+  "practice_enabled": false,
+  "practice_tasks": [],
+  "heldout_tasks": [],
+  "heldout_repositories": [],
+  "status": "Task and repository overlap review required before training"
+}

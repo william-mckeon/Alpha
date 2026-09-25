@@ -1,0 +1,63 @@
+{
+  "schema": "alpha-three-stage-v1",
+  "training_enabled": true,
+  "source_checkpoint": "runs/test2/alpha-idle-fresh-release-20260923/candidate.json",
+  "staging_store": "/review/staging.sqlite",
+  "eligible_review_sources": [
+    "Python",
+    "JavaScript",
+    "Go",
+    "Rust"
+  ],
+  "approved_batches": [
+    "f0c02c8cef24cb3d2b5f78590c7fcb2f1e8c3db0907072f5cc5030229838c173",
+    "43ccb95240ecbd64efde910af5d58968d5008edd8f754fb47a354b15f9876900",
+    "d6c350df2780f369d1fe5a3979b8973a48999ff11d24012c41569dc5970a85bc",
+    "9d0efd4a297b7bd23d020a44afe806151deb629f274939a97a067861ab3a475c",
+    "46dd9f1f93ab20d0afff934b226d2b3ab2c1446dd5932535c04e4c885022ed39",
+    "243940effb4d27685d90bcfe5c308a6fcbcad9e307389d05ae23fc9033664327",
+    "6ecdcdff6ac0a75af212c7ef559fc4a4c57884c2c5904515a7e23e6ce2f37470",
+    "9eb1f0a43bef7c6d100d9d8704337ca91213460ea685499b3c0d0f21f6e40370",
+    "141f0abcc783ac861ef1eebafdcf7495f71a5d13bbe19f1089be81c60593d6ac",
+    "e25a6d01d1d41d0da4409755465fa3d6c452607dcb4e7f9ec4592c76edf90f1f",
+    "260513167f372bc5ed616f50c351523eae203d73a6c9764709ef7bbc0d747eed",
+    "800736ee0eb1bc41cd1a8765782fb8a625bcfd204b7103e16a29b4ad2685d915",
+    "c0208d526da79d0299ccabf83eacb8eaf399a16c6451bd4bca27951f387b9e17",
+    "d01a7bb8f58d6d6687cc7e42f10a2a2251f5dce987533093e5ede9caed75467e",
+    "ce2f19a710be4d1b08f6e0b3b6236302f15d891b0d261201e3a9552d9ded3d96",
+    "bcb2476cbaf514359dfe37e14b4e7cf0cfc8c2f748dd55c1f0752860c169cf5c",
+    "dd4d38b717de4066f1eac46e7e540f2f072719b9eaec93aa3c134f014d5cf285",
+    "9fd3452e3424a294e450d5eca666670948d4fc53e5f91b704e024cb62c476e84",
+    "d84abc0ac0ee618a7c02d966ccbd433674d33320ed7a57ed39e611f93b11e1aa",
+    "8fd4cce636846502684384b1e3277f63dbede6d1082fd773739937b6600b4aae"
+  ],
+  "approved_source_manifests": [
+    "0c57194a8866a474ff7650f64bc030fd3b78712440b312dd7571b8db104e182f"
+  ],
+  "mixture": [
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "embodied",
+    "coding_corpus",
+    "sft"
+  ],
+  "token_budget": 1000000,
+  "context_tokens": 512,
+  "resume_after_seconds": 60,
+  "preserve_embodied_schedule": true,
+  "automatic_promotion": false,
+  "source_sha256": "9e6f8e21bc4b5e70d94d92cfcdff2872980e28c6585ebcaabad11a0fbb810520",
+  "exhaustion_policy": "stop",
+  "baseline_policy": "fresh-release",
+  "source_updates": 37000,
+  "gates_file": "configs/baby_arcus/alpha_three_stage_gates.json",
+  "gates_sha256": "e9f5fb230e02f5a94082e2fa1161cd04b71d3bf5f3b80b2bd2a36cf70ad28d37"
+}

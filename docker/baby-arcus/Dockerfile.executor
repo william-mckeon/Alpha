@@ -1,0 +1,7 @@
+FROM python@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93
+ARG DOCKER_CLI_VERSION=26.1.5+dfsg1-9+deb13u1
+RUN apt-get update && apt-get install -y --no-install-recommends docker-cli=${DOCKER_CLI_VERSION} && docker --version && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY baby_arcus /app/baby_arcus
+ENV PYTHONDONTWRITEBYTECODE=1
+ENTRYPOINT ["python3", "-m", "baby_arcus.services.coding_executor", "--host", "0.0.0.0"]

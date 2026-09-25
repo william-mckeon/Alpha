@@ -1,0 +1,55 @@
+name: arcus-alpha-idle
+services:
+  learner:
+    image: arcus-alpha-idle:local
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.test2
+    command: ["-m", "baby_arcus.services.shared_trainer", "--config", "configs/baby_arcus/alpha_idle.container.json", "--host", "0.0.0.0", "--port", "8921"]
+    environment:
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set a service token}
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_JOB_CONTROL: /control
+      CUDA_LAUNCH_BLOCKING: "1"
+      LANGSMITH_TRACING: "false"
+    volumes:
+      - type: volume
+        source: alpha-job-control
+        target: /control
+      - type: bind
+        source: ${ARCUS_IDLE_RUN:?Set the prepared continuation directory}
+        target: /app/runs/test2/alpha-idle
+      - type: bind
+        source: ${ARCUS_TEST2_DATASET:?Set the original corpus directory}
+        target: /dataset
+        read_only: true
+    gpus: all
+    mem_limit: 12g
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8921/ready',headers={'Authorization':'Bearer '+os.environ['ARCUS_TEST2_TOKEN']}),timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  playroom:
+    image: arcus-alpha-idle:local
+    command: ["-m", "baby_arcus.services.test2_playroom", "--config", "configs/baby_arcus/alpha_idle.container.json", "--learner-url", "http://learner:8921", "--host", "0.0.0.0", "--port", "8920"]
+    environment:
+      ARCUS_TEST2_TOKEN: ${ARCUS_TEST2_TOKEN:?Set a service token}
+      LANGSMITH_TRACING: "false"
+    ports: ["127.0.0.1:8920:8920"]
+    volumes:
+      - type: bind
+        source: ${ARCUS_IDLE_RUN:?Set the prepared continuation directory}
+        target: /app/runs/test2/alpha-idle
+      - type: bind
+        source: ${ARCUS_TEST2_DATASET:?Set the original corpus directory}
+        target: /dataset
+        read_only: true
+    depends_on:
+      learner:
+        condition: service_healthy
+    mem_limit: 3g
+
+volumes:
+  alpha-job-control:
+    name: arcus-alpha-job-control

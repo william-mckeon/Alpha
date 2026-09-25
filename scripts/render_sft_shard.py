@@ -50,7 +50,10 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Render captured SFT trajectories into an alpha-dataset shard")
     ap.add_argument("--sft", default=DEFAULT_SFT, help="openagent-code sft.jsonl (per-step rows)")
     ap.add_argument("--out", default=DEFAULT_OUT, help="output *.jsonl.zst shard under the alpha dataset")
+    ap.add_argument("--format", choices=("legacy-text","structured"), default="legacy-text")
     args = ap.parse_args()
+    if os.path.exists(args.out):
+        raise ValueError('Output already exists; choose a new versioned shard path')
 
     if not os.path.isfile(args.sft):
         print(f"no sft.jsonl at {args.sft} — run `python -m train.convert` in openagent-code first")
@@ -74,6 +77,10 @@ def main() -> int:
 
     docs = []
     for sid, (_step, row) in by_session.items():
+        if args.format == 'structured':
+            docs.append({'session_id':sid,'messages':list(row.get('messages') or [])+([row['completion']] if row.get('completion') else []),
+                         'source':'openagent_sft','format':'structured-unreviewed-v1'})
+            continue
         text = render_session(row.get("messages"), row.get("completion"))
         if text.strip():
             docs.append({"text": text, "source": "openagent_sft", "session_id": sid})
@@ -87,7 +94,7 @@ def main() -> int:
             tw.write(json.dumps(d, ensure_ascii=False) + "\n")
         tw.flush()
 
-    chars = sum(len(d["text"]) for d in docs)
+    chars = sum(len(d.get("text",json.dumps(d))) for d in docs)
     print(f"rendered {len(docs)} session(s) -> {args.out}")
     print(f"  ~{chars/1e3:.1f}K chars  (~{chars/4/1e3:.1f}K tokens approx)  | source: {args.sft}")
     return 0

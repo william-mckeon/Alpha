@@ -8,6 +8,10 @@ import sys
 import time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from baby_arcus.runtime_contract import require_container
+if __name__ == '__main__':
+    require_container()
+from baby_arcus.runtime_contract import model_device
 import torch
 from arcus.tokenizer import get_tokenizer
 from baby_arcus.shared_checkpoint import load, save, restore_optimizer
@@ -25,6 +29,9 @@ SCHEDULE = ('standing', 'lying', 'sitting', 'commands', 'color_reference', 'rest
             'language', 'perception', 'causal', 'approach', 'continuity')
 
 
+from baby_arcus.gpu_job_control import serialized
+
+@serialized
 def train(config, updates, checkpoint_every=1024):
     cfg = read_config(config)
     if cfg['depth_capacity'] not in (.25, 1.0) or not 1 <= updates <= 65536:
@@ -37,7 +44,7 @@ def train(config, updates, checkpoint_every=1024):
     started = time.monotonic()
     try:
         manifest = json.loads((root/'candidate.json').read_text())
-        model, data = load(root, manifest, 'cuda' if torch.cuda.is_available() else 'cpu')
+        model, data = load(root, manifest, model_device(cfg))
         verify_run(cfg, data)
         optimizer = restore_optimizer(model, data, cfg['learning_rate'])
         torch.set_rng_state(data['rng'])
@@ -58,6 +65,7 @@ def train(config, updates, checkpoint_every=1024):
         reserve = sum(p.numel()*p.element_size() for p in model.parameters())*4
         check(root, cfg['max_storage_bytes'], reserve)
         last_commit = time.monotonic()
+        corpus_exhausted = False
         def commit():
             nonlocal manifest, last_commit
             if source_manifest() != sources:
@@ -89,7 +97,11 @@ def train(config, updates, checkpoint_every=1024):
                 # Actual sampled movement feedback; no scripted motor action labels.
                 target = {'policy': {'head': head, 'index': choice, 'advantage': outcome['reward']}}
             elif family == 'language':
-                ids, cursor = next(language)
+                try:
+                    ids, cursor = next(language)
+                except StopIteration:
+                    corpus_exhausted = True
+                    break
                 row, _, _ = example(index, 'training', 'commands')
                 row['hearing'] = []
                 row['language_prefix_ids'] = ids[:1]
@@ -113,7 +125,8 @@ def train(config, updates, checkpoint_every=1024):
                 commit()
         if progress['updates'] != manifest['updates']:
             commit()
-        return {'candidate': manifest, 'seconds': time.monotonic()-started, 'mastery_established': False}
+        return {'candidate': manifest, 'seconds': time.monotonic()-started,
+                'corpus_exhausted': corpus_exhausted, 'mastery_established': False}
     finally:
         if motor:
             motor.close()

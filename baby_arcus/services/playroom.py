@@ -461,15 +461,23 @@ class PlayroomViewer:
         raise KeyError(path)
 
 
-def viewer_server(port, application, audit=None, host="127.0.0.1"):
-    server = serve(host, port, application,audit=audit)
+def viewer_server(port, application, audit=None, host="127.0.0.1", internal_host=None, internal_token=None):
+    # LocalHandler below enforces the published localhost Host/Origin boundary.
+    # Container binding may be 0.0.0.0 while the published host port is loopback-only.
+    server = serve(host, port, application,audit=audit,application_auth=True)
     base = server.RequestHandlerClass
 
     class LocalHandler(base):
         def handle_command(self):
             expected = {f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}"}
             host = self.headers.get("Host", "")
-            if host not in expected:
+            if internal_host and host == internal_host and internal_token:
+                import hmac
+                if not hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+internal_token):
+                    return self.reply(403, {'error':'Service authentication required'})
+                if self.headers.get('Origin'):
+                    return self.reply(403, {'error':'Internal service route does not accept browser origins'})
+            elif host not in expected:
                 return self.reply(403, {"error": "Local host required"})
             origin = self.headers.get("Origin")
             if self.command == "POST" and origin and origin != "http://" + host:

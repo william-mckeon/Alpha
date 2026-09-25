@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torch
+from baby_arcus.shared_checkpoint import read_data
 from baby_arcus.shared_factory import read_config
 from baby_arcus.shared_checkpoint import digest
 from baby_arcus.language_stream import atomic_json
@@ -25,8 +26,8 @@ def compare(low_config, full_config, destination):
         for manifest in (initial,candidate):
             if digest(root/(manifest['generation']+'.pt')) != manifest['sha256']:
                 raise ValueError('Checkpoint hash mismatch')
-        initial_weights.append(torch.load(root/(initial['generation']+'.pt'), map_location='cpu', weights_only=True)['model'])
-        state = torch.load(root/(candidate['generation']+'.pt'), map_location='cpu', weights_only=True)
+        initial_weights.append(read_data(root/(initial['generation']+'.pt'))['model'])
+        state = read_data(root/(candidate['generation']+'.pt'))
         progress.append(state['progress'])
         del state
         evaluations = [json.loads((root/('evaluation-'+m['generation']+'.json')).read_text()) for m in (initial,candidate)]

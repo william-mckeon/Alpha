@@ -17,8 +17,18 @@ class Application:
             return 200, {'ready': True, 'mode': 'isolated-training'}
         if method == 'GET' and path == '/api/test2':
             return 200, r.snapshot()
+        if method == 'GET' and path == '/api/test2/memory':
+            return 200, r.client.request('GET','/memory')
+        if method == 'POST' and path == '/api/test2/practice':
+            return 200, r.start_practice(body['task'])
+        if method == 'POST' and path == '/api/test2/practice-stop':
+            r.interrupt_idle()
+            return 200, {'stopping':True}
         if method == 'POST' and path == '/api/test2/step':
+            r.interrupt_idle()
             return 200, r.step(body['request_id'])
+        if method == 'POST' and path == '/api/test2/idle':
+            return 200, r.idle_control(body['action'])
         if method == 'POST' and path == '/api/test2/control':
             return 200, r.control(body['action'], body.get('cycles', 10))
         if method == 'POST' and path == '/api/test2/message':
@@ -26,11 +36,16 @@ class Application:
         if method == 'POST' and path == '/api/test2/action':
             return 200, r.human_action(body['request_id'], body['action'])
         if method == 'POST' and path == '/api/test2/hear':
+            r.interrupt_idle()
             return 200, r.hear()
         if method == 'POST' and path == '/api/test2/learn':
+            if r.idle:
+                raise ValueError('Use quiet-time continuation; direct replay would change the training method')
             (r.root / 'pause-training').unlink(missing_ok=True)
             return 200, r.learn_one()
         if method == 'POST' and path == '/api/test2/train':
+            if r.idle:
+                raise ValueError('Use quiet-time continuation to retain its scheduling and budget controls')
             (r.root / 'pause-training').unlink(missing_ok=True)
             return 200, r.client.request('POST', '/train', {'updates': body.get('updates', 5), 'request_id': body['request_id']})
         files = {'/': 'test2.html', '/learning-status.js': 'learning-status.js',

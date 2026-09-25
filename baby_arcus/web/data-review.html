@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Alpha — training data review</title>
+<body><h1>Alpha training data review</h1>
+<p>Inspect the exact batch before making a decision. Approval admits data to a future training pool; it does not start training.</p>
+<label>Human review credential <input id="credential" type="password" autocomplete="off"></label>
+<button id="queue">Load review queue</button><button id="queue-prev" disabled>Previous</button><span id="queue-page"></span><button id="queue-next" disabled>Next</button><div id="queue-items"></div>
+<label>Batch SHA256 <input id="batch" size="68"></label>
+<button id="load">Load batch</button>
+<pre id="record">No batch loaded.</pre>
+<p>Phase 2B: local conversation logs are excluded. Check source revision, reported outcome, identity changes, and context fit. Source-reported success is not a new verified execution.</p>
+<label>Your reviewer name <input id="reviewer" autocomplete="name"></label>
+<button id="approve" disabled>Approve this exact batch</button>
+<button id="reject" disabled>Reject this exact batch</button>
+<label>Reason for withdrawing future use <input id="revoke-reason" maxlength="4000"></label><button id="revoke" disabled>Withdraw future training use</button>
+<p id="status" role="status"></p><script src="/data-review.js"></script></body></html>

@@ -1,0 +1,19 @@
+# Use alongside compose.alpha-three-stage.yaml. Explicitly separate paused run.
+services:
+  learner:
+    image: arcus-alpha-phase2b:local
+    build:
+      context: ../..
+      dockerfile: docker/baby-arcus/Dockerfile.phase2b
+    command: ["-m", "baby_arcus.services.shared_trainer", "--config", "configs/baby_arcus/alpha_phase2b_learner.container.json", "--host", "0.0.0.0", "--port", "8931"]
+    environment:
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset","phase2b-code":"/phase2-dataset"}'
+    volumes:
+      - ${ALPHA_PHASE2B_RUN:?Set separate Phase 2B run}:/app/runs/test2/alpha-phase2b
+  playroom:
+    image: arcus-alpha-phase2b:local
+    command: ["-m", "baby_arcus.services.test2_playroom", "--config", "configs/baby_arcus/alpha_phase2b_learner.container.json", "--learner-url", "http://learner:8931", "--host", "0.0.0.0", "--port", "8930"]
+    volumes:
+      - ${ALPHA_PHASE2B_RUN:?Set separate Phase 2B run}:/app/runs/test2/alpha-phase2b
+  review:
+    image: arcus-alpha-phase2b:local

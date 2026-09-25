@@ -14,9 +14,9 @@ Ported verbatim in BEHAVIOR from boenet/adaptive_backbone.py::MoDBlock._select:
 prefix-rank + per-position budget + exclusive-cumsum slot + overflow drop. The
 selection is causal — token t's keep/skip depends only on positions 0..t.
 
-NOTE (scaling): mod_select builds a [T, T] comparison matrix -> O(T^2) memory.
-Fine for validation and short sequences; long-context use needs the chunked
-rewrite tracked under ROADMAP "Known follow-ups".
+NOTE (scaling): exact prefix ranks use merge levels with sorted left halves and
+binary searches for right halves. This bounds storage linearly and avoids all-pairs
+comparisons. Dense attention still prevents a million-token context claim.
 """
 
 from __future__ import annotations
@@ -46,7 +46,24 @@ class MoDSelection:
     kmax: int            # fixed buffer size = floor(capacity * T + 1 - eps)
 
 
-def mod_select(scores: torch.Tensor, capacity: float) -> MoDSelection:
+def prefix_ranks(scores):
+    """Count strictly greater earlier scores, O(T log^2 T) work, O(T) storage."""
+    B,T=scores.shape
+    size=1 << max(0,(T-1).bit_length())
+    values=torch.full((B,size),-torch.inf,device=scores.device,dtype=scores.dtype)
+    values[:,:T]=scores.detach().masked_fill(torch.isnan(scores),-torch.inf)
+    rank=torch.zeros((B,size),device=scores.device,dtype=torch.long)
+    width=1
+    while width<size:
+        blocks=values.reshape(B,-1,2*width)
+        left=blocks[:,:,:width].sort(-1).values.contiguous()
+        right=blocks[:,:,width:].contiguous()
+        rank.reshape(B,-1,2*width)[:,:,width:]+=width-torch.searchsorted(left,right,right=True)
+        width*=2
+    return rank[:,:T].masked_fill(torch.isnan(scores),0)
+
+
+def mod_select(scores: torch.Tensor, capacity: float, rank_mode='prefix') -> MoDSelection:
     """Causal fixed-K selection. `scores`: [B, T] (higher = more worth computing).
 
     keep[t] iff rank[t] < ceil(capacity*(t+1)), where
@@ -61,8 +78,21 @@ def mod_select(scores: torch.Tensor, capacity: float) -> MoDSelection:
     B, T = scores.shape
     device = scores.device
 
-    causal = torch.tril(torch.ones(T, T, device=device, dtype=torch.bool))
-    rank = ((scores.unsqueeze(1) > scores.unsqueeze(2)) & causal.unsqueeze(0)).sum(dim=2)  # [B,T]
+    # Exact prefix ranks, tiled in both dimensions. Memory is bounded independently
+    # of context length; arithmetic remains quadratic. Ties retain strict > semantics.
+    rank = torch.zeros(B, T, device=device, dtype=torch.long)
+    tile = 256
+    with torch.no_grad():
+        if rank_mode=='prefix':rank=prefix_ranks(scores)
+        elif rank_mode!='tiled':raise ValueError('Unknown rank mode')
+        for start in range(0, T if rank_mode=='tiled' else 0, tile):
+            end = min(start + tile, T)
+            query = scores[:, start:end, None]
+            positions = torch.arange(start, end, device=device)[:, None]
+            for previous in range(0, end, tile):
+                stop = min(previous + tile, end)
+                causal = torch.arange(previous, stop, device=device)[None, :] <= positions
+                rank[:, start:end] += ((scores[:, None, previous:stop] > query) & causal).sum(-1)
     pos = torch.arange(T, device=device).unsqueeze(0) + 1                                   # [1,T]
     budget = torch.ceil(capacity * pos.float()).clamp(min=1).long()                         # [1,T]
     keep_raw = rank < budget

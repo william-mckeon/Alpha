@@ -1,0 +1,9 @@
+ARG BASE_IMAGE=arcus-alpha-three-stage:phase2-39000
+FROM ${BASE_IMAGE}
+RUN python3 -m pip install --no-cache-dir pyarrow==21.0.0
+WORKDIR /app
+COPY baby_arcus /app/baby_arcus
+COPY arcus /app/arcus
+COPY scripts /app/scripts
+COPY configs /app/configs
+COPY tests /app/tests

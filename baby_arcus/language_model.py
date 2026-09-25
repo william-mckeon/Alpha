@@ -1,4 +1,4 @@
-"""Factorized tiktoken embeddings on the frozen motor transformer; independent text weights."""
+"""Factorized tiktoken embeddings and projections on the single shared transformer."""
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -15,9 +15,30 @@ class LanguageAdapter(nn.Module):
         self.choice=nn.Linear(4,len(CHOICES))
         nn.init.zeros_(self.choice.weight);nn.init.zeros_(self.choice.bias)
 
-    def forward(self,core,tokens):
+    def forward(self,core,tokens,last_only=False):
         hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
+        if last_only: hidden=hidden[:, -1:]
         return F.linear(self.output(hidden),self.embedding.weight)
+
+    def loss(self,core,tokens,labels,residual,chunk_size=32):
+        from torch.utils.checkpoint import checkpoint
+        hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
+        projected=self.output(hidden)+residual[:,None]
+        flat=projected.reshape(-1,projected.shape[-1]); targets=labels.reshape(-1)
+        count=(targets != -100).sum()
+        if not bool(count): raise ValueError('No language targets')
+        def chunk_loss(values,weight,target):
+            return F.cross_entropy(F.linear(values,weight),target,ignore_index=-100,reduction='sum')
+        total=flat.new_zeros(())
+        for start in range(0,len(targets),chunk_size):
+            # Recompute vocabulary logits in backward instead of retaining every chunk.
+            total=total+checkpoint(chunk_loss,flat[start:start+chunk_size],self.embedding.weight,
+                                   targets[start:start+chunk_size],use_reentrant=False)
+        return total/count
+
+    def cached_logits(self,core,tokens,cache):
+        hidden=core.trunk_cached(self.input(self.embedding(tokens)),cache)
+        return F.linear(self.output(hidden[:,-1]),self.embedding.weight)
 
     def decide(self,features,allowed):
         device=self.embedding.weight.device
@@ -32,7 +53,7 @@ def generate(adapter,core,tokenizer,context,allowed_ids,limit=12):
     output=[];allowed=torch.tensor(allowed_ids,device=device)
     with torch.no_grad():
         for _ in range(limit):
-            logits=adapter(core,torch.tensor([ids[-128:]],device=device))[0,-1]
+            logits=adapter(core,torch.tensor([ids[-128:]],device=device),last_only=True)[0,-1]
             probs=(logits[allowed]/.8).softmax(-1)
             token=int(allowed[torch.multinomial(probs,1)])
             if token==tokenizer.eot_token:break

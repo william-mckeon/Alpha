@@ -3,6 +3,17 @@ import hashlib,json,os,uuid
 from pathlib import Path
 import torch
 
+
+class HashingWriter:
+    """Hash the sequential PyTorch archive as it is written, without a reread."""
+    def __init__(self,stream):self.stream=stream;self.hash=hashlib.sha256()
+    def write(self,data):
+        count=self.stream.write(data)
+        if count!=len(data):raise OSError('Incomplete checkpoint write')
+        self.hash.update(data)
+        return count
+    def flush(self):self.stream.flush()
+
 def digest(path):
     # Checkpoints exceed 1.8 GB; avoid allocating another checkpoint-sized buffer
     # while the CPU state and model are already resident during startup.
@@ -12,6 +23,9 @@ def digest(path):
     return value.hexdigest()
 
 def save(root,model,optimizer,progress):
+    from baby_arcus.runtime_contract import require_device
+    device = next(model.parameters()).device
+    require_device(device)
     if model.body.cfg.capacity==.25 or hasattr(model,'experiment_depth_capacity'):
         from baby_arcus.shared_depth import verify_depth
         verify_depth(model)
@@ -19,24 +33,44 @@ def save(root,model,optimizer,progress):
     generation=uuid.uuid4().hex;pending=root/(generation+'.pending');path=root/(generation+'.pt')
     from dataclasses import asdict
     names={id(param):name for name,param in model.named_parameters()}
+    from baby_arcus.training_receipt_journal import encode_progress
     data={'schema':f'arcus-shared-v{model.version}','body_config':asdict(model.body.cfg),
         'vocab_size':model.language.embedding.num_embeddings,'text_dim':model.language.embedding.embedding_dim,
-        'model':model.state_dict(),'optimizer':optimizer.state_dict(),'progress':progress,
+        'model':model.state_dict(),'optimizer':optimizer.state_dict(),'progress':encode_progress(progress),
         'integrated_motor':bool(getattr(model,'integrated_motor',False)),
         'experiment_depth_capacity':getattr(model,'experiment_depth_capacity',None),
         'optimizer_layout':[[names[id(param)] for param in group['params']] for group in optimizer.param_groups],
-        'rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []}
-    with pending.open('wb') as stream:torch.save(data,stream);stream.flush();os.fsync(stream.fileno())
+        'rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all() if device.type == 'cuda' else []}
+    with pending.open('wb') as stream:
+        writer=HashingWriter(stream)
+        torch.save(data,writer);stream.flush();os.fsync(stream.fileno())
     os.replace(pending,path)
-    return {'generation':generation,'sha256':digest(path),'updates':progress.get('updates',0),
+    return {'generation':generation,'sha256':writer.hash.hexdigest(),'updates':progress.get('updates',0),
             'receipt_count':len(progress.get('receipts',[])), 'depth_capacity':model.body.cfg.capacity}
 
 def load(root,manifest,device='cpu'):
     generation=manifest['generation']
     if len(generation)!=32 or any(c not in '0123456789abcdef' for c in generation):raise ValueError('Invalid generation')
     path=Path(root)/(generation+'.pt')
+    from baby_arcus.runtime_contract import require_checkpoint
+    require_checkpoint(path, device)
     if digest(path)!=manifest['sha256']:raise ValueError('Shared checkpoint hash mismatch')
+    data=read_data(path)
+    return construct(data,manifest,device),data
+
+
+def read_data(path):
+    """Read old/new portable snapshots without constructing or executing a model."""
+    from baby_arcus.runtime_contract import require_checkpoint
+    from baby_arcus.training_receipt_journal import decode_progress
+    require_checkpoint(path)
     data=torch.load(path,map_location='cpu',weights_only=True)
+    data['progress']=decode_progress(data['progress'])
+    return data
+
+
+def construct(data,manifest,device):
+    """Construct from already verified state; both artifact loaders share this path."""
     if 'depth_capacity' in manifest and manifest['depth_capacity']!=data['body_config']['capacity']:
         raise ValueError('Checkpoint depth capacity differs from its manifest')
     if data['schema'] not in tuple(f'arcus-shared-v{i}' for i in range(1,12)):raise ValueError('Wrong shared checkpoint schema')
@@ -56,7 +90,7 @@ def load(root,manifest,device='cpu'):
         model.experiment_depth_capacity=data['experiment_depth_capacity']
         from baby_arcus.shared_depth import verify_depth
         verify_depth(model)
-    return model.to(device),data
+    return model.to(device)
 
 def restore_optimizer(model,data,lr):
     named=dict(model.named_parameters())

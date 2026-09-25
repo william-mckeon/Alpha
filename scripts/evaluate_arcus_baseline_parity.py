@@ -11,6 +11,10 @@ import sys
 import time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from baby_arcus.runtime_contract import require_container
+if __name__ == '__main__':
+    require_container()
+from baby_arcus.runtime_contract import model_device
 import torch
 from arcus.tokenizer import get_tokenizer
 from baby_arcus.shared_checkpoint import load, digest
@@ -26,19 +30,26 @@ from baby_arcus.language_stream import atomic_json, inventory, documents
 from scripts.evaluate_arcus_shared_pathways import task_loss
 
 
-def evaluate(config, split, episodes, cases, baseline_output=None):
+from baby_arcus.gpu_job_control import serialized
+
+@serialized
+def evaluate(config, split, episodes, cases, baseline_output=None, report_directory=None, evaluation_capacity=None):
     cfg = json.loads(Path(config).read_text()) if baseline_output else read_config(config)
     root = Path(cfg['root'])
     manifest = json.loads((root/('active.json' if baseline_output else 'candidate.json')).read_text())
-    output = Path(baseline_output or root)/f'baseline-{split}-{manifest["generation"]}.json'
+    output = Path(report_directory or baseline_output or root)/f'baseline-{split}-{manifest["generation"]}.json'
     if output.exists():
         raise FileExistsError(output)
-    model, data = load(root, manifest, 'cuda' if torch.cuda.is_available() else 'cpu')
+    model, data = load(root, manifest, model_device(cfg))
     if not baseline_output:
         verify_run(cfg, data)
     progress = {'updates': data['progress']['updates'], 'trained_tokens': data['progress'].get('trained_tokens')}
     del data
     model.eval().requires_grad_(False)
+    routing = None
+    if evaluation_capacity is not None:
+        from scripts.alpha_evaluation_capacity import configure
+        routing = configure(model, evaluation_capacity)
     tokenizer = get_tokenizer(cfg['encoding'])
     results = {}
     started = time.monotonic()
@@ -48,7 +59,9 @@ def evaluate(config, split, episodes, cases, baseline_output=None):
         report = {'schema': 'arcus-baseline-parity-v1', 'candidate': manifest, 'split': split,
                   'results': results, 'progress': progress, 'seconds': time.monotonic()-started,
                   'mastery_established': False, 'motor_dispatch': 'retained legacy pathway' if baseline_output else 'full integrated shared model',
-                  'sources': source_manifest(), 'complete': False}
+                  'sources': source_manifest(), 'complete': False, 'evaluation_routing': routing,
+                  'evaluator_sha256': digest(Path(__file__)),
+                  'cohort':{'split':split,'episodes':episodes,'cases':cases,'seed_offset':seed_offset}}
         atomic_json(output, report)
         return report
 

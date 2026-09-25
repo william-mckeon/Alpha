@@ -9,6 +9,7 @@ RUN python3 -c "import torch; assert torch.__version__.startswith('2.11.0')" || 
 RUN python3 -m pip install --no-cache-dir -r requirements-baby-arcus.txt -r requirements-visual.lock && python3 -m pip check
 COPY requirements-test2.lock /app/
 RUN python3 -m pip install --no-cache-dir -r requirements-test2.lock && python3 -m pip check
+ENV ALPHA_RUNTIME_PROFILE=alpha-container-v1
 ENV TIKTOKEN_CACHE_DIR=/opt/arcus-tokenizer-cache
 RUN mkdir -p /opt/arcus-tokenizer-cache && python3 -c "import tiktoken; tiktoken.get_encoding('o200k_base')" && chmod -R a+rX /opt/arcus-tokenizer-cache
 RUN python3 -c "import sys; assert sys.version_info[:2] == (3,10); assert '22.04' in open('/etc/os-release').read()"
@@ -17,7 +18,7 @@ COPY baby_arcus /app/baby_arcus
 COPY configs /app/configs
 COPY scripts /app/scripts
 COPY tests /app/tests
-RUN (id -u experiment >/dev/null 2>&1 || useradd --uid 10002 --create-home experiment) && mkdir -p /app/runs/test2 && chown -R experiment /app/runs
+RUN (id -u experiment >/dev/null 2>&1 || useradd --uid 10002 --create-home experiment) && mkdir -p /app/runs/test2 /control && chown -R experiment /app/runs /control
 USER experiment
 ENTRYPOINT ["python3"]
 CMD ["-m","baby_arcus.services.shared_trainer","--host","0.0.0.0"]

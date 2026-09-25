@@ -212,3 +212,13 @@ class TestFresh(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ReadinessTests(unittest.TestCase):
+    def test_http_readiness_rejects_unqualified_production(self):
+        from baby_arcus.services.shared_trainer import Learner
+        with patch('baby_arcus.services.shared_trainer.read_config',return_value={'root':'unused','preset':'baby-125m-cap4','depth_capacity':1.}),patch('baby_arcus.runtime_contract.require_gpu',side_effect=RuntimeError('unqualified')):
+            learner=Learner('unused')
+            status,body=learner('GET','/ready',None)
+            self.assertEqual(status,503); self.assertFalse(body['ready'])
+            self.assertEqual(body['reason'],'unqualified')

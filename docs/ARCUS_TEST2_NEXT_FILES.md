@@ -1,5 +1,10 @@
 # Test 2 remaining acceptance and next files
 
+September 23: curriculum/objective changes in this older proposal remain future
+experiments. The current Phase 2 explicitly preserves the 37k model's sustained
+training method. See spec 0047 and ARCUS_IDLE_LEARNING_RUNBOOK.md. Capacity 1.0
+is authorized for Alpha-1.0.0; the .25-only restriction below is historical.
+
 The next work is to finish the **current experiment's comparative learning and
 endurance acceptance**, before growth or production promotion. This is a file-level
 plan, not a claim these later capabilities already work. No deletions are needed.

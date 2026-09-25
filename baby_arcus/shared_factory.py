@@ -15,6 +15,12 @@ from baby_arcus.shared_depth import verify_depth
 
 def read_config(path):
     cfg = json.loads(Path(path).read_text(encoding='utf-8'))
+    if type(cfg.get('indexed_corpus',False)) is not bool:
+        raise ValueError('indexed_corpus must be an explicit boolean')
+    if type(cfg.get('training_cache_bytes',0)) is not int or not 0 <= cfg.get('training_cache_bytes',0) <= 2*1024**3:
+        raise ValueError('training_cache_bytes must be 0–2 GiB; default 0 releases training state')
+    from baby_arcus.context_contract import context_tokens
+    context_tokens(cfg)
     if cfg.get('schema') != 'arcus-test2-v1' or cfg.get('depth_capacity') not in (.25, 1.0):
         raise ValueError('Test 2 requires its own schema and capacity 0.25 or 1.0')
     if cfg.get('initialization') != 'random' or any(cfg.get(k) for k in ('body_checkpoint', 'language_root', 'parent_checkpoint')):
@@ -25,16 +31,31 @@ def read_config(path):
     if base not in root.parents:
         raise ValueError('Experiment root must be under runs/test2')
     cfg['root'] = str(root)
+    if 'idle_learning' in cfg:
+        idle = cfg['idle_learning']
+        if type(idle.get('auto_resume')) is not bool or not 0 <= idle.get('idle_seconds', -1) <= 3600:
+            raise ValueError('Invalid quiet-time resume policy')
+        for name, maximum in (('chunk_updates', 64), ('checkpoint_every', 64), ('session_updates', 65536)):
+            if type(idle.get(name)) is not int or not 1 <= idle[name] <= maximum:
+                raise ValueError('Invalid quiet-time budget: '+name)
+        if idle['checkpoint_every'] > idle['chunk_updates']:
+            raise ValueError('Checkpoint interval exceeds quiet-time chunk')
     return cfg
 
 
 def create(cfg, vocab_size, device='cpu'):
+    from baby_arcus.runtime_contract import require_device
+    require_device(device)
     if cfg['depth_capacity'] not in (.25, 1.0):
         raise ValueError('Capacity must be 0.25 or 1.0 before construction')
-    torch.manual_seed(cfg['seed'])
     shape = configuration(cfg.get('preset', 'baby-125m-cap4'))
+    if cfg.get('preset', 'baby-125m-cap4') != 'tiny':
+        from baby_arcus.runtime_contract import require_container
+        require_container()
+    torch.manual_seed(cfg['seed'])
     shape.capacity = cfg['depth_capacity']
-    shape.max_seq_len = max(512, shape.max_seq_len)
+    from baby_arcus.context_contract import context_tokens
+    shape.max_seq_len = context_tokens(cfg)
     body = BodyPolicy(shape, lying=True, sitting=True, approach=True)
     model = ContinuityModel(body, LanguageAdapter(shape.dim, vocab_size, cfg.get('text_dim', 128)), 11)
     # Migration bridges start at zero in the retained model. Fresh learning has no
@@ -52,6 +73,9 @@ def create(cfg, vocab_size, device='cpu'):
 def verify_run(cfg, data):
     """Mutable curriculum settings cannot silently change a checkpoint's identity."""
     original = json.loads((Path(cfg['root']) / 'experiment.json').read_text())
+    from baby_arcus.context_contract import context_tokens
+    if context_tokens(cfg)!=context_tokens(original) or data['body_config']['max_seq_len']!=context_tokens(cfg):
+        raise ValueError('Resume changed immutable context; prepare an explicit context extension')
     for key in ('seed', 'preset', 'text_dim', 'depth_capacity', 'encoding', 'tiktoken_version'):
         if cfg[key] != original[key]:
             raise ValueError('Resume changed immutable experiment setting: ' + key)

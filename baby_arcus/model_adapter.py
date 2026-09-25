@@ -8,7 +8,7 @@ from baby_arcus.services.shared_worker import gaze_action
 def decide(model, tokenizer, row):
     with torch.no_grad():
         model.eval()
-        out = model([row], tokenizer)
+        out = model([row], tokenizer,requested=('decision',))
         activity = int(out['activity'][0].argmax())
         action, hearing, expression = None, None, ''
         if activity == 1:

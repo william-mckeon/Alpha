@@ -1,0 +1,25 @@
+{
+  "schema": "alpha-source-selection-v1",
+  "dataset_root": "alpha dataset",
+  "eligible_languages": [
+    "Python",
+    "JavaScript",
+    "Go",
+    "Rust"
+  ],
+  "source_patterns": [
+    "bigcode_the-stack_data_python/*.jsonl.zst",
+    "bigcode_the-stack_data_javascript/*.jsonl.zst",
+    "bigcode_the-stack_data_go/*.jsonl.zst",
+    "bigcode_the-stack_data_rust/*.jsonl.zst"
+  ],
+  "approved": false,
+  "existing_sft": "C:/Users/willi/OneDrive/Desktop/OpenCode/train/dataset/sft.jsonl",
+  "sft_requires_structured_import_and_review": true,
+  "dataset_id": "datasetforge",
+  "sft_adapter": "opencode-v1",
+  "review_manifest": "runs/test2/real-data-review-20260924/source-manifest.json",
+  "source_lesson_adapter": "opencode-literal-lesson-v1",
+  "source_lesson_review_report": "runs/test2/source-lessons-20260924/review-v3/report.json",
+  "source_lesson_scope": "Literal tool mechanics; deterministic teacher; original repository tasks are not preserved or claimed solved."
+}

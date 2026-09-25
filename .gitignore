@@ -49,3 +49,6 @@ alpha dataset/.datasetforge_state.json
 # --- OS ---
 .DS_Store
 Thumbs.db
+
+# Local debugger symbol cache
+symbols/

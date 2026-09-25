@@ -1,0 +1,4 @@
+{
+  "dataset_root": "/dataset",
+  "source_patterns": ["HuggingFaceFW_fineweb-edu_sample-100BT/*.jsonl.zst", "wikimedia_wikipedia_20231101.en/*.jsonl.zst"]
+}

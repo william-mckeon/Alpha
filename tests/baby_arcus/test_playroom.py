@@ -8,6 +8,8 @@ import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
+from baby_arcus.embodiment import Embodiment
 
 from baby_arcus.contracts import ContractError
 from baby_arcus.playroom import Playroom
@@ -82,7 +84,12 @@ class ProcessRestartTests(unittest.TestCase):
             expected = None
             previous_environment = None
             for attempt in range(2):
-                proc = subprocess.Popen([sys.executable, "-m", "baby_arcus.services.playroom",
+                # Freeze only the restarted test process's clock. Otherwise its
+                # rest signals advance before the first HTTP read, making exact
+                # restoration assertions dependent on Windows process timing.
+                entry = (["-m", "baby_arcus.services.playroom"] if attempt == 0 else
+                         ["-c", "from baby_arcus.services.playroom import PlayroomApplication,main; PlayroomApplication.run_clock=lambda self:self.stop.wait(); main()"])
+                proc = subprocess.Popen([sys.executable, *entry,
                     "--port", "0", "--simulation-port", "0", "--state-root", root],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 try:
@@ -106,6 +113,10 @@ class ProcessRestartTests(unittest.TestCase):
                 finally:
                     proc.terminate()
                     proc.communicate(timeout=5)
+                if attempt == 0:
+                    # The first process may commit another tick after our HTTP
+                    # read. Compare the last durable state, not the older reply.
+                    expected = Embodiment.restore(json.loads((Path(root)/'body.json').read_text())).snapshot()
 
 
 if __name__ == "__main__":

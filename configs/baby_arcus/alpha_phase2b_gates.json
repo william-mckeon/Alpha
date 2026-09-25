@@ -1,0 +1,36 @@
+{
+  "schema": "alpha-three-stage-gates-v1",
+  "training_authorized": false,
+  "required_workflow_checks": [
+    "native_production_execution_rejected",
+    "container_cpu_regressions",
+    "sandbox_fail_fix_pass",
+    "machine_cannot_approve",
+    "revoked_batches_excluded",
+    "assistant_only_complete_targets",
+    "shared_optimizer_rng_continuation",
+    "retry_does_not_duplicate_updates",
+    "explicit_pause_preserved"
+  ],
+  "required_before_production_gpu_validation": [
+    "review_host_remediation_evidence",
+    "bounded_gpu_smoke_pass",
+    "verify_runtime_image_and_mounts",
+    "freeze_parent_checkpoint"
+  ],
+  "capability_thresholds": {
+    "max_retention_rate_drop": 0,
+    "max_language_nll_increase": 0,
+    "min_coding_solved": 0,
+    "min_coding_gain": 0
+  },
+  "automatic_promotion": false,
+  "note": "User authorized this dataset and continuation to exactly 39000 total updates on 2026-09-24. Thresholds are conservative non-regression diagnostics; no automatic promotion. Controlled Docker operating mode selected; no hardware clearance is asserted.",
+  "required_before_real_training": [
+    "approve_exact_batches",
+    "agree_mixture_and_additional_token_budget",
+    "set_capability_thresholds",
+    "fresh_release_attempt"
+  ],
+  "runtime_receipt_max_age_seconds": 86400
+}

@@ -56,6 +56,10 @@ class SharedModel(nn.Module):
     def core(self):return self.body.core
 
     def forward(self,rows,tokenizer,requested=None):
+        staged=requested==('decision',)
+        if staged and (len(rows)!=1 or self.training or torch.is_grad_enabled()):
+            raise ValueError('Staged decisions require one eval/no-grad observation')
+        needed=lambda key: requested is None or key in requested
         if self.version>=5 and not getattr(self,'integrated_motor',False) and requested and set(requested)<= {'body','lying','sitting'}:
             for row in rows:validate(row)
             goals={'body':'standing','lying':'lying','sitting':'sitting'}
@@ -80,11 +84,8 @@ class SharedModel(nn.Module):
             sensation += [s['eyelid_openness']]
             parts.append(self.body_sensation_input(torch.tensor([sensation],device=device,dtype=torch.float32))[:,None])
             if raw:
-                import numpy as np
-                from PIL import Image
-                with Image.open(BytesIO(raw)) as image:
-                    if image.width>800 or image.height>560:raise ValueError('Oversized sensory frame')
-                    pixels=torch.tensor(np.asarray(image.convert('RGB').resize((96,96))).copy(),device=device,dtype=torch.float32).permute(2,0,1)[None]/255
+                from baby_arcus.observation_pixels import decode
+                pixels=torch.tensor(decode(raw),device=device,dtype=torch.float32).permute(2,0,1)[None]/255
                 parts.append(self.visual_input(self.rgb(pixels).flatten(2).transpose(1,2)))
                 if self.version>=3:
                     perception=self.perception(self.core,pixels)
@@ -96,7 +97,7 @@ class SharedModel(nn.Module):
                     parts.append(self.perceptual_input(features.flatten(2).transpose(1,2)))
             messages=row['hearing'][-1:] if self.version>=4 else row['hearing']
             text='\n'.join(str(m.get('text','')) for m in messages)[-2048:]
-            ids=row.get('language_prefix_ids',tokenizer.encode(text)[-64:])
+            ids=row['language_prefix_ids'] if 'language_prefix_ids' in row else tokenizer.encode(text)[-64:]
             if len(ids)>64 or any(type(i) is not int or not 0<=i<self.language.embedding.num_embeddings for i in ids):raise ValueError('Invalid language prefix')
             if ids:
                 embedding=self.language.embedding(torch.tensor([ids],device=device))
@@ -128,7 +129,22 @@ class SharedModel(nn.Module):
                 sequence=sequence.clone();sequence[:,-1]+=self.memory_input(memory)
             if sequence.shape[1]>self.body.cfg.max_seq_len:raise ValueError('Shared context exceeds core capacity')
             hidden=self.core.trunk_embedded(sequence)[:,-1]
-            text_features=self.language.output(hidden)
+            if staged:
+                # Choose activity using this same sensory context, then execute only
+                # the selected output branch; no second sensory forward is needed.
+                activity_logits=self.activity(hidden)
+                activity_index=int(activity_logits[0].argmax())
+                selected={'activity'}
+                if activity_index==1:
+                    posture=int(self.posture_choice(hidden)[0].argmax())
+                    selected.update(('posture_choice',('body','lying','sitting')[posture]))
+                elif activity_index==2:selected.add('rest')
+                elif activity_index==4:selected.add('language_choice')
+                elif activity_index==5:selected.add('text')
+                elif activity_index==6:selected.add('gaze_choice')
+                elif activity_index==7:selected.add('body' if row['senses']['height']<.92 else 'approach')
+                requested=tuple(selected)
+            text_features=self.language.output(hidden) if needed('text') else None
             if self.version>=3 and (requested is None or 'text' in requested):
                 prefix=ids or tokenizer.encode('Arcus:')
                 language_hidden=self.core.trunk_embedded(self.language.input(self.language.embedding(torch.tensor([prefix],device=device))))[:,-1]
@@ -137,32 +153,34 @@ class SharedModel(nn.Module):
                 if not raw:perception=torch.zeros((1,4,96,96),device=device)
             # Existing motor pathway uses the very same core; zero residual starts with retained standing logits.
             from baby_arcus.body_vocabulary import mask
-            body_hidden=self.core.trunk(tokens)[:,-1]
-            allowed=torch.tensor([mask(row['senses'])],device=device)
+            motor_needed=any(needed(key) for key in ('body','lying','sitting','aux'))
+            body_hidden=self.core.trunk(tokens)[:,-1] if motor_needed else None
+            allowed=torch.tensor([mask(row['senses'])],device=device) if motor_needed else None
             # Sensory context selects the intention; retained motor heads execute it.
             # An unconstrained context residual overturned working joint sequences.
             def motor(head):
                 logits=head(body_hidden)
                 if self.version<5 or getattr(self,'integrated_motor',False):logits=logits+self.body_context(hidden)
                 return logits.masked_fill(~allowed,-torch.inf)
-            object_values=torch.full((1,32),-1e9,device=device)
-            if object_rows:object_values[:,:len(object_rows)]=self.curiosity(object_tokens+hidden[:,None]).squeeze(-1)
-            result={'body':motor(self.body.actor),
-                'lying':motor(self.body.lying_actor),
-                'sitting':motor(self.body.sitting_actor),
-                'posture_choice':self.posture_choice(hidden),'objects':object_values,
-                'rest':self.rest(hidden),'curiosity':self.curiosity(hidden),'activity':self.activity(hidden),
-                'language_choice':self.language_choice(hidden),'prediction':self.prediction(hidden),
-                'text':nn.functional.linear(text_features,self.language.embedding.weight) if requested is None or 'text' in requested else torch.empty((1,0),device=device),
-                'hidden':hidden,'aux':self.core.last_aux_loss}
-            if self.version>=2:result['gaze_choice']=self.gaze_choice(hidden)
-            if getattr(self,'integrated_motor',False):
+            result={'hidden':hidden,'aux':self.core.last_aux_loss}
+            for key,head in (('body',self.body.actor),('lying',self.body.lying_actor),('sitting',self.body.sitting_actor)):
+                if needed(key):result[key]=motor(head)
+            for key in ('posture_choice','rest','curiosity','activity','language_choice','prediction'):
+                if needed(key):result[key]=getattr(self,key)(hidden)
+            if needed('objects'):
+                object_values=torch.full((1,32),-1e9,device=device)
+                if object_rows:object_values[:,:len(object_rows)]=self.curiosity(object_tokens+hidden[:,None]).squeeze(-1)
+                result['objects']=object_values
+            if needed('text'):result['text']=nn.functional.linear(text_features,self.language.embedding.weight)
+            if self.version>=2 and needed('gaze_choice'):result['gaze_choice']=self.gaze_choice(hidden)
+            if getattr(self,'integrated_motor',False) and needed('approach'):
                 relative=torch.tensor([row.get('hearing_relative',[0.,0.])],device=device,dtype=hidden.dtype)
                 result['approach']=self.body.approach_actor(torch.cat((torch.nn.functional.normalize(hidden,dim=-1)*.01,relative),dim=-1))
-            if self.version>=3:result['perception']=perception
+            if self.version>=3 and needed('perception'):result['perception']=perception
             if self.version>=8:
-                result.update(future_body=self.future_body(hidden),future_rgb=self.future_rgb(hidden),action_quality=self.action_quality(hidden))
-            if self.version>=9:
+                for key in ('future_body','future_rgb','action_quality'):
+                    if needed(key):result[key]=getattr(self,key)(hidden)
+            if self.version>=9 and any(needed(key) for key in ('future_body','future_rgb','future_ensemble','uncertainty')):
                 from baby_arcus.shared_causal import causal_features
                 features=torch.tensor([causal_features(row)],device=device,dtype=torch.float32)
                 context=torch.cat((nn.functional.normalize(hidden,dim=-1),features),-1)
@@ -173,6 +191,7 @@ class SharedModel(nn.Module):
                     future_ensemble=baseline[None]+predictions,uncertainty=predictions.var(0,unbiased=False).mean(-1,keepdim=True))
                 # Batch first, then ensemble index.
                 result['future_ensemble']=result['future_ensemble'].transpose(0,1)
+            if self.version>=9 and needed('curiosity'):
                 result['curiosity']=self.curiosity(nn.functional.normalize(hidden,dim=-1)).sigmoid()
             outputs.append(result)
         return {key:torch.cat([r[key] for r in outputs],dim=0) if key!='aux' else torch.stack([r[key] for r in outputs]).mean() for key in outputs[0] if requested is None or key in requested}

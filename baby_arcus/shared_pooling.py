@@ -3,6 +3,17 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+def separable_pool(value,size):
+    """GPU-only deterministic adaptive bins, including overlapping bins."""
+    if isinstance(size,int):size=(size,size)
+    def weights(length,bins):
+        index=torch.arange(length,device=value.device)[None,:]
+        output=torch.arange(bins,device=value.device)[:,None]
+        start=output*length//bins;end=((output+1)*length+bins-1)//bins
+        return ((index>=start)&(index<end)).to(value.dtype)/(end-start)
+    h,w=value.shape[-2:]
+    return torch.matmul(torch.matmul(weights(h,size[0]),value),weights(w,size[1]).t())
+
 def adaptive_pool(value,size):
     if isinstance(size,int):size=(size,size)
     if value.is_cuda and torch.are_deterministic_algorithms_enabled():

@@ -37,6 +37,10 @@ class ToolRegistry:
         old = self.db.execute('SELECT payload FROM world WHERE id=1').fetchone()
         if old:
             app.world = decode_world(json.loads(old[0]))
+        else:
+            # Identity must survive restart even before the first action receipt.
+            with app.lock, self.db:
+                self.db.execute('INSERT INTO world VALUES (1,?)',(json.dumps(encode_world(app.world)),))
 
     def execute(self, action_id, action, expected=None, human=False, session=None):
         if not isinstance(action_id, str) or not 1 <= len(action_id) <= 160:

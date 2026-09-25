@@ -54,7 +54,7 @@ class BatchedExperts(nn.Module):
 
     Parameter count is identical to E separate SwiGLUExperts — the only change is that
     every expert's GEMM is dispatched together (`torch.bmm` over the expert axis), so
-    wall-clock no longer scales with the expert count. The old per-expert loop launched
+    kernel launch count is reduced. Work still scales with expert count. The old per-expert loop launched
     E tiny, overhead-bound kernels per layer per step; that was the bottleneck that made
     16 experts 2x slower than 4 despite *fewer* FLOPs.
 
@@ -98,6 +98,7 @@ class MoELayer(nn.Module):
         self.n_experts = cfg.n_experts
         self.capacity_factor = cfg.capacity_factor
         self.lb_loss_weight = cfg.lb_loss_weight
+        self.dispatch_mode = 'padded'
         self.router = nn.Linear(cfg.dim, cfg.n_experts, bias=True)
         self.experts = BatchedExperts(cfg.n_experts, cfg.dim, cfg.expert_hidden)
 
@@ -130,12 +131,17 @@ class MoELayer(nn.Module):
         flat = (idx * cap + slot)                     # [B, T] in [0, E*cap)
         flat_exp = flat.unsqueeze(-1).expand(B, T, C)
 
-        buf = torch.zeros(B, E * cap, C, device=x.device, dtype=x.dtype)
-        buf.scatter_add_(1, flat_exp, x * keep_f)     # pack kept tokens (collision-free)
-        buf = buf.view(B, E, cap, C)
-        expert_out = self.experts(buf).reshape(B, E * cap, C)   # all experts, one bmm/proj
-
-        gathered = torch.gather(expert_out, 1, flat_exp)        # [B, T, C]
+        if self.dispatch_mode == 'compact':
+            from arcus.expert_dispatch import compact
+            gathered=compact(self.experts,x,idx,keep)
+        elif self.dispatch_mode == 'padded':
+            buf = torch.zeros(B, E * cap, C, device=x.device, dtype=x.dtype)
+            buf.scatter_add_(1, flat_exp, x * keep_f)
+            buf = buf.view(B, E, cap, C)
+            expert_out = self.experts(buf).reshape(B, E * cap, C)
+            gathered = torch.gather(expert_out, 1, flat_exp)
+        else:
+            raise ValueError('Unknown expert dispatch mode')
         delta = gathered * gate.unsqueeze(-1) * keep_f          # gate -> router gradient
 
         # Switch load-balance: lb = E * sum_e f_e * P_e, minimized (=1) at uniform usage.

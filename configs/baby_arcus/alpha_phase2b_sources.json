@@ -1,0 +1,11 @@
+{
+  "include_local_logs": false,
+  "hf": [
+    {"repo":"SWE-Gym/OpenHands-SFT-Trajectories","enabled":false,"revision":null,"license":"MIT","split":"train.success.oss"},
+    {"repo":"SWE-bench/SWE-smith-trajectories","enabled":false,"revision":null,"license":"MIT"},
+    {"repo":"nebius/SWE-rebench-openhands-trajectories","enabled":false,"revision":null,"license":"CC-BY-4.0"},
+    {"repo":"OpenHands/openhands-feedback","enabled":false,"revision":null,"license":"MIT"}
+  ],
+  "codebases": [],
+  "heldout_groups": []
+}
