@@ -65,7 +65,7 @@ class MotorStream:
 
 def corpus_windows(manifest, tokenizer, cursor, window_tokens=64, *, cache_root=None, tokenizer_identity=None, cancelled=lambda:False, cache_max_bytes=1024**3, cache_reserve=lambda size:None):
     """Checkpoint-owned cursor. Every tenth document stays exclusively held out."""
-    if type(window_tokens) is not int or not 1 <= window_tokens <= 8192:
+    if type(window_tokens) is not int or not 1 <= window_tokens <= 65536:
         raise ValueError('Invalid corpus context window')
     if cache_root is not None:
         if not tokenizer_identity:raise ValueError('Explicit tokenizer identity required')
@@ -73,7 +73,7 @@ def corpus_windows(manifest, tokenizer, cursor, window_tokens=64, *, cache_root=
         yield from indexed_windows(manifest,tokenizer,cursor,window_tokens,cache_root,tokenizer_identity,cancelled,cache_max_bytes,cache_reserve)
         return
     for file_index, entry in enumerate(manifest['files']):
-        explicit = manifest.get('schema') == 'alpha-coding-corpus-v3'
+        explicit = manifest.get('schema') == 'alpha-coding-corpus-v3' or (manifest.get('schema')=='alpha-coding-corpus-v4' and entry.get('split')!='document-holdout')
         if explicit and entry.get('split') != 'training':
             continue
         if file_index < cursor.get('file', 0):

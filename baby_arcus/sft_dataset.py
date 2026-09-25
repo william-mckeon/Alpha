@@ -16,8 +16,8 @@ def validate_window(sequence, vocabulary, context=512):
 
 def windows(record, tokenizer, context=512):
     validate(record)
-    if type(context) is not int or not 8 <= context <= 8192:
-        raise ValueError('Context exceeds the experimental 8192-token packing limit')
+    if type(context) is not int or not 8 <= context <= 65536:
+        raise ValueError('Context exceeds the experimental 65536-token packing limit')
     from baby_arcus.conversation_format import pack, content
     history = []
     for item in record['messages']:

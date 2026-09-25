@@ -8,7 +8,7 @@ def validate(record):
     if 'provenance' in record:
         p=record['provenance']
         fields(p, ('adapter','input_sha256','target_kinds','terminal_result_observed'), ('lesson','dataset'))
-        if (p['adapter'] not in ('hf-phase2b-v1','opencode-v1','opencode-literal-lesson-v1','alpha-synthetic-tool-lesson-v1') or not isinstance(p['input_sha256'],str)
+        if (p['adapter'] not in ('local-agent-log-v1','hf-phase2b-v1','opencode-v1','opencode-literal-lesson-v1','alpha-synthetic-tool-lesson-v1') or not isinstance(p['input_sha256'],str)
                 or not re.fullmatch('[a-f0-9]{64}',p['input_sha256'])
                 or not isinstance(p['target_kinds'],list) or not p['target_kinds']
                 or any(k not in ('text','action_prediction') for k in p['target_kinds'])

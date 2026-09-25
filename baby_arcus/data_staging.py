@@ -10,6 +10,7 @@ from baby_arcus.sft_validation import validate
 
 class StagingStore:
     def __init__(self, path, review_secret=None, fixture=False, readonly=False, max_bytes=1024**3):
+        self.path=Path(path).resolve()
         if review_secret is not None and (not isinstance(review_secret, str) or len(review_secret) < 24):
             raise ValueError('Separate human-review credential of at least 24 characters required')
         self.secret, self.fixture = review_secret, fixture
@@ -170,5 +171,33 @@ class StagingStore:
             raise ValueError('No approved training examples')
         return records
 
+    def approved_stream(self,identities,allow_fixture=False):
+        selection=ApprovedSelection(self.path,identities,self.fixture,allow_fixture)
+        # Check all approvals and content hashes before even opening a cached pack.
+        for _ in selection:pass
+        return selection
+
     def close(self):
         self.db.close()
+
+
+class ApprovedSelection:
+    """Repeatable bounded reader; one immutable review batch in memory at a time."""
+    def __init__(self,path,identities,fixture,allow_fixture):
+        if not identities or len(set(identities))!=len(identities):raise ValueError('Exact unique batch identities required')
+        if fixture and not allow_fixture:raise ValueError('Fixture batches cannot enter real training')
+        self.path=path;self.identities=tuple(identities);self.fixture=fixture
+        self.identity={'schema':'approved-sft-selection-v1','batches':list(identities),'fixture':fixture}
+
+    def __iter__(self):
+        store=StagingStore(self.path,fixture=self.fixture,readonly=True);seen=set();count=0
+        try:
+            for identity in self.identities:
+                batch=store.get(identity)
+                if batch['decision']!='approved' or batch.get('revoked'):raise ValueError('Batch lacks explicit human approval')
+                for row in batch['records']:
+                    key=digest(row['messages'])
+                    if row['split']=='training' and key not in seen:
+                        seen.add(key);count+=1;yield row
+            if not count:raise ValueError('No approved training examples')
+        finally:store.close()

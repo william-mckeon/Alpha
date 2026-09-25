@@ -6,7 +6,8 @@ from baby_arcus.contracts import decode
 
 
 def system_prompt(definitions):
-    return ('Choose one tool call as JSON with name, version and arguments. '
+    from baby_arcus.local_agent_dataset import IDENTITY
+    return (IDENTITY + '\nChoose one tool call as JSON with name, version and arguments. '
             'Available definitions: ' + json.dumps(definitions,sort_keys=True,separators=(',',':')))
 
 

@@ -39,17 +39,19 @@ def build(root, patterns, languages, fixture=False, dataset_id=None, cancelled=l
 
 
 def validate_manifest(manifest, verify_files=False, cancelled=lambda: False):
-    if manifest.get('schema') not in ('alpha-coding-corpus-v1','alpha-coding-corpus-v2','alpha-coding-corpus-v3') or type(manifest.get('fixture')) is not bool:
+    if manifest.get('schema') not in ('alpha-coding-corpus-v1','alpha-coding-corpus-v2','alpha-coding-corpus-v3','alpha-coding-corpus-v4') or type(manifest.get('fixture')) is not bool:
         raise ValueError('Unsupported corpus manifest')
     if not manifest.get('languages') or set(manifest['languages']) - {'Python','JavaScript','Go','Rust'}:
         raise ValueError('Ineligible coding source')
     if not manifest.get('files') or digest(manifest['files']) != manifest.get('fingerprint'):
         raise ValueError('Corpus identity mismatch')
-    if manifest['schema'] in ('alpha-coding-corpus-v2','alpha-coding-corpus-v3') and not manifest.get('dataset_id'):
+    if manifest['schema'] in ('alpha-coding-corpus-v2','alpha-coding-corpus-v3','alpha-coding-corpus-v4') and not manifest.get('dataset_id'):
         raise ValueError('Logical dataset identity required')
     from baby_arcus.dataset_paths import resolve_root
     root = resolve_root(manifest) if verify_files else None
     for item in manifest['files']:
+        if manifest['schema']=='alpha-coding-corpus-v4' and item.get('split') not in ('training','validation','test','document-holdout'):
+            raise ValueError('Explicit file or legacy document holdout policy required')
         if manifest['schema'] == 'alpha-coding-corpus-v3' and item.get('split') not in ('training','validation','test'):
             raise ValueError('Explicit file split required')
         if cancelled():

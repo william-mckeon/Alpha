@@ -61,6 +61,12 @@ class IOTests(unittest.TestCase):
             self.assertEqual(list(corpus_windows(manifest,tok,{},8,**options)),[])
             manifest['files'][0]['split']='training'
             self.assertEqual(list(corpus_windows(manifest,tok,{},8)),list(corpus_windows(manifest,tok,{},8,**options)))
+            manifest['schema']='alpha-coding-corpus-v4'
+            manifest['files'][0]['split']='document-holdout'
+            self.assertEqual(expected,list(corpus_windows(manifest,tok,{},8)))
+            self.assertEqual(expected,list(corpus_windows(manifest,tok,{},8,**options)))
+            manifest['files'][0]['split']='validation'
+            self.assertEqual(list(corpus_windows(manifest,tok,{},8)),[])
 
     def test_index_corruption_cancellation_and_changed_source(self):
         with tempfile.TemporaryDirectory() as tmp:

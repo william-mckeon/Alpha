@@ -1,0 +1,21 @@
+{
+  "schema": "arcus-test2-v1",
+  "initialization": "random",
+  "root": "runs/test2/alpha-fresh256m-16k-seed-2101",
+  "seed": 2101,
+  "preset": "baby-256m-cap4",
+  "text_dim": 128,
+  "depth_capacity": 1.0,
+  "context_tokens": 16384,
+  "encoding": "o200k_base",
+  "tiktoken_version": "0.14.0",
+  "learning_rate": 1E-05,
+  "training_updates": 0,
+  "max_job_updates": 64,
+  "max_storage_bytes": 137438953472,
+  "max_graph_records": 10000,
+  "dataset_config": "configs/baby_arcus/language.json",
+  "curriculum": "configs/baby_arcus/test2_curriculum.json",
+  "training_cache_bytes": 0,
+  "packed_sft_max_bytes": 17179869184
+}

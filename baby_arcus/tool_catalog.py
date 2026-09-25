@@ -18,17 +18,8 @@ class ToolCatalog:
             schema = tool['input_schema']
             if not isinstance(tool['description'],str) or not 1 <= len(tool['description']) <= 1000:
                 raise ValueError('Bounded tool description required')
-            if set(schema) != {'type','properties','required','additionalProperties'} or schema['additionalProperties'] is not False:
-                raise ValueError('Closed object schema required')
-            if not isinstance(schema['properties'],dict) or not isinstance(schema['required'],list) or set(schema['required']) - set(schema['properties']):
-                raise ValueError('Invalid required properties')
-            for spec in schema['properties'].values():
-                if spec.get('type') not in ('string','integer'):
-                    raise ValueError('Unsupported schema type')
-                if spec['type'] == 'string' and (type(spec.get('maxLength')) is not int or not 1 <= spec['maxLength'] <= 12000):
-                    raise ValueError('Bounded string schema required')
-                if spec['type'] == 'integer' and (type(spec.get('minimum')) is not int or type(spec.get('maximum')) is not int or spec['minimum'] > spec['maximum']):
-                    raise ValueError('Bounded integer schema required')
+            from baby_arcus.tool_schema import validate_schema
+            validate_schema(schema)
             if allowed is None or tool['name'] in allowed:
                 self.tools[tool['name']] = copy.deepcopy(tool)
         self.version = digest(self.tools)

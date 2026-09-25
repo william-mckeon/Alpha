@@ -5,16 +5,9 @@ from baby_arcus.contracts import canonical, digest
 
 
 def validate_args(schema, value):
-    if not isinstance(value, dict) or set(value)-set(schema['properties']) or set(schema.get('required', []))-set(value):
-        raise ValueError('Unexpected or missing tool arguments')
-    for key, item in value.items():
-        spec = schema['properties'][key]
-        kind = spec['type']
-        if kind == 'string' and (not isinstance(item, str) or len(item)>spec.get('maxLength', 12000)):
-            raise ValueError('Invalid string argument: '+key)
-        if kind == 'integer' and (type(item) is not int or not spec.get('minimum', 0)<=item<=spec.get('maximum', 100)):
-            raise ValueError('Invalid integer argument: '+key)
-    return value
+    from baby_arcus.tool_schema import validate_schema, validate_value
+    validate_schema(schema)
+    return validate_value(schema, value)
 
 
 def validate_call(call):

@@ -1,5 +1,6 @@
 """Resumable, fingerprinted reading of local DatasetForge shards. Source is read-only."""
 import hashlib,io,json,os
+from contextlib import ExitStack
 from pathlib import Path
 import zstandard
 
@@ -19,15 +20,26 @@ def inventory(root,patterns):
     return {'root':str(root),'files':files,'fingerprint':identity,'fingerprint_method':'relative names, sizes and modification times'}
 
 def documents(path):
-    with open(path,'rb') as raw,zstandard.ZstdDecompressor().stream_reader(raw) as reader:
+    with ExitStack() as resources:
+        raw=resources.enter_context(open(path,'rb'))
+        # Reviewed project-code shards are plain JSONL; public shards are Zstandard.
+        # Select by extension so corrupt compressed data still fails closed.
+        reader=resources.enter_context(zstandard.ZstdDecompressor().stream_reader(raw)) if Path(path).suffix=='.zst' else raw
         with io.TextIOWrapper(reader,encoding='utf-8') as stream:
             index=-1
             while True:
-                line=stream.readline(8_000_001)
+                try:
+                    line=stream.readline(8_000_001)
+                except (zstandard.ZstdError, UnicodeError) as exc:
+                    raise ValueError(f'Corpus read failed: {path}, record {index+1}: {exc}') from exc
                 if not line:break
                 index+=1
-                if len(line)>8_000_000:raise ValueError('Oversized dataset record')
-                row=json.loads(line)
+                if len(line)>8_000_000:raise ValueError(f'Oversized dataset record: {path}, record {index}')
+                try:
+                    row=json.loads(line)
+                    if not isinstance(row,dict): raise ValueError('Expected object')
+                except ValueError as exc:
+                    raise ValueError(f'Invalid JSONL: {path}, record {index}: {exc}') from exc
                 text=row.get('text') or row.get('content')
                 if isinstance(text,str) and text.strip():yield index,text
 

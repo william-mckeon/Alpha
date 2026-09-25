@@ -17,6 +17,19 @@ TASKS = {
 
 def task(name):
     import copy
+    if name in ('fresh_weighted_even', 'fresh_adjacent_rises', 'fresh_unique_positive_squares'):
+        cases = [[],[0],[1,2,2,-4,5],[-3,-2,-1],[2,2,4],[8,-6,3,0]]
+        if name == 'fresh_weighted_even':
+            instruction = 'Implement solve(values): sum each even integer multiplied by its one-based position in the list.'
+            expected = [sum((i+1)*x for i,x in enumerate(xs) if x%2==0) for xs in cases]
+        elif name == 'fresh_adjacent_rises':
+            instruction = 'Implement solve(values): count adjacent pairs where the second integer is strictly greater than the first.'
+            expected = [sum(b>a for a,b in zip(xs,xs[1:])) for xs in cases]
+        else:
+            instruction = 'Implement solve(values): sum the squares of distinct strictly positive integers.'
+            expected = [sum(x*x for x in set(xs) if x>0) for xs in cases]
+        return {'instruction':instruction,'initial':'def solve(values):\n    return 0\n',
+                'cases':cases,'expected':expected}
     if name not in TASKS:
         raise ValueError('Unknown coding lesson')
     return copy.deepcopy(TASKS[name])

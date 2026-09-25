@@ -10,6 +10,19 @@ class Tokenizer:
 
 
 class PackedTests(unittest.TestCase):
+    def test_source_interleaving_preserves_consumed_prefix(self):
+        records=[]
+        for source in ('fixture:a','fixture:b','fixture:c'):
+            records.append({'version':1,'source':source,'group':source,'split':'training',
+                'messages':[{'role':'user','content':source}, {'role':'assistant','content':'one'},
+                            {'role':'user','content':'Again'},{'role':'assistant','content':'two'}]})
+        with tempfile.TemporaryDirectory() as tmp:
+            store=PackedTrainingStore(tmp,records,Tokenizer(),512,'fixture',interleave=True,consumed_prefix=1)
+            self.assertEqual(store.order,[0,1,2,4,3,5])
+            expected=list(store.resume(0))
+            self.assertEqual(list(store.resume(3)),expected[3:])
+            store.close()
+
     def test_resume_cache_and_corruption(self):
         records=[{'version':1,'source':'fixture:packed','group':'packed','split':'training',
                   'messages':[{'role':'user','content':'Hello'}, {'role':'assistant','content':'Hello!'},

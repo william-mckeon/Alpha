@@ -70,8 +70,8 @@ def prepare(path,folder,tokenizer,identity,cancelled,max_bytes,reserve,expected_
 
 
 def corpus_windows(manifest,tokenizer,cursor,window_tokens,folder,identity,cancelled=lambda:False,max_bytes=1024**3,reserve=lambda size:None):
-    explicit=manifest.get('schema')=='alpha-coding-corpus-v3'
     for file_index,entry in enumerate(manifest['files']):
+        explicit=manifest.get('schema')=='alpha-coding-corpus-v3' or (manifest.get('schema')=='alpha-coding-corpus-v4' and entry.get('split')!='document-holdout')
         if file_index<cursor.get('file',0) or (explicit and entry.get('split')!='training'):continue
         path=Path(manifest['root'])/entry['path'];stat=path.stat()
         if stat.st_size!=entry['size'] or stat.st_mtime_ns!=entry['mtime_ns']:raise ValueError('Corpus source changed')

@@ -13,6 +13,19 @@ class Tokenizer:
 
 
 class ReviewControls(unittest.TestCase):
+    def test_streamed_approval_checks_revocation_again(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            secret='human-credential-fixture-12345'
+            store=StagingStore(Path(tmp)/'review.sqlite',secret,True)
+            try:
+                record=import_messages([{'role':'user','content':'Hello'},{'role':'assistant','content':'Hello'}],'fixture:test','one')
+                batch=store.stage([record]);store.review(batch,'approved','human',secret)
+                selection=store.approved_stream([batch],True)
+                self.assertEqual(list(selection),store.approved([batch],True))
+                store.revoke(batch,'human','test revocation',secret)
+                with self.assertRaises(ValueError):list(selection)
+            finally:store.close()
+
     def test_known_tool_normalized_and_result_matched(self):
         rows=[{'role':'user','content':'Inspect solution.py'},
               {'role':'assistant','content':None,'tool_calls':[{'id':'one','type':'function',

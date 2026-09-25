@@ -25,15 +25,30 @@ from baby_arcus.embodiment_store import EmbodimentStore
 
 from baby_arcus.gpu_job_control import serialized
 
+def executor_probe():
+    import os
+    from baby_arcus.transport import Client
+    client=Client(os.environ['ALPHA_EXECUTOR_URL'],os.environ['ALPHA_EXECUTOR_TOKEN'],timeout=65,attempts=1)
+    health=client.request('GET','/health')
+    if health.get('ready') is not True: raise RuntimeError('Coding executor unavailable')
+    good=client.request('POST','/execute',{'task':'negative_count','source':'def solve(values):\n    return sum(x < 0 for x in values)\n'})
+    bad=client.request('POST','/execute',{'task':'negative_count','source':'def solve(values):\n    return 0\n'})
+    if good.get('passed') is not True or bad.get('passed') is not False or good.get('returncode')!=0 or bad.get('returncode')!=0:
+        raise RuntimeError('Coding executor reference control failed')
+    return {'ready':True,'correct_solution_passed':True,'incorrect_solution_rejected':True,'image':good.get('executor_image')}
+
+
 @serialized
-def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None):
+def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None,tasks=None,checkpoint_pointer='candidate.json'):
     output=Path(output)
     if output.exists(): raise ValueError('Use a new evaluation output directory')
+    executor_evidence=executor_probe()
     cfg=read_config(config); root=Path(cfg['root'])
     # Shared GPU ownership already covers this read-only evaluation.
     store=None
     try:
-        pointer=json.loads((root/'candidate.json').read_text())
+        if checkpoint_pointer not in ('candidate.json','initial.json'):raise ValueError('Unsupported checkpoint pointer')
+        pointer=json.loads((root/checkpoint_pointer).read_text())
         model,data=load(root,pointer,model_device(cfg)); verify_run(cfg,data); del data
         model.eval().requires_grad_(False)
         routing = None
@@ -44,7 +59,10 @@ def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None):
         store=TrajectoryStore(output/'trajectories.sqlite'); results=[]
         row,_,_=example(0,'training','commands'); row['hearing']=[]
         started=time.monotonic()
-        for task in ('negative_count','absolute_sum'):
+        selected_tasks = tuple(tasks or ('negative_count','absolute_sum'))
+        if not selected_tasks or len(selected_tasks)>32 or len(set(selected_tasks))!=len(selected_tasks):
+            raise ValueError('Invalid coding cohort')
+        for task in selected_tasks:
             tools=CodingTools(CodingEnvironment(output/task,task))
             def policy(state):
                 return {**decide(model,tokenizer,row,state['messages'],state['definitions'],max_new_tokens),
@@ -57,11 +75,11 @@ def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None):
             result['tool_errors']=sum(e.get('kind')=='outcome' and e.get('result',{}).get('status')=='tool_error' for e in events)
             result['generated_tokens']=sum(e.get('decision',{}).get('generated_tokens',0) for e in events if e.get('kind')=='intent')
             results.append(result)
-        report={'complete':True,'cohort':{'evaluator_sha256':digest(Path(__file__)),'tasks':['negative_count','absolute_sum'],'actions':4,'max_new_tokens':max_new_tokens,'context':512},'candidate':pointer,'tasks':results,'solved':sum(r['solved'] for r in results),
+        report={'executor_control':executor_evidence,'complete':True,'cohort':{'evaluator_sha256':digest(Path(__file__)),'tasks':list(selected_tasks),'actions':4,'max_new_tokens':max_new_tokens,'context':model.body.cfg.max_seq_len},'candidate':pointer,'tasks':results,'solved':sum(r['solved'] for r in results),
                 'total':len(results),'seconds':time.monotonic()-started,
                 'checkpoint_unchanged':digest(root/(pointer['generation']+'.pt'))==pointer['sha256'],
                 'max_new_tokens':max_new_tokens,'mastery_established':False,'evaluation_routing':routing,
-                'limitations':'Two held-out task templates, one seed, four actions each; fixed 512-token context. No training or general superiority claim.'}
+                'limitations':'Small task cohort, one seed, four actions each. Training contamination requires a separate corpus audit; no general superiority claim.'}
         atomic_json(output/'report.json',report)
         return report
     finally:

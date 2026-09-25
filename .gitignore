@@ -52,3 +52,6 @@ Thumbs.db
 
 # Local debugger symbol cache
 symbols/
+
+# Generated Hugging Face export copies; recreated by scripts/package_alpha_hf.py
+artifacts/huggingface/

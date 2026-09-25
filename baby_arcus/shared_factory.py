@@ -15,6 +15,13 @@ from baby_arcus.shared_depth import verify_depth
 
 def read_config(path):
     cfg = json.loads(Path(path).read_text(encoding='utf-8'))
+    if type(cfg.get('gradient_checkpointing', False)) is not bool:
+        raise ValueError('gradient_checkpointing must be Boolean')
+    fraction = cfg.get('cuda_memory_fraction', 1.0)
+    if type(fraction) not in (int, float) or not 0 < fraction <= 1:
+        raise ValueError('Invalid CUDA memory fraction')
+    if cfg.get('attention_backend', 'default') not in ('default', 'efficient'):
+        raise ValueError('Unsupported training attention backend')
     if type(cfg.get('indexed_corpus',False)) is not bool:
         raise ValueError('indexed_corpus must be an explicit boolean')
     if type(cfg.get('training_cache_bytes',0)) is not int or not 0 <= cfg.get('training_cache_bytes',0) <= 2*1024**3:

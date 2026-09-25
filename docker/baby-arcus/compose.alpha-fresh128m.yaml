@@ -1,0 +1,61 @@
+name: alpha-fresh128m
+services:
+  learner:
+    image: ${ALPHA_RUNTIME_IMAGE:?Set the validated immutable image ID}
+    command: ["scripts/run_alpha_fresh_40000.py", "--config", "/run-config/learner.json"]
+    gpus: all
+    networks: [private]
+    depends_on:
+      executor:
+        condition: service_healthy
+    env_file: ["${ALPHA_EXECUTOR_ENV:?Set executor credential file}"]
+    cpus: 2
+    mem_limit: 8g
+    memswap_limit: 8g
+    pids_limit: 128
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: "no"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      ALPHA_RUNTIME_PROFILE: alpha-container-v1
+      ALPHA_GPU_MODE: controlled-docker
+      ALPHA_RUNTIME_IMAGE: ${ALPHA_RUNTIME_IMAGE}
+      ALPHA_HOST_FINGERPRINT: ${ALPHA_HOST_FINGERPRINT:?Set host identity}
+      ALPHA_EXECUTOR_URL: http://executor:8933
+      ALPHA_JOB_CONTROL: /control
+      ALPHA_DATASET_MOUNTS: '{"datasetforge":"/dataset"}'
+    volumes:
+      - ${ALPHA_FRESH_RUN:?Set fresh run path}:/app/runs/test2/alpha-fresh128m-16k-seed-2101
+      - ${ALPHA_FRESH_CONFIG:?Set generated configuration path}:/run-config:ro
+      - ${ALPHA_FRESH_REVIEW:?Set prepared dataset path}:/review:ro
+      - ${ARCUS_TEST2_DATASET:?Set corpus path}:/dataset:ro
+      - alpha-job-control:/control
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  executor:
+    image: ${ALPHA_EXECUTOR_IMAGE:?Set immutable executor image}
+    networks: [private]
+    env_file: ["${ALPHA_EXECUTOR_ENV:?Set executor credential file}"]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    restart: "no"
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os; from baby_arcus.transport import Client; assert Client('http://127.0.0.1:8933',os.environ['ALPHA_EXECUTOR_TOKEN']).request('GET','/health')['ready']"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+networks:
+  private:
+    internal: true
+volumes:
+  alpha-job-control:
+    external: true
+    name: arcus-alpha-three-stage_alpha-job-control
+# Use start_alpha_fresh128m.ps1 for live runs: it also starts the host-memory watchdog.

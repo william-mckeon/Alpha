@@ -9,12 +9,14 @@ def estimate(tokens, capacity=1.0, element_bytes=4):
     if element_bytes not in (2,4): raise ValueError('Use two or four bytes per floating element')
     return {
         'tokens':tokens, 'batch_size':1, 'depth_capacity':capacity,
-        'router_single_bool_matrix_bytes':tokens*tokens if capacity < 1 else 0,
-        'full_language_logits_bytes':tokens*200019*element_bytes,
-        'hypothetical_compact_kv_cache_bytes':tokens*8*2*2*64*element_bytes,
+        'legacy_router_single_bool_matrix_bytes':tokens*tokens if capacity < 1 else 0,
+        'legacy_full_language_logits_bytes':tokens*200019*element_bytes,
+        'compact_kv_cache_bytes':tokens*8*2*2*64*element_bytes,
+        'full_depth_padded_expert_one_hidden_tensor_bytes':tokens*4*2432*element_bytes,
+        'full_depth_padded_expert_input_buffer_bytes':tokens*4*512*element_bytes,
         'dense_attention_pair_count_per_head_per_layer':tokens*(tokens+1)//2,
         'supported_context_claim':False,
-        'limitations':'Component arithmetic, not peak memory. KV cache is not implemented. Excludes weights, optimizer, gradients, temporary allocations, routing buffers and other activations.'}
+        'limitations':'Batch-one retained baby-125m-cap4 shape. Component arithmetic, not peak memory. Prefix ranking, compact KV and last-only logits are implemented; legacy quadratic router/full-logit figures are not current unavoidable allocations. Padded expert figures describe depth 1 default dispatch. Excludes weights, optimizer, gradients, other simultaneous tensors and backend workspace. Operational context stages still stop at 8192.'}
 
 
 if __name__=='__main__':

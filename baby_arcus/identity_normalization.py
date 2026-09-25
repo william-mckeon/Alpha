@@ -1,7 +1,7 @@
 """Conservative, auditable identity normalization; code and quotes are untouched."""
 import re
 
-SELF = re.compile(r"\b(?:I am|I'm|My name is) (?:Claude(?: Code)?|ChatGPT)\b")
+SELF = re.compile(r"\b(?:I am|I'm|I’m|My name is) (?:Claude(?: Code)?|Chat\s*GPT|Codex)\b",re.IGNORECASE)
 
 
 def normalize(text):

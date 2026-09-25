@@ -9,10 +9,14 @@ def validate(config):
     language_only = config.get('schema') == 'alpha-phase2b-v1'
     if config.get('schema') not in ('alpha-three-stage-v1', 'alpha-phase2b-v1'):
         raise ValueError('Invalid training schema')
-    if config.get('exhaustion_policy','stop') != 'stop':
-        raise ValueError('Only stop-on-exhaustion is implemented; repetition requires a new reviewed policy')
-    if not config.get('fixture') and config.get('exhaustion_policy') != 'stop':
+    if config.get('exhaustion_policy','stop') not in ('stop', 'repeat-sft'):
+        raise ValueError('Unsupported exhaustion policy')
+    if config.get('exhaustion_policy') == 'repeat-sft' and (not language_only or config.get('baseline_policy') != 'random-initialization'):
+        raise ValueError('SFT repetition requires an explicit fresh language-only plan')
+    if not config.get('fixture') and config.get('exhaustion_policy') not in ('stop', 'repeat-sft'):
         raise ValueError('Explicit exhaustion policy required for real training')
+    if 'target_total_updates' in config and (type(config['target_total_updates']) is not int or config['target_total_updates'] < 1):
+        raise ValueError('Invalid total update budget')
     sequence = config.get('mixture')
     if not isinstance(sequence,list) or not 3 <= len(sequence) <= 128:
         raise ValueError('An explicit mixed schedule is required')
@@ -29,8 +33,12 @@ def validate(config):
         window=config.get('language_window_tokens',64)
         if type(window) is not int or not 1 <= window <= config['context_tokens']:
             raise ValueError('Language window exceeds configured context')
-    elif config.get('context_tokens') != 512:
-        raise ValueError('Existing 512-token model context is required')
+    else:
+        from baby_arcus.context_contract import context_tokens
+        context_tokens(config)
+        window=config.get('language_window_tokens',64)
+        if type(window) is not int or not 1<=window<=config['context_tokens']:
+            raise ValueError('Language window exceeds configured context')
     if config.get('preserve_embodied_schedule') is not (not language_only) or config.get('automatic_promotion') is not False:
         raise ValueError('Embodied retention and no automatic promotion are required')
     if config.get('resume_after_seconds') != 60:

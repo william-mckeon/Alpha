@@ -25,14 +25,21 @@ DOCS = {'sum':'sum(iterable) adds its numbers. A comprehension can filter values
 
 
 class CodingTools:
-    def __init__(self, environment):
+    def __init__(self, environment, extra_definitions=(), providers=None):
         self.environment = environment
-        self.catalog = ToolCatalog(DEFINITIONS)
+        self.providers = dict(providers or {})
+        extras = list(extra_definitions)
+        names = {tool['name'] for tool in extras}
+        if names != set(self.providers) or any(not callable(handler) for handler in self.providers.values()):
+            raise ValueError('Each extra tool requires a registered callable provider')
+        self.catalog = ToolCatalog([*DEFINITIONS, *extras])
         self.context = ToolContext(self.catalog)
 
     def execute(self, call):
         self.context.resolve(call)
         args, name = call['arguments'], call['name']
+        if name in self.providers:
+            return self.providers[name](**args)
         if name=='tool_search':
             result=search(self.catalog, **args)
             self.context.accept(result)

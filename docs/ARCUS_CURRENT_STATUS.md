@@ -1,4 +1,24 @@
+## User-authorized cutoff and recovery3 — September 25
+
+The user explicitly selected a **0.5 GiB (536,870,912 bytes) free-host-RAM cutoff** and requested another launch. Both startup and the fresh-run watchdog use that cutoff; GPU safeguards are unchanged. Recovery3 (`alpha-fresh128m-40000-recovery3`) was launched from the verified step-3 checkpoint. Check live status for progress; launch is not a completed update. The generic diagnostic watchdog remains unchanged. Earlier 2 GiB limits below are historical.
+
+## Latest verified stop — September 25, 21:13 UTC
+
+Recovery2 was stopped by the original 2 GiB host-memory guard after about 16 seconds during initial evaluation. Free host RAM: 1,768,042,496 bytes (1.65 GiB); GPU usage: 800 MiB. Exit137, OOMKilled false. No new saved updates; candidate remains3. Training is paused. Earlier launch statements below describe history, not a running job.
+
+# Current handoff — September 25, 2026
+
+The active fresh model is **128,353,994 parameters, depth 1.0, 16K context**, targeting 40,000 total updates. **Recovery2 has launched from 3 saved updates, following the user's explicit request to run with the original 2 GiB guard.** The newest reliability updates passed bounded data/executor checks; CUDA evaluation/resume is in progress and must be verified from live evidence. See [the current run guide](ALPHA_FRESH128M_16K_RUN.md) for exact artifacts, safeguards and remaining verification.
+
+The sections below are historical and do not override this current status.
+
+---
+
 # Arcus current status and handoff â€” September 21, 2026
+
+## Fresh Phase 1 restart â€” September 25
+
+The user selected random weights, depth 1.0 and 65,536 configured context, and re-enabled coding-agent logs. [Fresh64 rebuild report](ALPHA_FRESH64_REBUILD.md) records the new zero-update 151,946,954-parameter checkpoint, full existing corpus references, own-code/log/HF/ReAct review build, 46 passing tests and fresh 64K forward validation. All older checkpoints remain preserved. New training remains paused for the agreed data review, an explicit curriculum/budget, and full-length training feasibility; no 64K training qualification is claimed.
 
 ## September 25 integrated efficiency completion
 

@@ -16,12 +16,15 @@ class TrainingSession:
         self.metadata=None;self.rng=None;self.cuda_rng=None
 
     def acquire(self,root,manifest,cfg,device,verify):
+        if str(device).startswith('cuda') and 'cuda_memory_fraction' in cfg:
+            torch.cuda.set_per_process_memory_fraction(cfg['cuda_memory_fraction'])
         key=(str(root.resolve()),json.dumps(manifest,sort_keys=True),json.dumps(cfg,sort_keys=True))
         if self.key==key:
             if digest(root/(manifest['generation']+'.pt'))!=manifest['sha256']:
                 self.clear();raise ValueError('Cached training checkpoint changed')
             verify(cfg,self.metadata)
             self.model.to(device)
+            self.model.core.gradient_checkpointing = cfg.get('gradient_checkpointing', False)
             for param,state in self.optimizer.state.items():
                 for name,value in state.items():
                     # Adam's scalar step remains on CPU for non-capturable AdamW.
@@ -31,6 +34,7 @@ class TrainingSession:
             return self.model,self.optimizer,self.progress
         self.clear()
         model,data=load(root,manifest,device);verify(cfg,data)
+        model.core.gradient_checkpointing = cfg.get('gradient_checkpointing', False)
         optimizer=restore_optimizer(model,data,cfg['learning_rate'])
         torch.set_rng_state(data['rng'])
         if data['cuda_rng']:torch.cuda.set_rng_state_all(data['cuda_rng'])
