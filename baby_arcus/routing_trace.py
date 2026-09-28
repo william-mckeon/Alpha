@@ -46,6 +46,13 @@ def freeze_forward():
         collector.recording = False
 
 
+def resume_forward():
+    """Re-enable tracing for a new accumulation forward, never recomputation."""
+    collector = _collector.get()
+    if collector is not None:
+        collector.recording = True
+
+
 def observe_gradients(model):
     collector = _collector.get()
     if collector is not None:

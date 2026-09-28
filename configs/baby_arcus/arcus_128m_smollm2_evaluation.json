@@ -1,0 +1,50 @@
+{
+  "schema": "arcus-foundation-eval-v1",
+  "max_windows_per_domain": 8,
+  "sequence_length": 16384,
+  "max_generated_tokens": 128,
+  "generation": "greedy",
+  "tracks": [
+    "per-domain-heldout-language",
+    "base-completion",
+    "chat-diagnostic",
+    "likelihood-choice",
+    "long-context-retrieval"
+  ],
+  "base_prompts": [
+    "The capital of France is",
+    "A Python for loop that prints the integers 0 to 4:\n",
+    "Water freezes at"
+  ],
+  "chat_prompts": [
+    "User: Hi, how are you?\nAssistant:",
+    "User: Please write a simple Python for loop.\nAssistant:"
+  ],
+  "choices": [
+    {
+      "id": "arithmetic-fixture",
+      "prompt": "2 + 3 =",
+      "choices": [
+        " 5",
+        " 9"
+      ],
+      "answer": 0,
+      "scope": "diagnostic-fixture-not-benchmark"
+    }
+  ],
+  "retrieval_positions": [
+    128,
+    1024,
+    4096,
+    8192,
+    16000
+  ],
+  "lighteval_tasks": [
+    "hellaswag",
+    "arc:easy",
+    "piqa",
+    "winogrande"
+  ],
+  "benchmark_scores_required": false,
+  "note": "Fixture scores are separate from downloaded benchmark scores; neither is a training target."
+}

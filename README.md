@@ -5,7 +5,11 @@ with 128,353,994 unique parameters and separately reported developmental, langua
 tool and routing evidence. Training remains paused. The proposed next experiment
 uses Arcus's own 128M MoDE architecture and 16k window with an adapted SmolLM2 recipe;
 see the [complete file inventory](docs/ARCUS_128M_SMOLLM2_FILE_PLAN.md).
-The experiment history below describes earlier runs and tracks.
+The new pipeline is implemented; see its [runbook](docs/ARCUS_128M_SMOLLM2_TRAINING.md)
+and [live validation results](docs/ARCUS_128M_SMOLLM2_RESULTS.md). A full recipe-sized
+batch passed on the RTX 5080, but the complete token budget projects to about 5.4
+GPU-years. The long campaign has not been launched. The experiment history below
+describes earlier runs and tracks.
 
 ## Baby Arcus — native learning and viewer
 

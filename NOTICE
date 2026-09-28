@@ -28,3 +28,10 @@ Arcus foundation model and ships no Qwen weights.
 
 "Qwen" is a trademark of its respective owner. Arcus is not endorsed by or
 affiliated with the Qwen team or Alibaba Cloud.
+Arcus foundation recipe integration (2026-09-28):
+Nanotron, Hugging Face, Apache-2.0, pinned source fb0747bac263a4c3a8ff4d724869a533afb561d8.
+SmolLM training recipe, Hugging Face, Apache-2.0, reviewed source f54818907404ec3d6bb150357b7d0dea333f1aea.
+LightEval 0.6.2 model API, Hugging Face; upstream files carry MIT and Apache-2.0 notices.
+Their original license files remain in the installed source/packages. Runtime APIs
+are imported, not relicensed. Dataset terms remain separate; see
+docs/ARCUS_SMOLLM2_DATA_PROVENANCE.md.

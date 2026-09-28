@@ -1,4 +1,13 @@
 """Count unique parameters once and expose registration aliases and expert slices."""
+
+def assert_inventory(model, expected):
+    report = inventory(model)
+    if report['unique_parameters'] != expected:
+        raise ValueError('Unique parameter inventory changed')
+    if model.core is not model.body.core or model.core.head.weight is not model.core.token_embed.weight:
+        raise ValueError('Shared core or tied body embedding was broken')
+    return report
+
 def inventory(model):
     groups = {}
     for name, parameter in model.named_parameters(remove_duplicate=False):

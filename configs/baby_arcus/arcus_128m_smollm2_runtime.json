@@ -1,0 +1,18 @@
+{
+  "schema": "arcus-foundation-runtime-v1",
+  "image": "arcus-foundation:nanotron-v1",
+  "image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
+  "root": "runs/foundation/arcus-128m-smollm2-001",
+  "memory": "8g",
+  "cpus": 2,
+  "pids": 128,
+  "cuda_fraction": 0.7,
+  "gpu_lock_volume": "arcus-alpha-three-stage_alpha-job-control",
+  "pilot_max_updates": 2,
+  "pilot_max_seconds": 1800,
+  "campaign_authorized": false,
+  "campaign_deadline": null,
+  "memory_watchdog": false,
+  "note": "Bounded pilot only; no inherited 60k run deadline or automatic campaign start.",
+  "validated_benchmark_image": "sha256:ce652e447200a586ab86c2fc5673dcef5f0feef4e26ccbe77ab381d8981edbe3"
+}

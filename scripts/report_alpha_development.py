@@ -13,6 +13,8 @@ def compare(reports):
         raise ValueError('Scoring cohorts differ')
     if any(r.get('execution_identity') != reports[0].get('execution_identity') for r in reports):
         raise ValueError('Execution cohorts differ')
+    if any(r.get('lineage') != reports[0].get('lineage') or r.get('track','chat-diagnostic') != reports[0].get('track','chat-diagnostic') for r in reports):
+        raise ValueError('Do not merge fresh-run lineage or base/chat evaluation tracks')
     return {'schema':'alpha-development-comparison-v1', 'identity':reports[0]['identity'],
             'checkpoints':[{'candidate':r['candidate'],'summary':r['summary']} for r in reports],
             'limitations':'Descriptive small-cohort comparison. Null scores are unmeasured, not failures. No combined intelligence score.'}

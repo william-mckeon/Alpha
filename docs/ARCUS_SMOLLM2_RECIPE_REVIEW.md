@@ -1,5 +1,13 @@
 # Arcus 128M: SmolLM2 recipe review
 
+Implementation update: the single-rank Nanotron engine adapter, preparation,
+checkpointing, developmental/likelihood evaluation and bounded launcher are now
+implemented. See [live results](ARCUS_128M_SMOLLM2_RESULTS.md) and
+[runbook](ARCUS_128M_SMOLLM2_TRAINING.md). The historical review below records the
+state before implementation. Dataset proportions are now explicitly labeled
+Arcus adaptations, not recovered upstream values. Full-batch measurement projects
+about 5.4 GPU-years for the complete token budget; no campaign has been launched.
+
 Reviewed September 28, 2026. User selected **fresh Arcus initialization**, not
 pretrained SmolLM2 weights, and requested retaining the existing model size:
 **128,353,994 unique parameters**. This is a new experiment, not a continuation of

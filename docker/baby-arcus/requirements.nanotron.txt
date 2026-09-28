@@ -1,0 +1,11 @@
+# PyTorch/CUDA/tiktoken inherited from the immutable base image.
+numpy==1.26.4
+PyYAML==6.0.3
+packaging==25.0
+safetensors==0.6.2
+dacite==1.9.2
+tqdm==4.67.1
+torchtyping==0.1.5
+typeguard==2.13.3
+datasets==4.4.1
+huggingface-hub==0.36.2

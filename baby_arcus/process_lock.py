@@ -27,7 +27,7 @@ class ProcessLock:
             raise Conflict("Another controller owns this state directory") from exc
 
     def close(self):
-        if not self.handle.closed:
+        if getattr(self,'handle',None) is not None and not self.handle.closed:
             self.handle.close()
 
     def __del__(self):

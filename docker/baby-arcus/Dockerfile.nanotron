@@ -1,0 +1,19 @@
+ARG BASE_IMAGE=arcus-alpha-release:53192
+FROM ${BASE_IMAGE}
+WORKDIR /app
+COPY docker/baby-arcus/requirements.nanotron.txt /tmp/requirements.nanotron.txt
+RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.nanotron.txt
+# Build context must contain the verified pinned source checkout; never use main.
+COPY --from=nanotron_source . /opt/nanotron
+RUN python3 -c "from pathlib import Path; assert Path('/opt/nanotron/.git/HEAD').read_text().strip() == 'fb0747bac263a4c3a8ff4d724869a533afb561d8'"
+# Only the LightEval model API is required; benchmark runners are separate.
+RUN python3 -m pip install pytablewriter==1.2.1 && python3 -m pip install --no-deps lighteval==0.6.2 transformers==4.46.3 tokenizers==0.20.3
+COPY arcus /app/arcus
+COPY baby_arcus /app/baby_arcus
+COPY scripts /app/scripts
+COPY configs /app/configs
+COPY tests /app/tests
+COPY evaluation /app/evaluation
+COPY LICENSE NOTICE /app/
+ENV PYTHONPATH=/app:/opt/nanotron/src PYTHONUNBUFFERED=1
+ENTRYPOINT ["python3"]

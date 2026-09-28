@@ -1,0 +1,32 @@
+{
+  "schema": "arcus-tool-sft-sources-v1",
+  "stage": "future-separate-sft",
+  "training_enabled": false,
+  "pretraining_mixture": false,
+  "sources": [
+    {
+      "repo_id": "HuggingFaceTB/smoltalk",
+      "revision": "5feaf2fd3ffca7c237fc38d1861bc30365d48ffa",
+      "subset": "apigen-80k",
+      "splits": [
+        "train",
+        "test"
+      ],
+      "format": "messages",
+      "purpose": "tool/function calling",
+      "license": "component-specific; see upstream APIGen and source model terms",
+      "license_url": "https://huggingface.co/datasets/argilla/apigen-function-calling",
+      "upstream_components": [
+        "argilla/Synth-APIGen-v0.1",
+        "Salesforce/xlam-function-calling-60k"
+      ]
+    },
+    {
+      "repo_id": "HuggingFaceTB/smol-smoltalk",
+      "revision": "f73fe857d519ff6ac5af2ea67c4d3834da7b8bcc",
+      "purpose": "small-model conversational instruction data; excludes function calling",
+      "license": "apache-2.0"
+    }
+  ],
+  "note": "A separate reviewed SFT execution plan is required; this preserves the requested tool source without silently mixing assistant targets into base pretraining."
+}

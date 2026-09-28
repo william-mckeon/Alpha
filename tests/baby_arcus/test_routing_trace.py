@@ -91,6 +91,15 @@ class RoutingTests(unittest.TestCase):
 
 
 class OverflowTests(unittest.TestCase):
+    def test_accumulation_forward_scope_reopens_after_freeze(self):
+        from baby_arcus.routing_trace import observe,freeze_forward,resume_forward
+        layer=torch.nn.Linear(2,2)
+        with RoutingTrace(layer) as trace:
+            observe(layer,'fixture',ordinal=0);freeze_forward()
+            observe(layer,'fixture',ordinal=1)
+            resume_forward();observe(layer,'fixture',ordinal=2)
+        self.assertEqual([e['ordinal'] for e in trace.events],[0,2])
+
     def test_padding_is_not_counted_as_accepted_tokens(self):
         from arcus.moe import MoELayer,MoEConfig
         layer=MoELayer(MoEConfig(dim=4,expert_hidden=8,n_experts=2,capacity_factor=.5))

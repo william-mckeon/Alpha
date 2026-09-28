@@ -31,16 +31,32 @@
     "weight_decay": 0.01,
     "clip_grad": 1.0
   },
-  "dataset_mixture_weights": null,
+  "dataset_mixture_weights": {
+    "dclm": 0.6,
+    "cosmopedia": 0.15,
+    "finemath": 0.1,
+    "infiwebmath": 0.05,
+    "stack-python": 0.1
+  },
   "launch_blockers": [
-    "Exact component weights and prepared corpus provenance unresolved",
-    "Arcus Nanotron model adapter and checkpoint parity unimplemented",
-    "Fresh 128353994-parameter construction and optimizer stability untested in this trainer",
-    "Sustained hardware throughput and storage requirements unmeasured",
-    "New experiment runtime budget and deadline unresolved"
+    "Full corpus and held-out coverage must pass audit; bounded sample is not a full training corpus",
+    "Full recipe needs roughly 5.4 GPU-years at the measured synthetic full-batch throughput",
+    "New campaign runtime budget and deadline unresolved"
   ],
   "required_context_tokens": 16384,
   "mode_specification": "Retain current Arcus MoDE specifications; do not adopt donor dense architecture",
   "requested_training_sequence_length": 16384,
-  "tool_calling_data_intent": "Include reviewed tool-calling SFT data; smol-smoltalk excludes function calling, so exact dataset choice remains unresolved"
+  "tool_calling_data_intent": "Pinned SmolTalk apigen-80k for a separate later tool SFT stage; base pretraining does not teach the full tool protocol by itself.",
+  "implementation": {
+    "trainer": "pinned NanotronModel + upstream single-rank 1F1B engine; custom Arcus supervisor",
+    "pretrain_config": "configs/baby_arcus/arcus_128m_smollm2_pretrain.yaml",
+    "source_config": "configs/baby_arcus/arcus_128m_smollm2_sources.json",
+    "tool_sft_config": "configs/baby_arcus/arcus_128m_tool_sft_sources.json",
+    "cuda_tests_passed": 28,
+    "measured_full_batch_seconds": 85.2025669709983,
+    "measured_parameters": 128353994,
+    "training_window": 16384,
+    "exact_upstream_mixture": false
+  },
+  "dataset_mixture_note": "Arcus adaptation, document-sampling weights; not recovered upstream weights."
 }

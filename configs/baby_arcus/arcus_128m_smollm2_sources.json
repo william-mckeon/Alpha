@@ -1,0 +1,70 @@
+{
+  "schema": "arcus-foundation-sources-v1",
+  "mixture_kind": "explicit-arcus-adaptation-not-exact-reproduction",
+  "sampling_unit": "document",
+  "mixture_note": "60% unfiltered public DCLM,15% Cosmopedia-v2,10% FineMath4+,5% InfiWebMath4+,10% Python Stack-Edu. Upstream small-model educational DCLM filtering and precise allocation are unavailable. Observed token proportions are reported separately.",
+  "heldout_modulus": 100,
+  "encoding": "o200k_base",
+  "sources": [
+    {
+      "name": "dclm",
+      "repo_id": "mlfoundations/dclm-baseline-1.0",
+      "revision": "a3b142c183aebe5af344955ae20836eb34dcf69b",
+      "subset": "default",
+      "split": "train",
+      "weight": 0.6,
+      "text_field": "text",
+      "license": "cc-by-4.0",
+      "license_url": "https://huggingface.co/datasets/mlfoundations/dclm-baseline-1.0",
+      "content_mode": "text"
+    },
+    {
+      "name": "cosmopedia",
+      "repo_id": "HuggingFaceTB/smollm-corpus",
+      "revision": "3ba9d605774198c5868892d7a8deda78031a781f",
+      "subset": "cosmopedia-v2",
+      "split": "train",
+      "weight": 0.15,
+      "text_field": "text",
+      "license": "odc-by",
+      "license_url": "https://huggingface.co/datasets/HuggingFaceTB/smollm-corpus",
+      "content_mode": "text"
+    },
+    {
+      "name": "finemath",
+      "repo_id": "HuggingFaceTB/finemath",
+      "revision": "e92b25a616738fe95dc186b64dfb19f9c8525594",
+      "subset": "finemath-4plus",
+      "split": "train",
+      "weight": 0.1,
+      "text_field": "text",
+      "license": "odc-by",
+      "license_url": "https://huggingface.co/datasets/HuggingFaceTB/finemath",
+      "content_mode": "text"
+    },
+    {
+      "name": "infiwebmath",
+      "repo_id": "HuggingFaceTB/finemath",
+      "revision": "e92b25a616738fe95dc186b64dfb19f9c8525594",
+      "subset": "infiwebmath-4plus",
+      "split": "train",
+      "weight": 0.05,
+      "text_field": "text",
+      "license": "odc-by",
+      "license_url": "https://huggingface.co/datasets/HuggingFaceTB/finemath",
+      "content_mode": "text"
+    },
+    {
+      "name": "stack-python",
+      "repo_id": "HuggingFaceTB/stack-edu",
+      "revision": "eeec5caac5cc3758a18f1d3ba4416837a9ba814c",
+      "subset": "Python",
+      "split": "train",
+      "weight": 0.1,
+      "text_field": "text",
+      "license": null,
+      "license_url": "https://huggingface.co/datasets/HuggingFaceTB/stack-edu",
+      "content_mode": "swh"
+    }
+  ]
+}

@@ -1,9 +1,13 @@
-# Arcus 128M / 16k: proposed implementation file inventory
+# Arcus 128M / 16k: implementation file inventory
 
-This is the next-experiment plan, not a claim that these changes are implemented.
+Implementation status: the files below are now present and wired into the pipeline.
+See `ARCUS_128M_SMOLLM2_RESULTS.md` for verified tests, throughput and remaining
+corpus/campaign readiness conditions. A test fixture helper and a defensive
+`baby_arcus/process_lock.py` cleanup fix were additionally needed during live tests.
+This inventory does not claim that the full campaign or benchmark suite has run.
 It follows the user's selection of random initialization, Arcus's own MoDE specs,
 128,353,994 unique parameters and a 16,384-token training/context window. The current
-Alpha 2.0 snapshot is published separately before starting this work. Preserve all
+Alpha 2.0 snapshot upload is monitored separately. Preserve all
 old checkpoints and historical evaluations.
 
 The reviewed upstream recipe specifies 2,000,000 optimizer updates and 1,048,576
@@ -71,14 +75,15 @@ files (`arcus/model.py`, `arcus/moe.py`, `arcus/model_config.py`,
 architecture changes; any required compatibility edits must prove parameter and
 functional parity before inclusion.
 
-## Decisions that remain unresolved
+## Resolved choices and remaining campaign decisions
 
-- Exact small-model mixture proportions and prepared-corpus provenance are absent
-  from the inspected public YAML; recover them or explicitly label an adapted mix.
-- Review full SmolTalk/tool subsets and their terms. The small-model SFT subset
-  excludes function calling; reported larger-model behavior is not a promised result.
-- Validate learning-rate/router settings and training-loss reduction on Arcus.
-- Benchmark 16k useful throughput and select a new runtime budget/deadline. The
+- The public recipe does not expose exact source weights; the source configuration
+  now explicitly labels adapted document weights and pins every dataset revision.
+- SmolTalk `apigen-80k` is pinned separately for later tool SFT. Smol-smoltalk alone
+  excludes function calling; no tool SFT or RL run has been started.
+- Loss/gradient reduction, save/resume and 16k execution passed live tests. The
+  inherited learning rate still needs a longer stability study before a campaign.
+- Full-batch throughput is measured. Select a feasible new runtime budget/deadline. The
   previous Alpha continuation deadline does not authorize an unbounded new campaign.
 - Keep pretraining, tool SFT and any future preference/RL stages separately specified.
 
