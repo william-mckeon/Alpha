@@ -1,5 +1,10 @@
 # Arcus 128M / 16k: implementation file inventory
 
+Historical strategy as of September 28, 2026: superseded as the next campaign by
+[Arcus 3.0](ARCUS_3_LOCAL_FIRST_PLAN.md). Preserve this implementation and its
+two-update pilot evidence. The Alpha snapshot is now privately published; see
+[publication record](ALPHA_2_SNAPSHOT_RELEASE.md). Original inventory follows.
+
 Implementation status: the files below are now present and wired into the pipeline.
 See `ARCUS_128M_SMOLLM2_RESULTS.md` for verified tests, throughput and remaining
 corpus/campaign readiness conditions. A test fixture helper and a defensive

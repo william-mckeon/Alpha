@@ -1,5 +1,22 @@
 # Arcus — Roadmap
 
+## Active direction — September 28, 2026
+
+The [Arcus 3.0 local-first plan](docs/ARCUS_3_LOCAL_FIRST_PLAN.md) is the current
+phase sequence: 0 preservation/isolation; 1 pinned donor; 2 baseline; 3 application
+integration; 4 dense LoRA control; 5 approximately 2B conversion; 6 local training
+qualification; 7 expert specialization; 8 depth routing; 9 context extension;
+10 validation and separate private release.
+
+See the [Phase 0 handoff](docs/ARCUS_3_PHASE_0_HANDOFF.md) and
+[Phase 1 inventory](docs/ARCUS_3_PHASE_1_FILE_PLAN.md). Selected donor:
+SmolLM2-1.7B-Instruct; donor incorporation has not started. Alpha 2.0 is preserved
+and privately published at 53,192 updates. Its training stays paused. The random
+128M foundation pilot is historical evidence, not the next campaign.
+
+Everything below is a retained historical roadmap. Its priorities, locked decisions
+and donor-selection statements do not override this dated direction or authorize runs.
+
 ## Baby Arcus branch plan
 
 Current embodied work is summarized in [current status](docs/ARCUS_CURRENT_STATUS.md)

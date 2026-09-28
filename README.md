@@ -1,15 +1,18 @@
 # arcus
 
-Current Alpha 2.0 release work: [53,192-update research snapshot](docs/ALPHA_2_SNAPSHOT_RELEASE.md),
-with 128,353,994 unique parameters and separately reported developmental, language,
-tool and routing evidence. Training remains paused. The proposed next experiment
-uses Arcus's own 128M MoDE architecture and 16k window with an adapted SmolLM2 recipe;
-see the [complete file inventory](docs/ARCUS_128M_SMOLLM2_FILE_PLAN.md).
-The new pipeline is implemented; see its [runbook](docs/ARCUS_128M_SMOLLM2_TRAINING.md)
-and [live validation results](docs/ARCUS_128M_SMOLLM2_RESULTS.md). A full recipe-sized
-batch passed on the RTX 5080, but the complete token budget projects to about 5.4
-GPU-years. The long campaign has not been launched. The experiment history below
-describes earlier runs and tracks.
+Current direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
+starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B
+expert expansion. See the [Phase 0 handoff](docs/ARCUS_3_PHASE_0_HANDOFF.md) and
+[Phase 1 file inventory](docs/ARCUS_3_PHASE_1_FILE_PLAN.md). Donor execution and
+training have not started; the project metadata does not authorize either.
+
+Alpha 2.0's [53,192-update snapshot](docs/ALPHA_2_SNAPSHOT_RELEASE.md) is privately
+published with verified hashes. Its 128,353,994-parameter training remains paused.
+The separate random-initialized 128M pipeline and its two-update pilot remain
+[historical research evidence](docs/ARCUS_128M_SMOLLM2_RESULTS.md); its full campaign
+was not launched and is superseded as the next strategy. No old checkpoint is an
+Arcus 3.0 weight parent. Sections below preserve earlier experiment status; their
+"current", "next", or "running" descriptions are historical, not live status.
 
 ## Baby Arcus — native learning and viewer
 
@@ -233,7 +236,7 @@ The native desktop host now supports independent normalized leg controls, body s
 
 ## Alpha 2.0 developmental diagnostics (2026-09-28)
 
-Mapping, separate developmental evaluation, pause handling and gated private release are implemented. Training remains paused at 53,192. See [implementation and validation](docs/ALPHA_2_MAPPING_AND_EVALUATION.md). No 60k completion or publication is claimed.
+Mapping, separate developmental evaluation, pause handling and gated private release are implemented. Training remains paused at 53,192. See [implementation and validation](docs/ALPHA_2_MAPPING_AND_EVALUATION.md). The separately authorized [53,192-step snapshot publication](docs/ALPHA_2_SNAPSHOT_RELEASE.md) is verified; 60k completion is not claimed.
 
 The [final developmental dashboard](runs/diagnostics/alpha-development-final-20260928-140825/REPORT.html)
 contains all 108 responses from matched 40k, 45k and 53,192 evaluations, mapping,

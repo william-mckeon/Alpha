@@ -1,5 +1,11 @@
 # Alpha continuation: 41,000 to 60,000
 
+Dated handoff, September 28, 2026: training remains paused at durable update 53,192.
+The separately authorized [snapshot release](ALPHA_2_SNAPSHOT_RELEASE.md) is private
+and verified; 60,000 updates were not completed. [Arcus 3.0](ARCUS_3_LOCAL_FIRST_PLAN.md)
+is the new proposed direction. Preserve the pause flag and original run state.
+The original scope below is history, not permission to resume or extend its deadline.
+
 User approved implementation and live testing after requesting exactly 60,000 total updates with evaluation every 1,000. This is 19,000 additional updates, not 60,000 additional. No promotion, architecture growth, new data or automatic curriculum changes are authorized by this run.
 
 ## Frozen identity

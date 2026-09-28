@@ -1,5 +1,10 @@
 # Arcus 128M / 16k foundation pipeline
 
+Historical runbook as of September 28, 2026. The implemented pipeline and bounded
+pilot remain research evidence. The full campaign is not authorized and is
+superseded as the next strategy by [Arcus 3.0](ARCUS_3_LOCAL_FIRST_PLAN.md).
+Commands below are preserved for reproducibility, not instructions to launch.
+
 This is a new random-initialized lineage. It never imports Alpha or SmolLM2 weights.
 The old Alpha 2.0 learner remains paused. Core dimensions, shared heads and tokenizer
 are preserved: 128,353,994 unique parameters, depth capacity 1 and 16,384 context.
