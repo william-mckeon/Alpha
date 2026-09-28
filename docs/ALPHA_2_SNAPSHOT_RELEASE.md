@@ -30,7 +30,18 @@ packager now copies those explicit assets and NOTICE, with a regression test.
 The repaired package passed the isolated CUDA test and manifest verification.
 These checks establish package integrity, not language or coding mastery.
 
-The next experiment's complete proposed file inventory is in
-[ARCUS_128M_SMOLLM2_FILE_PLAN.md](ARCUS_128M_SMOLLM2_FILE_PLAN.md):
-11 existing files to update, 29 files to add, and none to delete. It is a plan,
-not an implemented trainer or an authorization to launch training.
+## Verified private publication
+
+The publisher completed successfully on September 28, 2026. It verified repository
+privacy and every packaged file against the local manifest at immutable revision
+`677ed8cb1febcf26e0f31b4d1488205f1b9f1b5e`.
+
+- Repository: [Islanderintel/Alpha-2.0](https://huggingface.co/Islanderintel/Alpha-2.0).
+- Receipt: `artifacts/huggingface/Alpha-2.0-publication-677ed8cb1febcf26e0f31b4d1488205f1b9f1b5e.json`.
+- Receipt confirms `private: true`, `all_files_verified: true`, and the exact
+  53,192-update generation and source hash recorded above.
+
+This is the authorized snapshot release, not completion of 60k training.
+The separate 128M foundation pilot remains research evidence. The new proposed
+direction is documented in [ARCUS_3_LOCAL_FIRST_PLAN.md](ARCUS_3_LOCAL_FIRST_PLAN.md);
+that plan does not authorize restarting either historical run.
