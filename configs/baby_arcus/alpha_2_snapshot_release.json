@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "model_name": "Alpha-2.0",
+  "repo_id": "Islanderintel/Alpha-2.0",
+  "private": true,
+  "release_kind": "research-snapshot",
+  "authorization": "user-requested-current-checkpoint-publication",
+  "required_updates": 53192,
+  "expected_candidate": {
+    "generation": "49873f5c4ba3483e83e5cbf9aab80169",
+    "sha256": "200772c9e75bea17738ba8a309dc46fe78330289fe552de7b86a8cca4aa63e2e",
+    "updates": 53192,
+    "receipt_count": 53192,
+    "depth_capacity": 1.0
+  },
+  "run_root": "runs/test2/alpha-tool-correction-60k-001",
+  "developmental_report": "runs/diagnostics/alpha-development-final-20260928-140825/53192/evaluation-53192-scored.json",
+  "mapping_report": "runs/diagnostics/alpha-development-final-20260928-140825/53192/mapping-53192.json",
+  "agent_report": "runs/diagnostics/alpha-full-mapping-20260928-133714/full-report.json",
+  "model_card": "docs/ALPHA_2_SNAPSHOT_MODEL_CARD.md",
+  "destination": "artifacts/huggingface/Alpha-2.0-53192"
+}

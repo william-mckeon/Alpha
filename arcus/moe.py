@@ -128,6 +128,13 @@ class MoELayer(nn.Module):
         slot = pos_in_expert.long().clamp(max=cap - 1)
         keep_f = keep.to(x.dtype).unsqueeze(-1)
 
+        from baby_arcus.routing_trace import observe, tracing
+        if tracing():
+            observe(self, 'expert', expert=idx, selected_probability=gate, accepted=keep,
+                    valid=valid_mask if valid_mask is not None else torch.ones_like(keep),
+                    capacity=cap, experts=E, dispatch_mode=self.dispatch_mode,
+                    physical_slots=B*E*cap if self.dispatch_mode == 'padded' else int(keep.sum()))
+
         flat = (idx * cap + slot)                     # [B, T] in [0, E*cap)
         flat_exp = flat.unsqueeze(-1).expand(B, T, C)
 

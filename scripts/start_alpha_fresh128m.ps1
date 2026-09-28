@@ -26,8 +26,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Image unavailable' }
 $reference=(docker inspect alpha-memory-before | ConvertFrom-Json)[0]
 $fingerprint=$reference.Config.Env | Where-Object { $_.StartsWith('ALPHA_HOST_FINGERPRINT=') }
 if (-not $fingerprint) { throw 'Host identity unavailable' }
-python -c "import ctypes; from scripts.watch_alpha_memory_minute import Memory; m=Memory();m.length=ctypes.sizeof(m);assert ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m));assert m.free>=512*2**20"
-if ($LASTEXITCODE -ne 0) { throw 'Host memory below user-selected 0.5 GiB guard' }
+python -c "import ctypes,sys; sys.path.insert(0,'scripts'); from watch_alpha_training import Memory,host_memory_low; m=Memory();m.length=ctypes.sizeof(m);assert ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m));assert not host_memory_low(m.free,m.total)"
+if ($LASTEXITCODE -ne 0) { throw 'Host free memory at or below user-selected 0.5 GiB guard' }
 $mounts=@('--mount',"type=bind,source=$runPath,target=/app/runs/test2/alpha-fresh128m-16k-seed-2101",'--mount',"type=bind,source=$configPath,target=/run-config,readonly",'--mount',"type=bind,source=$dataPath,target=/review,readonly",'--mount',"type=bind,source=$corpus,target=/dataset,readonly")
 if (-not (Test-Path (Join-Path $runPath 'three-stage-continuation.json'))) {
  docker run --rm --network none --memory 3g --cpus 2 @mounts $image scripts/prepare_alpha_fresh_training.py --config /run-config/learner.json

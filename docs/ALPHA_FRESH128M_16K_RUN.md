@@ -42,3 +42,8 @@ The earlier update-3 model scored 0/3 coding and 0/3 unseen-tool tasks. These ar
 4. Review measured outcomes before deciding on 64,000, promotion or application integration.
 
 Launch: `scripts/start_alpha_fresh128m.ps1 -Name alpha-fresh128m-40000-recovery2 -RunConfig runs/test2/alpha-fresh128m-run-config-v2`. The launcher clears the pause only for this explicit launch. Compose now supplies the internal executor but standalone Compose does not start the host watchdog; use the launcher for local live runs.
+
+
+## Separate tool-correction continuation
+
+The completed 40,000-update checkpoint is preserved. See [tool correction results](ALPHA_TOOL_CORRECTION_RESULTS.md) for the target audit, isolated paused continuation, tests, and outstanding executor/data review gates. This does not change the historical run or authorize additional production training.

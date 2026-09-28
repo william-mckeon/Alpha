@@ -1,6 +1,7 @@
 """Factorized tiktoken embeddings and projections on the single shared transformer."""
 import torch
 from torch import nn
+from baby_arcus.routing_trace import route_phase
 import torch.nn.functional as F
 
 CHOICES=('silence','listen','pause','resume','replay','express')
@@ -16,13 +17,15 @@ class LanguageAdapter(nn.Module):
         nn.init.zeros_(self.choice.weight);nn.init.zeros_(self.choice.bias)
 
     def forward(self,core,tokens,last_only=False):
-        hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
+        with route_phase("language"):
+            hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
         if last_only: hidden=hidden[:, -1:]
         return F.linear(self.output(hidden),self.embedding.weight)
 
     def loss(self,core,tokens,labels,residual,chunk_size=32):
         from torch.utils.checkpoint import checkpoint
-        hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
+        with route_phase("language"):
+            hidden=core.trunk_embedded(self.input(self.embedding(tokens)))
         projected=self.output(hidden)+residual[:,None]
         flat=projected.reshape(-1,projected.shape[-1]); targets=labels.reshape(-1)
         count=(targets != -100).sum()
@@ -37,7 +40,8 @@ class LanguageAdapter(nn.Module):
         return total/count
 
     def cached_logits(self,core,tokens,cache):
-        hidden=core.trunk_cached(self.input(self.embedding(tokens)),cache)
+        with route_phase("language-cached"):
+            hidden=core.trunk_cached(self.input(self.embedding(tokens)),cache)
         return F.linear(self.output(hidden[:,-1]),self.embedding.weight)
 
     def decide(self,features,allowed):

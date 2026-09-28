@@ -68,6 +68,7 @@ def adapt_messages(messages, source, group, split='training', target_last=False)
     # A terminal action can be a prediction target; it is not a successful execution.
     if pending is not None and (not normalized or not normalized[-1].get('train')):
         raise ValueError('unobserved_history_action')
-    return validate({'version':1,'source':source,'group':group,'split':split,'messages':normalized,
+    from baby_arcus.sft_target_contract import annotate
+    return validate(annotate({'version':1,'source':source,'group':group,'split':split,'messages':normalized,
                      'provenance':{'adapter':VERSION,'input_sha256':digest(messages),
-                                   'target_kinds':targets,'terminal_result_observed':pending is None}})
+                                   'target_kinds':targets,'terminal_result_observed':pending is None}}))

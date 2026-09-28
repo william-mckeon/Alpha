@@ -1,15 +1,26 @@
 """Resumable, fingerprinted reading of local DatasetForge shards. Source is read-only."""
-import hashlib,io,json,os
+import hashlib,io,json,os,tempfile,time
 from contextlib import ExitStack
 from pathlib import Path
 import zstandard
 
 def atomic_json(path,value):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
-    temp=path.with_suffix('.pending')
-    with temp.open('w',encoding='utf-8') as f:
-        json.dump(value,f,ensure_ascii=False);f.flush();os.fsync(f.fileno())
-    os.replace(temp,path)
+    descriptor,temp_name=tempfile.mkstemp(dir=path.parent,prefix=f'.{path.name}.',suffix='.pending')
+    temp=Path(temp_name)
+    try:
+        with os.fdopen(descriptor,'w',encoding='utf-8') as f:
+            json.dump(value,f,ensure_ascii=False);f.flush();os.fsync(f.fileno())
+        # OneDrive can briefly hold a bind-mounted destination while syncing it.
+        # Retrying preserves atomic publication without deleting the last good file.
+        for attempt in range(20):
+            try:
+                os.replace(temp,path);break
+            except PermissionError:
+                if attempt==19:raise
+                time.sleep(min(.05*(attempt+1),.5))
+    finally:
+        temp.unlink(missing_ok=True)
 
 def inventory(root,patterns):
     root=Path(root).resolve();paths=sorted({p.resolve() for pattern in patterns for p in root.glob(pattern)})

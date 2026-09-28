@@ -8,12 +8,18 @@ import time
 from pathlib import Path
 from watch_alpha_memory_minute import Memory
 
-# Explicitly authorized September 25 for this fresh run only.
+# Explicitly authorized September 26 for this fresh run only.
 HOST_MINIMUM_FREE_BYTES = 512 * 1024**2
 
 
+def host_memory_low(free_bytes, total_bytes):
+    if total_bytes <= 0:
+        raise ValueError('Host total memory unavailable')
+    return free_bytes <= HOST_MINIMUM_FREE_BYTES
+
+
 def watch(name, folder, max_seconds):
-    if not re.fullmatch(r'alpha-fresh128m-[a-z0-9-]+',name): raise ValueError('Unexpected training container')
+    if not re.fullmatch(r'alpha-(?:fresh128m|tool-correction)-[a-z0-9-]+',name): raise ValueError('Unexpected training container')
     if not 1<=max_seconds<=7*86400: raise ValueError('Invalid monitoring duration')
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     start=time.monotonic();reason=None;state={}
@@ -26,8 +32,11 @@ def watch(name, folder, max_seconds):
                 memory=Memory();memory.length=ctypes.sizeof(memory)
                 if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(memory)): raise RuntimeError('Host memory unavailable')
                 total,used,free=map(int,command(['nvidia-smi','--query-gpu=memory.total,memory.used,memory.free','--format=csv,noheader,nounits']).splitlines()[0].split(','))
-                log.write(json.dumps({'time':time.time(),'host_free_bytes':memory.free,'host_minimum_free_bytes':HOST_MINIMUM_FREE_BYTES,'gpu_used_mib':used,'gpu_free_mib':free})+'\n')
-                if memory.free<HOST_MINIMUM_FREE_BYTES: reason='host_memory_guard';break
+                log.write(json.dumps({'time':time.time(),'host_free_bytes':memory.free,
+                                      'host_total_bytes':memory.total,'host_free_percent':100*memory.free/memory.total,
+                                      'host_minimum_free_bytes':HOST_MINIMUM_FREE_BYTES,
+                                      'gpu_used_mib':used,'gpu_free_mib':free})+'\n')
+                if host_memory_low(memory.free,memory.total): reason='host_memory_guard';break
                 if free<max(3072,total*.2): reason='gpu_memory_guard';break
                 if time.monotonic()-start>max_seconds: reason='watchdog_deadline';break
                 time.sleep(2)

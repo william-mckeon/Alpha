@@ -92,7 +92,10 @@ def step(model, optimizer, tokenizer, row, target):
     model.train()
     optimizer.zero_grad(set_to_none=True)
     total, metrics = loss(model, tokenizer, row, target)
+    from baby_arcus.routing_trace import freeze_forward, observe_gradients
+    freeze_forward()
     total.backward()
+    observe_gradients(model)
     groups = {'core': model.core, 'rgb': model.rgb, 'language': model.language,
               'body_sensation': model.body_sensation_input, 'internal': model.internal_input}
     norms=[]

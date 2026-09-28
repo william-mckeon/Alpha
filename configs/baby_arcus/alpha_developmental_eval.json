@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "prompts": "evaluation/alpha_developmental/prompts-v2.jsonl",
+  "rubric": "evaluation/alpha_developmental/rubric-v2.json",
+  "max_new_tokens": 128,
+  "decoding": "greedy",
+  "training_use": false
+}

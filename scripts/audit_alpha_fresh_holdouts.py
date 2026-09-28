@@ -25,6 +25,18 @@ def audit(records, code):
             'tasks':list(NAMES),'limitations':'Exact local checks only; compressed public corpora and semantic overlap are not cleared by this audit.'}
 
 
+def audit_splits(records):
+    from baby_arcus.contracts import digest
+    groups={};contents={};conflicts=[]
+    with Path(records).open(encoding='utf-8') as stream:
+        for number,line in enumerate(stream,1):
+            record=json.loads(line);split=record['split']
+            for table,key in ((groups,record['group']),(contents,digest(record['messages']))):
+                if key in table and table[key]!=split:conflicts.append({'line':number,'group':record['group']})
+                table[key]=split
+    return {'passed':not conflicts,'conflicts':conflicts,'groups':len(groups),'scope':'Exact groups and conversation hashes, not semantic decontamination'}
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--records',required=True);p.add_argument('--code',required=True);p.add_argument('--output',required=True)
     a=p.parse_args();result=audit(a.records,a.code);Path(a.output).write_text(json.dumps(result,indent=2));print(json.dumps(result))

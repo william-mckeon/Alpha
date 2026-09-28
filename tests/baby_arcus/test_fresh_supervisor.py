@@ -36,7 +36,7 @@ class SupervisorTests(unittest.TestCase):
             (root/'initial.json').write_text(json.dumps(initial))
             old=root/'run-40000/initial';old.mkdir(parents=True)
             (old/'evaluation.json').write_text(json.dumps({'complete':False}))
-            def worker(command,**kwargs):
+            def worker(command,*args,**kwargs):
                 if '--worker' in command:
                     count=int(command[command.index('--updates')+1])
                     self.assertEqual(count,61)
@@ -46,7 +46,7 @@ class SupervisorTests(unittest.TestCase):
                     output=Path(command[command.index('--output')+1]);output.parent.mkdir(parents=True)
                     output.write_text(json.dumps({'complete':True,'checkpoint_unchanged':True,'candidate':initial if '--initial' in command else pointer,'coding_execution_evaluated':True,'evaluation_identity':{'test':1}}))
                 return SimpleNamespace(returncode=0)
-            with patch('baby_arcus.shared_factory.read_config',return_value={'root':folder}), patch('scripts.evaluate_alpha_fresh.evaluation_identity',return_value={'test':1}),patch('scripts.run_alpha_fresh_40000.subprocess.run',side_effect=worker):
+            with patch('baby_arcus.shared_factory.read_config',return_value={'root':folder}), patch('scripts.evaluate_alpha_fresh.evaluation_identity',return_value={'test':1}),patch('scripts.run_alpha_fresh_40000.run_logged',side_effect=worker):
                 supervise('unused')
             status=json.loads((root/'run-40000/status.json').read_text())
             self.assertEqual(status['state'],'paused');self.assertEqual(status['saved_updates'],64)

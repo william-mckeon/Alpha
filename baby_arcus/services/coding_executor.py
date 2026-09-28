@@ -21,14 +21,15 @@ print(json.dumps([scope['solve'](case) for case in data['cases']]))
 
 
 def execute(task_name, source):
-    lesson = task(task_name)
+    from baby_arcus.developmental_tasks import TASKS
+    lesson = TASKS[task_name] if task_name in TASKS else task(task_name)
     if not isinstance(source,str) or len(source.encode()) > 12000:
         raise ValueError('Source exceeds sandbox budget')
     name = 'alpha-coding-' + uuid.uuid4().hex
     command = ['docker','run','--name',name,'--rm','-i','--network','none','--log-driver','none',
                '--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',
                '--pids-limit','32','--memory','256m','--cpus','0.5','--user','10002:10002',
-               '--tmpfs','/tmp:rw,noexec,nosuid,size=16m','--entrypoint','python3',IMAGE,'-I','-B','-c',HARNESS]
+               '--tmpfs','/tmp:rw,noexec,nosuid,size=16m','--entrypoint','python3',IMAGE,'-I','-B','-c',('import json,sys; exec(compile(json.loads(sys.stdin.read())["source"],"solution.py","exec"),{})' if lesson.get('stdout') else HARNESS)]
     payload=json.dumps({'source':source,'cases':lesson['cases']}).encode()
     with tempfile.TemporaryFile() as stdin, tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
         stdin.write(payload); stdin.seek(0)
@@ -48,6 +49,8 @@ def execute(task_name, source):
         output=stdout.read(1048576).decode(errors='replace'); error=stderr.read(1048576).decode(errors='replace')
     try: actual=json.loads(output)
     except ValueError: actual=None
+    if lesson.get('stdout'):
+        actual=[int(output.strip()==lesson['expected'])];lesson={**lesson,'expected':[1]}
     return {'passed':reason is None and process.returncode==0 and isinstance(actual,list)
             and all(type(value) is int for value in actual) and actual==lesson['expected'],
             'returncode':process.returncode,'output':output[-2000:],'error':reason or error[-2000:],

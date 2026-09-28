@@ -49,13 +49,18 @@ def validate(record):
     assistant = False
     previous = None
     for item in messages:
-        fields(item, ('role', 'content'), ('train',))
+        fields(item, ('role', 'content'), ('train','target_kind'))
+        if 'target_kind' in item and (item['role'] != 'assistant' or item['target_kind'] not in ('text','action_prediction')):
+            raise ValueError('Invalid target kind')
         if 'train' in item and (item['role'] != 'assistant' or type(item['train']) is not bool):
             raise ValueError('Only assistant messages may have a Boolean train flag')
         if item['role'] not in ('system', 'user', 'assistant', 'tool'):
             raise ValueError('Unknown role')
         if not isinstance(item['content'], str) or not item['content']:
             raise ValueError('Nonempty textual content required; serialize tool calls explicitly')
+        if item['role'] == 'assistant' and item.get('train', True):
+            from baby_arcus.sft_target_contract import validate_target
+            validate_target(item)
         if item['role'] == 'tool' and previous not in ('assistant','tool'):
             raise ValueError('Tool observation must follow an assistant action')
         if re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bhf_[A-Za-z0-9]{20,}|\bsk-[A-Za-z0-9_-]{20,}',item['content']):

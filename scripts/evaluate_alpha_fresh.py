@@ -18,8 +18,12 @@ def evaluation_identity(config):
     cfg=json.loads(Path(config).read_text())
     files=[Path(__file__),Path('scripts/evaluate_alpha_coding.py'),
            Path('baby_arcus/coding_curriculum.py'),Path('baby_arcus/tool_discovery_curriculum.py'),
-           Path('baby_arcus/coding_policy.py'),Path('/review/records.jsonl')]
-    return {'config':cfg,'files':{str(p):sha(p) for p in files},'sft_windows':4,'tools':3,'coding_actions':4,'generation_tokens':128}
+           Path('baby_arcus/coding_policy.py'),Path(cfg.get('evaluation_records','/review/records.jsonl')),
+           *[Path('baby_arcus')/name for name in ('conversation_format.py','sft_dataset.py','sft_target_contract.py',
+              'evaluation_metrics.py','shared_objectives.py','tool_context.py','tool_search.py','coding_contracts.py',
+              'tool_episode_metrics.py','coding_practice.py','coding_tools.py','routing_trace.py','route_usage.py')]]
+    return {'config':cfg,'files':{str(p):sha(p) for p in files},'sft_windows':cfg.get('evaluation_windows',4),
+            'tools':cfg.get('evaluation_tools',3),'coding_actions':cfg.get('evaluation_actions',4),'generation_tokens':128}
 
 
 def reusable(report, pointer, identity):
@@ -28,7 +32,7 @@ def reusable(report, pointer, identity):
             and report.get('coding_execution_evaluated') is True)
 
 
-def evaluate(config, output, initial=False, coding=False):
+def evaluate(config, output, initial=False, coding=False, checkpoint_pointer=None):
     import torch
     from torch.nn.attention import sdpa_kernel, SDPBackend
     from arcus.tokenizer import get_tokenizer
@@ -46,11 +50,14 @@ def evaluate(config, output, initial=False, coding=False):
     from baby_arcus.runtime_contract import require_gpu
     from baby_arcus.gpu_job_control import gpu_job
     from baby_arcus.local_agent_dataset import IDENTITY
+    from baby_arcus.routing_trace import RoutingTrace
+    from contextlib import nullcontext
     require_gpu(); torch.set_num_threads(2);torch.cuda.set_per_process_memory_fraction(.70)
     started=time.monotonic();torch.cuda.reset_peak_memory_stats()
     cfg=read_config(config);root=Path(cfg['root']);output=Path(output)
     if output.exists(): raise ValueError('Use a fresh evaluation output')
-    pointer_name='initial.json' if initial else 'candidate.json'
+    pointer_name=checkpoint_pointer or ('initial.json' if initial else 'candidate.json')
+    if pointer_name not in ('candidate.json','initial.json','baseline.json'):raise ValueError('Unsupported checkpoint pointer')
     pointer=json.loads((root/pointer_name).read_text())
     report={'evaluation_identity':evaluation_identity(config),'candidate':pointer,'complete':False,'sft':[],'unseen_tools':[],
             'coding_execution_evaluated':False,'mastery_established':False}
@@ -60,24 +67,30 @@ def evaluate(config, output, initial=False, coding=False):
         model.eval().requires_grad_(False); tokenizer=get_tokenizer(cfg['encoding'])
         row,_,_=example(0,'training','commands');row['hearing']=[]
         with torch.inference_mode(), sdpa_kernel(SDPBackend.EFFICIENT_ATTENTION):
-            for line in Path('/review/records.jsonl').open():
+            for line in Path(cfg.get('evaluation_records','/review/records.jsonl')).open():
                 record=json.loads(line)
                 if record['split']!='validation':continue
                 window=next(windows(record,tokenizer,16384))
-                _, metrics=loss(model,tokenizer,row,{'sft':window})
+                with (RoutingTrace(model,max_events=1,max_positions=1,count_usage=True) if cfg.get('evaluation_mapping',False) else nullcontext()) as trace:
+                    _, metrics=loss(model,tokenizer,row,{'sft':window})
                 value=float(metrics['sft'])
                 if not math.isfinite(value):raise RuntimeError('Nonfinite validation loss')
                 report['sft'].append({'record_sha256':__import__('hashlib').sha256(line.encode()).hexdigest(),
+                                      'routing_usage':trace.usage.report() if trace is not None else None,
                                       'input_tokens':len(window['ids']) if 'ids' in window else len(window.get('tokens',[])),
                                       'target_tokens':sum(window['mask'][1:]),'nll':value})
-                if len(report['sft'])==4:break
-            for task in list(tasks('validation'))[:3]:
+                if len(report['sft'])==cfg.get('evaluation_windows',4):break
+            from baby_arcus.evaluation_metrics import language_metrics
+            report['language_metrics']=language_metrics(report['sft'])
+            for task in list(tasks('validation'))[:cfg.get('evaluation_tools',3)]:
                 catalog=ToolCatalog([DEFINITIONS[0],task['tool']]);context=ToolContext(catalog)
                 messages=[{'role':'system','content':IDENTITY},{'role':'user','content':task['query']+': '+next(iter(task['arguments'].values()))}]
                 item={'tool':task['tool']['name'],'searched':False,'solved':False,'decisions':[]}
                 for _ in range(3):
-                    decision=decide(model,tokenizer,row,messages,context.definitions(),128)
-                    call=decision.get('call');item['decisions'].append({'status':decision['status'],'call':call})
+                    with (RoutingTrace(model,max_events=1,max_positions=1,count_usage=True) if cfg.get('evaluation_mapping',False) else nullcontext()) as trace:
+                        decision=decide(model,tokenizer,row,messages,context.definitions(),128)
+                    if trace is not None: decision['routing_usage']=trace.usage.report()
+                    call=decision.get('call');item['decisions'].append({k:decision.get(k) for k in ('status','call','text','reason','generated_tokens','input_sha256','routing_usage')})
                     try:
                         if call is None:raise ValueError('No valid call')
                         context.resolve(call)
@@ -94,7 +107,7 @@ def evaluate(config, output, initial=False, coding=False):
                     if item['solved']:break
                 report['unseen_tools'].append(item)
         report['checkpoint_unchanged']=digest(root/(pointer['generation']+'.pt'))==pointer['sha256']
-        report['complete']=len(report['sft'])==4 and report['checkpoint_unchanged']
+        report['complete']=len(report['sft'])==cfg.get('evaluation_windows',4) and report['checkpoint_unchanged']
     if coding:
         del model
         torch.cuda.empty_cache()
@@ -106,7 +119,7 @@ def evaluate(config, output, initial=False, coding=False):
     report.update(seconds=time.monotonic()-started,peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(),
                   parameters=parameter_count,
                   context_tokens=16384,depth_capacity=pointer['depth_capacity'],
-                  limitations='Four validation windows and three tasks per cohort; not proof of 16K competence or general coding ability.')
+                  limitations=f"{len(report['sft'])} validation windows and {len(report['unseen_tools'])} discovery tasks; repeated validation, not proof of 16K competence or general coding ability.")
     from baby_arcus.language_stream import atomic_json
     output.parent.mkdir(parents=True,exist_ok=True);atomic_json(output,report)
     return report
@@ -115,4 +128,5 @@ def evaluate(config, output, initial=False, coding=False):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--config',required=True);p.add_argument('--output',required=True)
     p.add_argument('--initial',action='store_true');p.add_argument('--coding',action='store_true')
-    a=p.parse_args();print(json.dumps(evaluate(a.config,a.output,a.initial,a.coding)))
+    p.add_argument('--checkpoint-pointer',choices=('candidate.json','baseline.json','initial.json'))
+    a=p.parse_args();print(json.dumps(evaluate(a.config,a.output,a.initial,a.coding,a.checkpoint_pointer)))

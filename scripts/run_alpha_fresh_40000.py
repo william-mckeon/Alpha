@@ -6,6 +6,31 @@ import sys
 import time
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from baby_arcus.training_progress import emit
+
+
+def run_logged(command, log):
+    """Tee child output to both its durable attempt log and Docker stdout."""
+    import queue
+    import threading
+    lines=queue.Queue(maxsize=100)
+    with subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
+                          text=True,bufsize=1,errors='replace') as process:
+        def read():
+            try:
+                for line in process.stdout: lines.put(line)
+            finally: lines.put(None)
+        reader=threading.Thread(target=read,daemon=True);reader.start()
+        while True:
+            try: line=lines.get(timeout=30)
+            except queue.Empty:
+                emit('Worker still running; waiting for the next progress update.')
+                continue
+            if line is None: break
+            log.write(line);log.flush()
+            print(line,end='',flush=True)
+        reader.join()
+        return subprocess.CompletedProcess(command,process.wait())
 
 
 def next_count(current):
@@ -25,6 +50,7 @@ def supervise(config):
     state={'target_total_updates':40000,'automatic_promotion':False}
     def update(**values):
         state.update(values,updated_at=time.time()); atomic_json(out/'status.json',state)
+        emit(f"Run: {state.get('state')} | {state.get('stage','')} | saved={state.get('candidate',{}).get('updates','?')}/40000")
     def candidate(): return json.loads((root/'candidate.json').read_text())
     def evaluate(stage, initial=False):
         from scripts.evaluate_alpha_fresh import evaluation_identity,reusable
@@ -40,10 +66,10 @@ def supervise(config):
         if report.parent.exists():
             report.parent.rename(out/(stage+'-previous-'+str(time.time_ns())))
         update(state='evaluation',stage=stage,candidate=candidate())
-        command=[sys.executable,'scripts/evaluate_alpha_fresh.py','--config',config,'--output',str(report),'--coding']
+        command=[sys.executable,'-u','scripts/evaluate_alpha_fresh.py','--config',config,'--output',str(report),'--coding']
         if initial:command.append('--initial')
         with (out/(stage+'-'+str(time.time_ns())+'.log')).open('w') as log:
-            result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
+            result=run_logged(command,log)
         if result.returncode:raise RuntimeError(f'Evaluation {stage} failed')
         saved=json.loads(report.read_text())
         if not saved.get('complete') or not saved.get('checkpoint_unchanged'):raise RuntimeError('Incomplete evaluation evidence')
@@ -64,7 +90,7 @@ def supervise(config):
                 (root/'pause-training').touch(); update(state='complete',candidate=pointer,report=str(out/'report.json')); return
             update(state='training',stage=f'updates-{current}-{current+count}',candidate=pointer,saved_updates=current,next_updates=count)
             with (out/f'updates-{current}-{current+count}-{time.time_ns()}.log').open('w') as log:
-                result=subprocess.run([sys.executable,__file__,'--config',config,'--worker','--updates',str(count)],stdout=log,stderr=subprocess.STDOUT)
+                result=run_logged([sys.executable,'-u',__file__,'--config',config,'--worker','--updates',str(count)],log)
             if result.returncode: raise RuntimeError(f'Training worker exited {result.returncode}')
             now=candidate()
             if digest(root/(now['generation']+'.pt'))!=now['sha256']: raise RuntimeError('Checkpoint checksum mismatch')

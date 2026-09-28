@@ -47,7 +47,7 @@ def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None,tasks=Non
     # Shared GPU ownership already covers this read-only evaluation.
     store=None
     try:
-        if checkpoint_pointer not in ('candidate.json','initial.json'):raise ValueError('Unsupported checkpoint pointer')
+        if checkpoint_pointer not in ('candidate.json','initial.json','baseline.json'):raise ValueError('Unsupported checkpoint pointer')
         pointer=json.loads((root/checkpoint_pointer).read_text())
         model,data=load(root,pointer,model_device(cfg)); verify_run(cfg,data); del data
         model.eval().requires_grad_(False)
@@ -65,21 +65,37 @@ def evaluate(config,output,max_new_tokens=128,evaluation_capacity=None,tasks=Non
         for task in selected_tasks:
             tools=CodingTools(CodingEnvironment(output/task,task))
             def policy(state):
-                return {**decide(model,tokenizer,row,state['messages'],state['definitions'],max_new_tokens),
-                        'generation':pointer['generation']}
-            result=run_episode(task,tools,policy,store,4)
+                from contextlib import nullcontext
+                from baby_arcus.routing_trace import RoutingTrace
+                with (RoutingTrace(model,max_events=1,max_positions=1,count_usage=True)
+                      if cfg.get('evaluation_mapping',False) else nullcontext()) as trace:
+                    decision=decide(model,tokenizer,row,state['messages'],state['definitions'],max_new_tokens)
+                if trace is not None: decision['routing_usage']=trace.usage.report()
+                return {**decision, 'generation':pointer['generation']}
+            result=run_episode(task,tools,policy,store,cfg.get('evaluation_actions',4))
             events=store.read(task)
+            from baby_arcus.tool_episode_metrics import summarize
+            result.update(summarize(events))
             result['valid_calls']=sum(e.get('kind')=='intent' and e['decision'].get('status')=='call' for e in events)
             result['tool_search_calls']=sum(e.get('kind')=='intent' and (e.get('decision',{}).get('call') or {}).get('name')=='tool_search' for e in events)
             result['invalid_decisions']=sum(e.get('kind')=='intent' and e.get('decision',{}).get('status') not in ('call','cancelled') for e in events)
             result['tool_errors']=sum(e.get('kind')=='outcome' and e.get('result',{}).get('status')=='tool_error' for e in events)
             result['generated_tokens']=sum(e.get('decision',{}).get('generated_tokens',0) for e in events if e.get('kind')=='intent')
+            from baby_arcus.sft_target_contract import classify
+            result['external_transcript_decisions']=sum(classify(e.get('decision',{}).get('text',''))=='external_transcript' for e in events if e.get('kind')=='intent')
+            result['decisions']=[{k:e['decision'].get(k) for k in ('status','call','text','reason','generated_tokens','routing_usage')} for e in events if e.get('kind')=='intent']
             results.append(result)
         report={'executor_control':executor_evidence,'complete':True,'cohort':{'evaluator_sha256':digest(Path(__file__)),'tasks':list(selected_tasks),'actions':4,'max_new_tokens':max_new_tokens,'context':model.body.cfg.max_seq_len},'candidate':pointer,'tasks':results,'solved':sum(r['solved'] for r in results),
                 'total':len(results),'seconds':time.monotonic()-started,
                 'checkpoint_unchanged':digest(root/(pointer['generation']+'.pt'))==pointer['sha256'],
                 'max_new_tokens':max_new_tokens,'mastery_established':False,'evaluation_routing':routing,
                 'limitations':'Small task cohort, one seed, four actions each. Training contamination requires a separate corpus audit; no general superiority claim.'}
+        report['cohort']['actions']=cfg.get('evaluation_actions',4)
+        if cfg.get('evaluation_mapping',False):
+            from baby_arcus.route_usage import aggregate
+            decisions=[d for t in results for d in t['decisions']]
+            report['routing_usage']=aggregate([d['routing_usage'] for d in decisions],sum(d['generated_tokens'] or 0 for d in decisions))
+        report['limitations']='Small repeated task cohort, one seed. Action budget: '+str(cfg.get('evaluation_actions',4))+'. Not a general coding benchmark.'
         atomic_json(output/'report.json',report)
         return report
     finally:

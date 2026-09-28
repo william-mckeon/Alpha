@@ -13,12 +13,13 @@ from baby_arcus.sft_dataset import windows,validate_window
 
 
 class PackedTrainingStore:
-    def __init__(self,folder,records,tokenizer,context,tokenizer_identity,max_bytes=1024**3,interleave=False,consumed_prefix=0):
+    def __init__(self,folder,records,tokenizer,context,tokenizer_identity,max_bytes=1024**3,interleave=False,consumed_prefix=0,balance=False):
         if type(max_bytes) is not int or not 1024**2<=max_bytes<=64*1024**3:raise ValueError('Invalid packed SFT storage budget')
         folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
         sources={name:__import__('hashlib').sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
-                 for name in ('sft_dataset.py','conversation_format.py','sft_validation.py','packed_training_store.py')}
-        self.identity=digest({'records':getattr(records,'identity',records),'tokenizer':tokenizer_identity,'context':context,'sources':sources})
+                 for name in ('sft_dataset.py','conversation_format.py','sft_validation.py','sft_target_contract.py','packed_training_store.py')}
+        self.identity=digest({'version':2,'records':getattr(records,'identity',records),'tokenizer':tokenizer_identity,'context':context,'sources':sources,
+                              'sampling':{'interleave':interleave,'consumed_prefix':consumed_prefix,'balance':balance}})
         self.context=context;self.vocabulary=tokenizer.vocab_size
         path=folder/(self.identity+'.sqlite')
         if not path.exists():
@@ -27,16 +28,19 @@ class PackedTrainingStore:
             try:
                 db.execute('PRAGMA synchronous=FULL')
                 db.execute('PRAGMA max_page_count='+str(max_bytes//db.execute('PRAGMA page_size').fetchone()[0]))
-                db.executescript('CREATE TABLE windows (ordinal INTEGER PRIMARY KEY,payload TEXT,sha TEXT); CREATE TABLE meta (payload TEXT);')
+                db.executescript('CREATE TABLE windows (ordinal INTEGER PRIMARY KEY,payload TEXT,sha TEXT); CREATE TABLE meta (payload TEXT); CREATE TABLE provenance (ordinal INTEGER PRIMARY KEY,payload TEXT,sha TEXT);')
                 report={'context_tokens':context,'accepted':[],'quarantined':[],'target_tokens':0}
                 count=0
                 for record in records:
                     db.execute('SAVEPOINT example')
                     begin=count;tokens=0;maximum=0
                     try:
-                        for window in windows(record,tokenizer,context):
+                        from baby_arcus.sft_dataset import target_metadata
+                        metadata=target_metadata(record)
+                        for offset,window in enumerate(windows(record,tokenizer,context)):
                             validate_window(window,self.vocabulary,context)
                             db.execute('INSERT INTO windows VALUES (?,?,?)',(count,canonical(window).decode(),digest(window)))
+                            db.execute('INSERT INTO provenance VALUES (?,?,?)',(count,json.dumps(metadata[offset]),digest(metadata[offset])))
                             count+=1;tokens+=sum(window['mask'][1:]);maximum=max(maximum,len(window['ids'])-1)
                         if not tokens:raise ValueError('No assistant targets')
                         report['accepted'].append({'sha256':digest(record),'target_tokens':tokens,'max_input_tokens':maximum,'windows':count-begin})
@@ -55,6 +59,27 @@ class PackedTrainingStore:
             if metadata['identity']!=self.identity:raise ValueError('Packed dataset identity mismatch')
             self.report=metadata['report'];self.count=metadata['count']
             self.order=None
+            if balance:
+                if consumed_prefix or interleave:
+                    raise ValueError('Balanced sampling requires a new zero-cursor continuation')
+                buckets={}
+                for ordinal,payload,sha in self.db.execute('SELECT ordinal,payload,sha FROM provenance ORDER BY ordinal'):
+                    meta=json.loads(payload)
+                    if digest(meta)!=sha:raise ValueError('Target provenance integrity failure')
+                    from baby_arcus.sft_target_contract import source_family
+                    key=(meta['target_kind'],source_family(meta['source']))
+                    buckets.setdefault(key,[]).append(ordinal)
+                # Explicit repeat-small-buckets epoch: deterministic, bounded and resumable.
+                kinds=sorted({k[0] for k in buckets})
+                by_kind={kind:sorted(k for k in buckets if k[0]==kind) for kind in kinds}
+                rounds=max((len(v)*len(by_kind[k[0]]) for k,v in buckets.items()),default=0)
+                if rounds*len(kinds)>1000000:raise ValueError('Balanced epoch exceeds bounded schedule')
+                self.order=[]
+                for index in range(rounds):
+                    for kind in kinds:
+                        keys=by_kind[kind];key=keys[index%len(keys)];values=buckets[key]
+                        self.order.append(values[(index//len(keys))%len(values)])
+                self.count=len(self.order)
             if interleave:
                 if type(consumed_prefix) is not int or not 0<=consumed_prefix<=self.count:
                     raise ValueError('Invalid interleaved prefix')
@@ -95,3 +120,12 @@ class PackedTrainingStore:
         if expected!=self.count:raise ValueError('Packed windows missing')
 
     def close(self):self.db.close()
+
+    def metadata_at(self,cursor):
+        if not 0<=cursor<self.count:raise ValueError('Invalid metadata cursor')
+        ordinal=self.order[cursor] if self.order is not None else cursor
+        row=self.db.execute('SELECT payload,sha FROM provenance WHERE ordinal=?',(ordinal,)).fetchone()
+        if row is None:raise ValueError('Missing target provenance')
+        value=json.loads(row[0])
+        if digest(value)!=row[1]:raise ValueError('Target provenance integrity failure')
+        return value

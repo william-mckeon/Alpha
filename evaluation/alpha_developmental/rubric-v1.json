@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "relevance": "Human: does the answer address the question?",
+  "correctness": "Exact checks or restricted fixed tests when specified; otherwise human review.",
+  "instruction_following": "Exact requested format where checked; otherwise human review.",
+  "repetition": "Fraction of repeated word four-grams, descriptive only.",
+  "task_success": "Only measured for defined deterministic tasks; null is unmeasured.",
+  "scale": "Human review 0=not met, 1=partial, 2=met; never auto-infer human scores.",
+  "limitations": "36 fixed repeated prompts; not a broad intelligence or contamination-free benchmark."
+}

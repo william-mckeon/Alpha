@@ -1,0 +1,16 @@
+{
+  "training_authorized": false,
+  "capability_thresholds": {
+    "max_retention_rate_drop": 0.1,
+    "max_language_nll_increase": 0.2,
+    "min_coding_solved": 1,
+    "min_coding_gain": 1
+  },
+  "tool_correction": {
+    "min_valid_call_rate": 0.8,
+    "min_discovery_solved": 8,
+    "max_external_transcript_rate": 0.0,
+    "max_nll_increase": 0.2
+  },
+  "review_note": "Proposed thresholds; dataset and numeric gates require joint review before training."
+}

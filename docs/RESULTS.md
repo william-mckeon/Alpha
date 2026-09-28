@@ -212,3 +212,8 @@ logged here once a real (cloud-scale) run exists. See
 superseded config, not comparable. R1 above is the first valid, reproducible entry.*
 
 *See [ROADMAP.md](../ROADMAP.md) for the ladder, [ARCUS_MODEL_DESIGN.md](ARCUS_MODEL_DESIGN.md) for the design.*
+
+
+## Alpha 2.0 developmental implementation — 2026-09-28
+
+Training stays paused at 53,192. The new separate developmental suite, bounded routing maps, and gated private 60k release are documented in [the implementation report](ALPHA_2_MAPPING_AND_EVALUATION.md). No 60k completion or publication is claimed.

@@ -162,7 +162,7 @@ def package(name):
         raise RuntimeError("Loaded model differs from checkpoint state layout")
     destination = OUTPUT / name
     if destination.exists():
-        shutil.rmtree(destination)
+        raise ValueError("Refusing to replace an existing release directory")
     destination.mkdir(parents=True)
     weights = destination / "model.safetensors"
     parameter_count = sum(value.numel() for value in model.parameters())
@@ -213,7 +213,12 @@ def package(name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", choices=tuple(MODELS), action="append")
+    parser.add_argument("--spec", help="Explicit Alpha 2.0 release specification")
     args = parser.parse_args()
+    if args.spec:
+        from scripts.release_alpha_2 import package as package_v2
+        print(package_v2(json.loads(Path(args.spec).read_text())))
+        raise SystemExit(0)
     selected = args.model or list(MODELS)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     reports = []
@@ -221,4 +226,6 @@ if __name__ == "__main__":
         print(json.dumps({"packaging": model_name}), flush=True)
         reports.append(package(model_name))
         print(json.dumps(reports[-1]), flush=True)
-    (OUTPUT / "packages.json").write_text(json.dumps(reports, indent=2), encoding="utf-8")
+    index=OUTPUT / "packages.json"
+    retained=json.loads(index.read_text()) if index.exists() else []
+    index.write_text(json.dumps(retained+reports,indent=2),encoding="utf-8")

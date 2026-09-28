@@ -3,7 +3,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, hf_hub_download
 
 
 def sha256(path):
@@ -22,7 +22,13 @@ def main():
     for item in published:
         local = root / item["model"]
         manifest = json.loads((local / "manifest.json").read_text())
-        info = api.model_info(item["repo_id"], files_metadata=True)
+        revision=item.get("revision",item.get("commit"))
+        if not revision:raise ValueError("Immutable publication commit required")
+        if "/commit/" in revision:revision=revision.rsplit("/",1)[-1]
+        info = api.model_info(item["repo_id"], revision=revision, files_metadata=True)
+        for name,expected_hash in {**manifest["files"],"manifest.json":sha256(local/"manifest.json")}.items():
+            remote=hf_hub_download(item["repo_id"],name,revision=revision,token=os.environ.get("HF_TOKEN"))
+            if sha256(remote)!=expected_hash:raise ValueError("Remote checksum mismatch: "+name)
         siblings = {entry.rfilename: entry for entry in info.siblings}
         expected = set(manifest["files"]) | {"manifest.json"}
         missing = expected - set(siblings)

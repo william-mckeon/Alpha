@@ -10,6 +10,28 @@ class Tokenizer:
 
 
 class PackedTests(unittest.TestCase):
+    def test_numbered_lessons_do_not_crowd_out_coding(self):
+        records=[]
+        for source in ('alpha:synthetic:1','alpha:synthetic:2','alpha:coding'):
+            records.append({'version':1,'source':source,'group':source,'split':'training',
+                'messages':[{'role':'user','content':source},{'role':'assistant','content':'ok'}]})
+        with tempfile.TemporaryDirectory() as tmp:
+            store=PackedTrainingStore(tmp,records,Tokenizer(),512,'test',balance=True)
+            self.assertEqual(sum(store.metadata_at(i)['source']=='alpha:coding' for i in range(store.count)),store.count//2)
+            store.close()
+    def test_balanced_source_kind_epoch_resumes_exactly(self):
+        records=[]
+        for source,count in (('fixture:a',1),('fixture:b',3)):
+            for index in range(count):
+                records.append({'version':1,'source':source,'group':source,'split':'training',
+                    'messages':[{'role':'user','content':str(index)},{'role':'assistant','content':'ok'}]})
+        with tempfile.TemporaryDirectory() as tmp:
+            store=PackedTrainingStore(tmp,records,Tokenizer(),512,'test',balance=True)
+            self.assertEqual(store.count,6)
+            self.assertEqual([store.metadata_at(i)['source'] for i in range(6)],['fixture:a','fixture:b']*3)
+            self.assertEqual(list(store.resume(3)),list(store.resume(0))[3:])
+            store.close()
+
     def test_source_interleaving_preserves_consumed_prefix(self):
         records=[]
         for source in ('fixture:a','fixture:b','fixture:c'):

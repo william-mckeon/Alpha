@@ -49,3 +49,12 @@ def packing_report(records, tokenizer, context=512):
         except ValueError as exc:
             result['quarantined'].append({'sha256':identity,'reason':str(exc)})
     return result
+
+
+def target_metadata(record):
+    """Parallel metadata, kept outside the strict ids/mask loss contract."""
+    from baby_arcus.sft_target_contract import validate_target
+    from baby_arcus.contracts import digest
+    return [{'source':record['source'],'group':record['group'],'record_sha256':digest(record),
+             'target_kind':validate_target(item)} for item in record['messages']
+            if item['role']=='assistant' and item.get('train',True)]

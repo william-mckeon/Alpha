@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "max_events": 4096,
+  "max_positions": 256,
+  "max_new_tokens": 128,
+  "training_sample_every": 64,
+  "training_max_positions": 32,
+  "training_max_events": 256
+}

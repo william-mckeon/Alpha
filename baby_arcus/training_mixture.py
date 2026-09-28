@@ -11,7 +11,7 @@ def validate(config):
         raise ValueError('Invalid training schema')
     if config.get('exhaustion_policy','stop') not in ('stop', 'repeat-sft'):
         raise ValueError('Unsupported exhaustion policy')
-    if config.get('exhaustion_policy') == 'repeat-sft' and (not language_only or config.get('baseline_policy') != 'random-initialization'):
+    if config.get('exhaustion_policy') == 'repeat-sft' and (not language_only or config.get('baseline_policy') not in ('random-initialization','tool-correction')):
         raise ValueError('SFT repetition requires an explicit fresh language-only plan')
     if not config.get('fixture') and config.get('exhaustion_policy') not in ('stop', 'repeat-sft'):
         raise ValueError('Explicit exhaustion policy required for real training')
@@ -27,6 +27,10 @@ def validate(config):
         raise ValueError('Explicit additional target-token budget required')
     if config.get('training_enabled') is not True:
         raise ValueError('Training remains paused')
+    if config.get('baseline_policy') == 'tool-correction':
+        if ((config.get('source_updates'), config.get('target_total_updates')) not in ((40000,41000),(41000,60000))
+                or config.get('evaluation_every') != 1000 or config.get('balanced_sft') is not True):
+            raise ValueError('Correction requires an authorized frozen parent, bounded target and 1000-update evaluations')
     if language_only:
         from baby_arcus.context_contract import context_tokens
         context_tokens(config)
@@ -47,7 +51,8 @@ def validate(config):
         try:
             gates=json.loads(Path(config['gates_file']).read_text(encoding='utf-8'))
             if (gates.get('training_authorized') is not True or digest(gates)!=config.get('gates_sha256')
-                    or not valid_thresholds(gates.get('capability_thresholds'))):
+                    or not valid_thresholds(gates.get('capability_thresholds'))
+                    or (config.get('baseline_policy')=='tool-correction' and not valid_correction_gates(gates))):
                 raise ValueError('Agreed, content-pinned acceptance gates required')
         except (OSError,KeyError,TypeError) as exc:
             raise ValueError('Real training acceptance gates unavailable') from exc
@@ -68,9 +73,26 @@ def identity(config):
     return digest({'contract':'alpha-three-stage-context-v2','plan':semantic})
 
 
+def migrate_state(state, plan, new_identity, updates):
+    if state['plan_hash']==new_identity:return
+    migration=plan.get('migration',{})
+    if state['plan_hash']!=migration.get('previous_plan_hash') or updates!=migration.get('at_updates'):
+        raise ValueError('Mixture, approvals or budget changed; prepare a new continuation')
+    state.setdefault('plan_migrations',[]).append({'from':state['plan_hash'],'to':new_identity,'updates':updates})
+    state['plan_hash']=new_identity
+
+
 def valid_thresholds(values):
     keys={'max_retention_rate_drop','max_language_nll_increase','min_coding_solved','min_coding_gain'}
     return (isinstance(values,dict) and set(values)==keys
             and all(type(v) in (int,float) and math.isfinite(v) and v>=0 for v in values.values())
             and values['max_retention_rate_drop']<=1
             and all(type(values[k]) is int for k in ('min_coding_solved','min_coding_gain')))
+
+
+def valid_correction_gates(gates):
+    values=gates.get('tool_correction',{})
+    return (set(values)=={'min_valid_call_rate','min_discovery_solved','max_external_transcript_rate','max_nll_increase'}
+            and all(type(v) in (int,float) and math.isfinite(v) and v>=0 for v in values.values())
+            and values['min_valid_call_rate']<=1 and values['max_external_transcript_rate']<=1
+            and type(values['min_discovery_solved']) is int)

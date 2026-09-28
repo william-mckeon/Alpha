@@ -80,4 +80,14 @@ def decide(model, tokenizer, row, messages, definitions, max_new_tokens=128, can
                 return {**evidence, 'status':'call', 'call':call, 'text':text, 'generated_tokens':len(generated)}
             except (ValueError, TypeError, KeyError):
                 pass
-    return {**evidence, 'status':'invalid_call', 'call':None, 'text':tokenizer.decode(generated), 'generated_tokens':len(generated)}
+            if '\n</assistant>' in text:
+                return {**evidence,'status':'invalid_call','reason':'end_of_turn_without_action','call':None,
+                        'text':text,'generated_tokens':len(generated)}
+    text=tokenizer.decode(generated)
+    from baby_arcus.sft_target_contract import classify
+    kind=classify(text)
+    reason='external_transcript' if kind=='external_transcript' else 'generation_budget_exhausted'
+    try:
+        json.loads(__import__('html').unescape(text));reason='invalid_action_schema'
+    except ValueError:pass
+    return {**evidence, 'status':'invalid_call', 'reason':reason,'call':None, 'text':text, 'generated_tokens':len(generated)}

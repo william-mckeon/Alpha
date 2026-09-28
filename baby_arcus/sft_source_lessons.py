@@ -12,6 +12,26 @@ from baby_arcus.sft_validation import validate
 ADAPTER = 'opencode-literal-lesson-v1'
 
 
+def action_record(history, definitions, call, tokenizer, context, generation_tokens, source, group, split):
+    """A single runtime-identical action target; observations are never targets."""
+    from baby_arcus.coding_policy import prepare_prompt
+    from baby_arcus.coding_contracts import validate_call
+    from baby_arcus.conversation_format import content
+    from baby_arcus.sft_dataset import windows
+    validate_call(call)
+    target={'role':'assistant','content':json.dumps(call,sort_keys=True),'target_kind':'action_prediction'}
+    target_tokens=tokenizer.encode(content(target)+'\n</assistant>\n')
+    if len(target_tokens)>generation_tokens:raise ValueError('Action exceeds inference budget')
+    packed,ids,selected=prepare_prompt(history,definitions,tokenizer,context-generation_tokens)
+    if call['name'] not in {d['name'] for d in selected}:raise ValueError('Target tool not visible')
+    record={'version':1,'source':source,'group':group,'split':split,
+            'messages':[dict(m,train=False) if m['role']=='assistant' else dict(m) for m in packed]+[target]}
+    sequence=next(windows(record,tokenizer,context))
+    prefix=[i for i,m in zip(sequence['ids'],sequence['mask']) if not m]
+    if prefix!=ids:raise ValueError('Training/runtime prompt mismatch')
+    return record
+
+
 def extract(row):
     completion = row.get('completion', {})
     calls = completion.get('tool_calls', [])

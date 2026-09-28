@@ -1,0 +1,46 @@
+{
+  "schema": "arcus-smollm2-reference-v1",
+  "purpose": "Reviewed reference and constraints; not an executable training config",
+  "launch_ready": false,
+  "initialization": "random",
+  "required_unique_parameters": 128353994,
+  "preserve_arcus_architecture": true,
+  "preserve_arcus_tokenizer": true,
+  "pretrained_weight_import": false,
+  "upstream_revision": "f54818907404ec3d6bb150357b7d0dea333f1aea",
+  "upstream_recipe": "text/pretraining/smollm2/config_smollm2_135M.yaml",
+  "reference": {
+    "optimizer_steps": 2000000,
+    "sequence_length": 2048,
+    "data_parallel_replicas": 64,
+    "micro_batch_size": 8,
+    "gradient_accumulation": 1,
+    "global_sequences_per_update": 512,
+    "tokens_per_update": 1048576,
+    "nominal_total_tokens": 2097152000000,
+    "learning_rate": 0.003,
+    "warmup_steps": 2000,
+    "decay_start": 1600000,
+    "decay_steps": 400000,
+    "minimum_lr": 0,
+    "adam_betas": [
+      0.9,
+      0.95
+    ],
+    "adam_epsilon": 1E-08,
+    "weight_decay": 0.01,
+    "clip_grad": 1.0
+  },
+  "dataset_mixture_weights": null,
+  "launch_blockers": [
+    "Exact component weights and prepared corpus provenance unresolved",
+    "Arcus Nanotron model adapter and checkpoint parity unimplemented",
+    "Fresh 128353994-parameter construction and optimizer stability untested in this trainer",
+    "Sustained hardware throughput and storage requirements unmeasured",
+    "New experiment runtime budget and deadline unresolved"
+  ],
+  "required_context_tokens": 16384,
+  "mode_specification": "Retain current Arcus MoDE specifications; do not adopt donor dense architecture",
+  "requested_training_sequence_length": 16384,
+  "tool_calling_data_intent": "Include reviewed tool-calling SFT data; smol-smoltalk excludes function calling, so exact dataset choice remains unresolved"
+}

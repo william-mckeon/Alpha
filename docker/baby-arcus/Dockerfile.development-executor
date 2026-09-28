@@ -1,0 +1,3 @@
+ARG BASE_IMAGE=arcus-alpha-fresh-executor:local
+FROM ${BASE_IMAGE}
+COPY baby_arcus /app/baby_arcus

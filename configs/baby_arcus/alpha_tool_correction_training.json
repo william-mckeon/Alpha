@@ -1,0 +1,31 @@
+{
+  "schema": "alpha-phase2b-v1",
+  "training_enabled": false,
+  "baseline_policy": "tool-correction",
+  "source_sha256": "0fe1c3022f6e60e7171b394eb37ab844c3c851b86dec6e5f1375270f24f241da",
+  "staging_store": "/review/review.sqlite",
+  "approved_batches": [],
+  "approved_source_manifests": [],
+  "mixture": [
+    "language",
+    "sft",
+    "coding_corpus",
+    "sft"
+  ],
+  "token_budget": 20000000,
+  "context_tokens": 16384,
+  "language_window_tokens": 16384,
+  "resume_after_seconds": 60,
+  "preserve_embodied_schedule": false,
+  "automatic_promotion": false,
+  "exhaustion_policy": "stop",
+  "target_total_updates": 41000,
+  "gates_file": "/run-config/gates.json",
+  "gates_sha256": "",
+  "interleave_corpus_files": true,
+  "interleave_sft_sources": false,
+  "source_checkpoint": "runs/test2/alpha-fresh128m-16k-seed-2101/candidate.json",
+  "source_updates": 40000,
+  "evaluation_every": 1000,
+  "balanced_sft": true
+}

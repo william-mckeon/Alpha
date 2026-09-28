@@ -7,7 +7,7 @@ from baby_arcus.coding_policy import system_prompt
 
 
 def run_episode(episode, tools, policy, store, max_steps=8, cancelled=lambda: False):
-    if type(max_steps) is not int or not 1 <= max_steps <= 32:
+    if type(max_steps) is not int or not 1 <= max_steps <= 128:
         raise ValueError('Invalid episode budget')
     # A crash between intent and receipt is ambiguous. Never repeat a side effect.
     if store.read(episode):

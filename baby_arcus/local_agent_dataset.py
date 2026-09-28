@@ -73,5 +73,7 @@ def episode(messages,source,group):
     value={'version':1,'source':source,'group':group,'split':split_for(group),'messages':cleaned,
            'provenance':{'adapter':'local-agent-log-v1','input_sha256':digest(messages),
                          'target_kinds':['text'],'terminal_result_observed':True}}
+    from baby_arcus.sft_target_contract import annotate
+    value = annotate(value)
     validate(value)
     return value,edits

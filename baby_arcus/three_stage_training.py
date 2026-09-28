@@ -11,6 +11,7 @@ from baby_arcus.runtime_contract import model_device
 import torch
 from arcus.tokenizer import get_tokenizer
 from baby_arcus import training_mixture
+from baby_arcus.training_progress import emit, progress_line
 from baby_arcus.data_staging import StagingStore
 from baby_arcus.data_manifest import validate_manifest
 from baby_arcus.sft_dataset import windows
@@ -35,8 +36,12 @@ def train(config, updates, checkpoint_every=1):
     root = Path(cfg['root'])
     def stage(name, **values):
         atomic_json(root/'training-stage.json', {'stage':name,'updated_at':time.time(),**values})
+        if name != 'optimizer_step':
+            emit(f"Stage: {name} | " + ' '.join(f'{k}={v}' for k,v in values.items()))
     if (root/'pause-training').exists():
         return {'updates_this_call':0,'stop_reason':'paused','mastery_established':False}
+    from baby_arcus.routing_trace import load_mapping_config
+    trace_config=load_mapping_config() if cfg.get('routing_telemetry',False) else None
     plan = json.loads(Path(cfg['three_stage_config']).read_text())
     identity = training_mixture.validate(plan)
     if plan['context_tokens'] != cfg.get('context_tokens',512):
@@ -85,6 +90,7 @@ def train(config, updates, checkpoint_every=1):
                                     {'encoding':cfg['encoding'],'version':cfg['tiktoken_version']},
                                     interleave=plan.get('interleave_sft_sources',False),
                                     consumed_prefix=plan.get('sft_preserved_prefix',0),
+                                    balance=plan.get('balanced_sft',False),
                                     max_bytes=min(cfg.get('packed_sft_max_bytes',1024**3),cfg['max_storage_bytes']//4))
     packing=packed_store.report
     atomic_json(root/'sft-packing-report.json',packing)
@@ -105,12 +111,15 @@ def train(config, updates, checkpoint_every=1):
         sources = source_manifest()
         state = progress.setdefault('three_stage',{'version':1,'plan_hash':identity,'index':0,
             'sft_cursor':0,'coding_cursor':{},'additional_target_tokens':0,'seconds':0.})
+        if (plan.get('baseline_policy')=='tool-correction' and state['plan_hash']!=identity
+                and progress['updates']==plan['source_updates'] and manifest['sha256']==plan['source_sha256']
+                and not plan.get('migration')):
+            progress.setdefault('previous_three_stage',[]).append(state)
+            state={'version':1,'plan_hash':identity,'index':0,'sft_cursor':0,'coding_cursor':{},
+                   'additional_target_tokens':0,'seconds':0.}
+            progress['three_stage']=state
         if state['plan_hash'] != identity:
-            migration=plan.get('migration',{})
-            if state['plan_hash']!=migration.get('previous_plan_hash') or progress['updates']!=migration.get('at_updates'):
-                raise ValueError('Mixture, approvals or budget changed; prepare a new continuation')
-            state.setdefault('plan_migrations',[]).append({'from':state['plan_hash'],'to':identity,'updates':progress['updates']})
-            state['plan_hash']=identity
+            training_mixture.migrate_state(state,plan,identity,progress['updates'])
         import itertools
         supervised = packed_store.resume(state['sft_cursor'])
         sustained = progress.setdefault('sustained',{'index':0,'motor':{},'corpus_cursor':{},'seconds':0.})
@@ -138,6 +147,8 @@ def train(config, updates, checkpoint_every=1):
             coding_stream=interleaved(coding,tokenizer,state['coding_cursor'],window)
         check(root,cfg['max_storage_bytes'],reserve)
         started = time.monotonic(); completed = 0; reason = 'update_budget'
+        chunk_started = started
+        last_display = started
         def commit():
             nonlocal manifest,started
             if source_manifest() != sources:
@@ -148,6 +159,7 @@ def train(config, updates, checkpoint_every=1):
             manifest = save(root,model,optimizer,progress)
             atomic_json(root/'candidate.json',manifest)
             atomic_json(root/'three-stage-progress.json',{'candidate':manifest,'state':state,'mastery_established':False})
+            emit(f"Checkpoint saved: step {manifest['updates']:,} | sha256={manifest['sha256']}")
             started = time.monotonic()
         for offset in range(updates):
             if progress['updates'] >= plan.get('target_total_updates', 2**63):
@@ -197,8 +209,13 @@ def train(config, updates, checkpoint_every=1):
             from torch.nn.attention import sdpa_kernel, SDPBackend
             stage('optimizer_step', device=str(next(model.parameters()).device), updates=progress['updates'], stream=stream)
             attention = sdpa_kernel(SDPBackend.EFFICIENT_ATTENTION) if cfg.get('attention_backend') == 'efficient' else nullcontext()
-            with attention:
-                result = step(model,optimizer,tokenizer,row,target)
+            from baby_arcus.routing_trace import RoutingTrace
+            sampled = trace_config is not None and (progress['updates']+1) % trace_config['training_sample_every'] == 0
+            with (RoutingTrace(model, max_events=trace_config['training_max_events'], max_positions=trace_config['training_max_positions']) if sampled else nullcontext()) as trace:
+                with attention:
+                    result = step(model,optimizer,tokenizer,row,target)
+            if trace is not None:
+                atomic_json(root/('routing-update-'+str(progress['updates']+1)+'.json'), trace.report())
             progress['updates'] += 1; progress['trained_tokens'] += result['trained_tokens']
             state['additional_target_tokens'] += result['trained_tokens']; state['index'] += 1
             if stream == 'embodied': sustained['index'] += 1
@@ -208,12 +225,21 @@ def train(config, updates, checkpoint_every=1):
                 if state['sft_cursor'] == packed_store.count:
                     state['sft_epoch'] = state.get('sft_epoch', 0) + 1
                     state['sft_cursor'] = 0
+                provenance=packed_store.metadata_at(state['sft_cursor'])
+                exposure=state.setdefault('target_exposures',{}).setdefault(
+                    provenance['source']+'/'+provenance['target_kind'],{'updates':0,'target_tokens':0,'loss_sum':0.})
+                exposure['updates']+=1;exposure['target_tokens']+=result['trained_tokens'];exposure['loss_sum']+=result['loss']
                 state['sft_cursor'] += 1
             progress['receipts'].append({'update':progress['updates'],'family':family,'plan_hash':identity,**result})
             metrics = state.setdefault('streams', {}).setdefault(stream, {'updates':0,'target_tokens':0})
             metrics['updates'] += 1
             metrics['target_tokens'] += result['trained_tokens']
             completed += 1
+            now = time.monotonic()
+            if completed == 1 or completed == updates or now-last_display >= 10:
+                emit(progress_line(progress['updates'],plan.get('target_total_updates',progress['updates']),
+                                   manifest['updates'],completed,now-chunk_started,result['loss'],stream))
+                last_display = now
             if completed % checkpoint_every == 0: commit()
         if progress['updates'] != manifest['updates']: commit()
         SESSION.release(root,manifest,cfg)

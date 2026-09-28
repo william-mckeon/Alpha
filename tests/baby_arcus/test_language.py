@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -10,7 +11,7 @@ from arcus.tokenizer import get_tokenizer
 from baby_arcus.body_policy import BodyPolicy
 from baby_arcus.language_model import LanguageAdapter, generate
 from baby_arcus.language_learning import update
-from baby_arcus.language_stream import LanguageStream, inventory
+from baby_arcus.language_stream import LanguageStream, atomic_json, inventory
 from baby_arcus.language_runtime import LanguageRuntime
 from baby_arcus.services.playroom import PlayroomApplication
 
@@ -33,6 +34,21 @@ class LanguageTests(unittest.TestCase):
         ids=self.tokenizer.encode(text)
         self.assertEqual(self.tokenizer.decode(ids),text)
         self.assertNotIn(self.tokenizer.eot_token,ids)
+
+    def test_atomic_json_retries_transient_permission_error(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'status.json';path.write_text('{"old":true}',encoding='utf-8')
+            real_replace=os.replace;attempts=[]
+            def transient(source,destination):
+                attempts.append((source,destination))
+                if len(attempts)<3:raise PermissionError('simulated OneDrive lock')
+                return real_replace(source,destination)
+            with patch('baby_arcus.language_stream.os.replace',side_effect=transient), \
+                 patch('baby_arcus.language_stream.time.sleep'):
+                atomic_json(path,{'new':True})
+            self.assertEqual(json.loads(path.read_text(encoding='utf-8')),{'new':True})
+            self.assertEqual(len(attempts),3)
+            self.assertEqual(list(Path(folder).glob('*.pending')),[])
 
     def test_stream_cursor_pause_replay_restart_and_holdout(self):
         with tempfile.TemporaryDirectory() as folder:

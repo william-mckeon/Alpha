@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "fluency": "Human review of sentence formation only: 0 predominantly malformed fragments; 1 mixed readable and malformed constructions; 2 predominantly readable grammatical sentences. Do not infer correctness or relevance from fluency.",
+  "coherence": "Human review of internal continuity: 0 disconnected or looping; 1 partially connected with repetition or contradictions; 2 a consistent connected response. Score separately from factual correctness.",
+  "relevance": "Human review: 0 does not address the request; 1 partly addresses it; 2 directly addresses it.",
+  "correctness": "Exact checks or restricted fixed tests when specified; otherwise human review.",
+  "instruction_following": "Exact requested format where checked; otherwise human review.",
+  "repetition": "Mean per-response fraction of repeated word four-grams; descriptive only, not a fluency score.",
+  "generation": "Report truncation, response length and empty responses separately; ending before the token limit is not proof of a complete answer.",
+  "task_success": "Only measured for defined deterministic tasks; null is unmeasured.",
+  "scale": "Human review 0=not met, 1=partial, 2=met. Never manufacture human ratings. Keep unreviewed values null and report their coverage.",
+  "limitations": "36 fixed repeated prompts; small single-seed cohort. No combined intelligence score. No training on these prompts or feedback."
+}

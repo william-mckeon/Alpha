@@ -16,7 +16,8 @@ class TrajectoryStore:
     def append(self, episode, sequence, record):
         from baby_arcus.contracts import identifier
         identifier(episode)
-        if type(sequence) is not int or not 0 <= sequence <= 64 or len(canonical(record)) > 1048576:
+        # One start event plus an intent/outcome pair for each of 128 actions.
+        if type(sequence) is not int or not 0 <= sequence <= 256 or len(canonical(record)) > 1048576:
             raise ValueError('Trajectory event exceeds bounds')
         with self.lock:
             return self._append(episode,sequence,record)

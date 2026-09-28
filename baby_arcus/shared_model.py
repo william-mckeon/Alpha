@@ -1,3 +1,4 @@
+from baby_arcus.routing_trace import route_phase
 """One trainable MoDE core; shared sensory context and specialized outputs."""
 from io import BytesIO
 import torch
@@ -55,6 +56,7 @@ class SharedModel(nn.Module):
     @property
     def core(self):return self.body.core
 
+    @route_phase("sensory")
     def forward(self,rows,tokenizer,requested=None):
         staged=requested==('decision',)
         if staged and (len(rows)!=1 or self.training or torch.is_grad_enabled()):
@@ -128,7 +130,8 @@ class SharedModel(nn.Module):
                 memory=torch.tensor([m['features'] for m in memories],device=device,dtype=torch.float32).mean(0,keepdim=True)
                 sequence=sequence.clone();sequence[:,-1]+=self.memory_input(memory)
             if sequence.shape[1]>self.body.cfg.max_seq_len:raise ValueError('Shared context exceeds core capacity')
-            hidden=self.core.trunk_embedded(sequence)[:,-1]
+            with route_phase("sensory"):
+                hidden=self.core.trunk_embedded(sequence)[:,-1]
             if staged:
                 # Choose activity using this same sensory context, then execute only
                 # the selected output branch; no second sensory forward is needed.
@@ -147,14 +150,16 @@ class SharedModel(nn.Module):
             text_features=self.language.output(hidden) if needed('text') else None
             if self.version>=3 and (requested is None or 'text' in requested):
                 prefix=ids or tokenizer.encode('Arcus:')
-                language_hidden=self.core.trunk_embedded(self.language.input(self.language.embedding(torch.tensor([prefix],device=device))))[:,-1]
+                with route_phase("language"):
+                    language_hidden=self.core.trunk_embedded(self.language.input(self.language.embedding(torch.tensor([prefix],device=device))))[:,-1]
                 text_features=self.language.output(language_hidden)+self.text_context(hidden)
             if self.version>=3:
                 if not raw:perception=torch.zeros((1,4,96,96),device=device)
             # Existing motor pathway uses the very same core; zero residual starts with retained standing logits.
             from baby_arcus.body_vocabulary import mask
             motor_needed=any(needed(key) for key in ('body','lying','sitting','aux'))
-            body_hidden=self.core.trunk(tokens)[:,-1] if motor_needed else None
+            with route_phase("motor"):
+                body_hidden=self.core.trunk(tokens)[:,-1] if motor_needed else None
             allowed=torch.tensor([mask(row['senses'])],device=device) if motor_needed else None
             # Sensory context selects the intention; retained motor heads execute it.
             # An unconstrained context residual overturned working joint sequences.

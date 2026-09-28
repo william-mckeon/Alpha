@@ -1,8 +1,13 @@
 ARG BASE_IMAGE=arcus-alpha-context:experimental
 FROM ${BASE_IMAGE}
 WORKDIR /app
+RUN python3 -m pip install --no-cache-dir --no-deps safetensors==0.6.2
 COPY arcus /app/arcus
 COPY baby_arcus /app/baby_arcus
 COPY scripts /app/scripts
 COPY tests /app/tests
 COPY configs /app/configs
+COPY evaluation /app/evaluation
+COPY docs/ALPHA_2_MODEL_CARD.md /app/docs/ALPHA_2_MODEL_CARD.md
+COPY docs/ALPHA_2_SNAPSHOT_MODEL_CARD.md /app/docs/ALPHA_2_SNAPSHOT_MODEL_CARD.md
+COPY LICENSE /app/LICENSE

@@ -29,6 +29,7 @@ from torch.utils.checkpoint import checkpoint
 
 from arcus.backbone import RMSNorm, GQAAttention, build_rope_cache
 from arcus.moe import MoELayer
+from baby_arcus.routing_trace import observe, tracing
 from arcus.mod_core import (
     ScalarRouter,
     mod_select,
@@ -71,6 +72,7 @@ class MoDEBlock(nn.Module):
         self.last_p_soft = p_soft
 
         if self.capacity >= 1.0:
+            if tracing():observe(self, "depth", kept=torch.ones(x.shape[:2], device=x.device, dtype=torch.bool), probability=p_soft, capacity=self.capacity)
             delta, aux, frac, _ovf = self.moe(normed)    # pure MoE (lossless reduction)
             self.last_compute_fraction = torch.ones((), device=x.device)
             self.last_expert_fraction = frac
@@ -79,6 +81,7 @@ class MoDEBlock(nn.Module):
 
         _B, T, _C = x.shape
         sel = mod_select(p_soft, self.capacity)
+        observe(self, "depth", kept=sel.keep, packed_slot=sel.slot, probability=p_soft, capacity=self.capacity)
         self.last_compute_fraction = sel.keep.float().mean().detach()
         packed = pack_kept(normed, sel)                  # gather kept tokens
         # Unfilled MoD buffer slots are padding, not real tokens for expert routing/loss.
@@ -145,6 +148,7 @@ class ArcusMoDE(nn.Module):
         try:
             for index,block in enumerate(self.blocks):
                 h=h+block.attn(block.norm1(h),cos,sin,cache=cache,layer=index)
+                if tracing():observe(block, "depth", kept=torch.ones(h.shape[:2], device=h.device, dtype=torch.bool), capacity=block.capacity, cached=True, position_offset=start)
                 delta,_,_,_=block.moe(block.norm2(h))
                 h=h+delta
             cache.length+=count

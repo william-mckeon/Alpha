@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "model_name": "Alpha-2.0",
+  "repo_id": "Islanderintel/Alpha-2.0",
+  "private": true,
+  "required_updates": 60000,
+  "milestones": [
+    42000,
+    43000,
+    44000,
+    45000,
+    46000,
+    47000,
+    48000,
+    49000,
+    50000,
+    51000,
+    52000,
+    53000,
+    54000,
+    55000,
+    56000,
+    57000,
+    58000,
+    59000,
+    60000
+  ],
+  "run_root": "runs/test2/alpha-tool-correction-60k-001",
+  "developmental_report": "developmental/evaluation-60000-scored.json",
+  "mapping_report": "developmental/mapping-60000.json",
+  "destination": "artifacts/huggingface/Alpha-2.0"
+}

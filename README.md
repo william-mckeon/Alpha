@@ -1,5 +1,12 @@
 # arcus
 
+Current Alpha 2.0 release work: [53,192-update research snapshot](docs/ALPHA_2_SNAPSHOT_RELEASE.md),
+with 128,353,994 unique parameters and separately reported developmental, language,
+tool and routing evidence. Training remains paused. The proposed next experiment
+uses Arcus's own 128M MoDE architecture and 16k window with an adapted SmolLM2 recipe;
+see the [complete file inventory](docs/ARCUS_128M_SMOLLM2_FILE_PLAN.md).
+The experiment history below describes earlier runs and tracks.
+
 ## Baby Arcus — native learning and viewer
 
 Latest experiment: [fresh repeat at depth capacity 1.0](docs/ARCUS_DEPTH100_RESULTS.md),
@@ -218,3 +225,12 @@ all required notices. No donor is selected or incorporated yet. The archived
 ## Arcus body, eyes and text
 
 The native desktop host now supports independent normalized leg controls, body sensations, separate eye/sleep state, scoped gaze and a durable Talk to Arcus input. A small reward-only standing pilot has separate checkpoints and live HTTP evidence. The 125M grid learner remains unchanged. See [implementation and validation](docs/ARCUS_BODY_EYES_CHAT_RESULTS.md) and [standing lesson](docs/ARCUS_STANDING_CURRICULUM.md).
+
+
+## Alpha 2.0 developmental diagnostics (2026-09-28)
+
+Mapping, separate developmental evaluation, pause handling and gated private release are implemented. Training remains paused at 53,192. See [implementation and validation](docs/ALPHA_2_MAPPING_AND_EVALUATION.md). No 60k completion or publication is claimed.
+
+The [final developmental dashboard](runs/diagnostics/alpha-development-final-20260928-140825/REPORT.html)
+contains all 108 responses from matched 40k, 45k and 53,192 evaluations, mapping,
+separate descriptive language measurements and pending human-review fields.
