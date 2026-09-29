@@ -81,4 +81,3 @@ headroom is checked before taking more updates and before saves. The current dri
 cannot retain an extended campaign of these checkpoints at the default cadence;
 resolve checkpoint storage before launch. Do not delete historical checkpoints.
 Read-only checkpoint inference uses the same GPU lock after training exits.
-

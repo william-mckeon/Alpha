@@ -52,4 +52,3 @@ Delete: **none**. Preserve all existing architectures, checkpoints, evaluation
 prompts and the Alpha 3.0 immutable package. If expert specialization has not
 demonstrated a useful gain, treat depth work as an independent efficiency experiment
 and disclose that limitation. No RL, context extension or new release is implied.
-
