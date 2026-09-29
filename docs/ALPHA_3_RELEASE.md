@@ -30,7 +30,25 @@ training data, credentials and private transcripts. Loading needs reviewed custo
 code (`trust_remote_code=True`). The LangChain/LangGraph application remains a
 separate local integration; publication does not create a hosted inference service.
 
-## Remote verification — pending
+## Remote verification — complete
+
+Verified September 29, 2026: private repository
+`https://huggingface.co/Islanderintel/Alpha-3.0`, immutable revision
+`127c753c055702c68a4afffece1d45b8bb266ece`.
+All 20 manifest entries plus manifest.json matched local SHA256 values. A second
+independent read verified privacy, revision and every hash: LFS server SHA256 for
+weight shards, downloaded immutable bytes for small Git files. Evidence:
+`runs/arcus3/release-alpha3-001/publication-127c753c055702c68a4afffece1d45b8bb266ece.json`
+and `independent-publication-verification.json` alongside it.
+
+All five shards finished successfully. Final metadata initially failed because
+installed huggingface_hub 1.21.0 does not accept upload_folder(num_threads=...).
+Removing that unsupported argument passed three recovery tests. Recovery 002
+reused all five verified remote shards and committed metadata without reuploading
+weights. The release remains the Phase 5 initialization, not any Phase 6/7/8
+training delta. Current Phase 8 project state is unchanged.
+
+## Historical upload recovery
 
 September 29 recovery: the original concurrent bulk upload exited with a shard
 upload error. No model files were committed; the repository remained private at
@@ -40,7 +58,7 @@ so no specific server failure is asserted. The uploader now commits/verifies one
 weight shard at a time, skips already matching LFS hashes on recovery, and commits
 metadata/manifest last. Two CPU-only mocked tests passed for resume behavior and
 privacy rejection. Intermediate shard commits are explicitly incomplete releases.
-One changed recovery attempt is running; see `upload-recovery-001.log` beside
+The first changed recovery attempt is recorded in `upload-recovery-001.log` beside
 the package. Failures now record sanitized exception types/HTTP status without
 printing signed URLs or credentials. Do not repeatedly relaunch unchanged failures.
 

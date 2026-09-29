@@ -90,5 +90,13 @@
   "training_scope": "dense-control-v1",
   "conversion_scope": "selective-experts-parity-v1",
   "expanded_scope": "qualification-v1",
-  "specialization_scope": "matched-64-v1"
+  "specialization_scope": "matched-64-v1",
+  "alpha3_publication": {
+    "receipt": "runs/arcus3/release-alpha3-001/publication-127c753c055702c68a4afffece1d45b8bb266ece.json",
+    "repo_id": "Islanderintel/Alpha-3.0",
+    "revision": "127c753c055702c68a4afffece1d45b8bb266ece",
+    "status": "verified-private",
+    "artifact": "phase5-initialization",
+    "training_updates": 0
+  }
 }
