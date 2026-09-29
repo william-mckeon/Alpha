@@ -32,6 +32,18 @@ separate local integration; publication does not create a hosted inference servi
 
 ## Remote verification — pending
 
+September 29 recovery: the original concurrent bulk upload exited with a shard
+upload error. No model files were committed; the repository remained private at
+revision `45885b5ea4b1ec3008e55e2d2026f7d1bc18f69b` with only `.gitattributes`.
+The available terminal error did not retain the underlying HTTP/network cause,
+so no specific server failure is asserted. The uploader now commits/verifies one
+weight shard at a time, skips already matching LFS hashes on recovery, and commits
+metadata/manifest last. Two CPU-only mocked tests passed for resume behavior and
+privacy rejection. Intermediate shard commits are explicitly incomplete releases.
+One changed recovery attempt is running; see `upload-recovery-001.log` beside
+the package. Failures now record sanitized exception types/HTTP status without
+printing signed URLs or credentials. Do not repeatedly relaunch unchanged failures.
+
 Standard HTTPS upload started September 29, 2026 after local validation and
 private-repository checks. Do not treat transferred LFS bytes as a committed or
 verified release. `scripts/publish_alpha_3.py` will record the immutable revision,
