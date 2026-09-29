@@ -1,8 +1,8 @@
 {
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
-  "phase": 5,
-  "status": "phase5-conversion-verified",
+  "phase": 6,
+  "status": "phase6-qualified-release-uploading",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -37,7 +37,8 @@
     "cloud": false,
     "publication": false,
     "inference": true,
-    "conversion": false
+    "conversion": false,
+    "expanded_preflight": false
   },
   "active_run": null,
   "deadline": null,
@@ -51,7 +52,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Phase 5 verified at 2,013,390,848 parameters with exact initialization/reload parity and matched live evaluations. No active job. Additional conversion or expanded training requires its own authorized scope.",
+  "note": "Eight-update qualification and exact replay passed. No further training authorized. Private Alpha 3.0 initialization upload is in progress, remote verification pending.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -71,8 +72,13 @@
     "conversion_parameters": 2013390848,
     "conversion_manifest_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
     "converted_baseline_report": "runs/arcus3/baseline-phase5-converted-001/scores.json",
-    "converted_application_report": "runs/arcus3/application-phase5-converted-002/application-report.json"
+    "converted_application_report": "runs/arcus3/application-phase5-converted-002/application-report.json",
+    "expanded_qualification_report": "runs/arcus3/expanded-preflight-phase6-002/qualification-report.json",
+    "expanded_baseline_report": "runs/arcus3/baseline-phase6-qualified-001/scores.json",
+    "alpha3_package_report": "runs/arcus3/release-alpha3-001/package-report.json",
+    "expanded_application_report": "runs/arcus3/application-phase6-qualified-002/application-report.json"
   },
   "training_scope": "dense-control-v1",
-  "conversion_scope": "selective-experts-parity-v1"
+  "conversion_scope": "selective-experts-parity-v1",
+  "expanded_scope": "qualification-v1"
 }

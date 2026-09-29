@@ -13,11 +13,13 @@ class SelectiveExperts(nn.Module):
                                 device=weight.device, dtype=weight.dtype)
         nn.init.zeros_(self.router.weight)
         self.last_counts = None
+        self.collect_aux = False
+        self.last_aux = None
 
     def forward(self, hidden):
         shape = hidden.shape
         flat = hidden.reshape(-1, shape[-1])
-        probabilities = self.router(flat).float().softmax(-1)
+        probabilities = self.router(flat.to(self.router.weight.dtype)).float().softmax(-1)
         choices = probabilities.argmax(-1)
         output = torch.empty_like(flat)
         counts = []
@@ -32,4 +34,7 @@ class SelectiveExperts(nn.Module):
                 scale = (1 + (p - p.detach())).to(values.dtype)
                 output.index_copy_(0, positions, values * scale[:, None])
         self.last_counts = counts  # bounded diagnostic; no retained computation graph
+        if self.collect_aux:
+            fractions = torch.tensor(counts,device=flat.device,dtype=torch.float32) / flat.shape[0]
+            self.last_aux = 2 * (fractions.detach() * probabilities.mean(0)).sum()
         return output.reshape(shape)

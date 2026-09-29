@@ -293,3 +293,15 @@ experts are independent copies, not newly learned skills. See the
 [Phase 5 results](docs/ARCUS_3_PHASE_5_RESULTS.md), and
 [Phase 6 file inventory](docs/ARCUS_3_PHASE_6_FILE_PLAN.md).
 Use `-ConvertedPath` with baseline/application modes to select a verified artifact.
+
+## Phase 6 qualification and Alpha 3.0 release
+
+Eight expanded expert/router updates passed frozen-base and exact checkpoint-replay
+checks. Matched diagnostic scores were essentially unchanged. LangChain/LangGraph
+live memory and both tool round trips passed. See [results](docs/ARCUS_3_PHASE_6_RESULTS.md)
+and the [Phase 7 file inventory](docs/ARCUS_3_PHASE_7_FILE_PLAN.md).
+
+The 2,013,390,848-parameter Phase 5 initialization passed standalone export/reload
+parity and is uploading privately as Alpha 3.0. The qualification delta is separate.
+[Release status](docs/ALPHA_3_RELEASE.md) distinguishes local verification from
+pending remote verification. No further training is active or authorized.

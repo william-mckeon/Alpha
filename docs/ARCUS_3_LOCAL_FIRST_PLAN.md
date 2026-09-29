@@ -412,3 +412,16 @@ quality improvement. Zero routers initially select the original experts; depth
 remains disabled. `ARCUS_3_PHASE_5_RESULTS.md` records live evaluation evidence.
 `ARCUS_3_PHASE_6_FILE_PLAN.md` specifies bounded training/memory/recovery
 qualification before the separate Phase 7 specialization campaign.
+
+## Phase 6 qualification and publication — September 29, 2026
+
+Eight expanded updates passed frozen-base and exact recovery checks after fixing
+attention nondeterminism. The small matched diagnostic scores remain essentially
+unchanged. Live application memory and real tool round trips pass. See
+`ARCUS_3_PHASE_6_RESULTS.md` and `ARCUS_3_PHASE_7_FILE_PLAN.md`.
+
+The user additionally authorized a private Alpha 3.0 publication. The verified
+Phase 5 initialization is selected, not the disposable qualification delta.
+Standalone package parity passed; remote upload/verification remains in progress.
+`ALPHA_3_RELEASE.md` records the distinction. Historical pauses remain intact;
+long training, RL, depth activation, 16k changes and cloud spending remain separate.

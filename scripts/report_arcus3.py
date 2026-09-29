@@ -44,7 +44,7 @@ def render(root, report, rows):
     report['tool_metrics']['total']=len(tools)
     (root/'transcripts.json').write_text(json.dumps(rows,indent=2))
     (root/'scores.json').write_text(json.dumps(report,indent=2))
-    variant = 'converted experts' if report.get('conversion_manifest_sha256') else 'adapted dense control' if report.get('adapter_manifest_sha256') else 'unchanged donor'
+    variant = 'expanded qualification delta' if report.get('expanded_manifest_sha256') else 'converted experts' if report.get('conversion_manifest_sha256') else 'adapted dense control' if report.get('adapter_manifest_sha256') else 'unchanged donor'
     text=['# Arcus 3 matched evaluation — '+variant,'',report['limitations'],'',
           'Read-only evaluation. Conversation fluency, relevance and coherence await human review.','',
           '```json',json.dumps({k:v for k,v in report.items() if k!='language_records'},indent=2),'```']

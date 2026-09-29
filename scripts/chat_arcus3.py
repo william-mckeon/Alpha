@@ -48,7 +48,7 @@ def run(args):
     with gpu_job(),torch.inference_mode():
         if not torch.cuda.is_available(): raise RuntimeError('CUDA required')
         torch.cuda.set_per_process_memory_fraction(.7)
-        model,tokenizer=load(args.donor,args.adapter,args.converted)
+        model,tokenizer=load(args.donor,args.adapter,args.converted,args.expanded)
         def generate(messages):
             check_live(end,out)
             serialized=tokenizer.apply_chat_template(messages,tokenize=False,add_generation_prompt=True)
@@ -76,7 +76,9 @@ def run(args):
                                 'tool_calls':state['tool_calls'],'messages':messages_to_dict(state['messages'])})
             (out/'application-transcripts.json').write_text(json.dumps(transcripts,indent=2))
             print(json.dumps({'session':request['session'],'status':state['status'],'tool_calls':state['tool_calls']}),flush=True)
-        report={'schema':'arcus3-application-v1','adapter':args.adapter,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'training_updates':0,'unique_parameters':sum(p.numel() for p in model.parameters()),
+        selected_delta=args.expanded or args.adapter
+        checkpoint_updates=read(Path(selected_delta)/'manifest.json')['updates'] if selected_delta else 0
+        report={'schema':'arcus3-application-v1','adapter':args.adapter,'expanded_manifest_sha256':sha(Path(args.expanded)/'manifest.json') if args.expanded else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'training_updates':checkpoint_updates,'updates_this_invocation':0,'unique_parameters':sum(p.numel() for p in model.parameters()),
                 'requests':transcripts,'generations':generations,'persist_memory':args.persist_memory,
                 'seconds':time.monotonic()-started,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),
                 'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024}
@@ -86,5 +88,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--donor',default='/donor');p.add_argument('--output',default='/output')
     p.add_argument('--deadline',required=True);p.add_argument('--max-new-tokens',type=int,default=128)
     p.add_argument('--requests');p.add_argument('--persist-memory',action='store_true')
-    p.add_argument('--adapter');p.add_argument('--converted')
+    p.add_argument('--adapter');p.add_argument('--converted');p.add_argument('--expanded')
     run(p.parse_args())

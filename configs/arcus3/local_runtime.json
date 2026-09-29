@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:conversion-v1",
-  "image_id": "sha256:139c846549a990d3280f775810000eb7c82b58eb1400b4663216015cc0c1847e",
+  "image": "arcus3:release-v4",
+  "image_id": "sha256:326e2f9f5701b8925678944cf0e74847ed4218973c85859e9100d07a756c68ef",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -10,7 +10,7 @@
   "memory_watchdog": false,
   "max_seconds": 1800,
   "max_new_tokens": 128,
-  "mode": "probe-baseline-application-and-explicitly-authorized-dense-control",
+  "mode": "probe-baseline-application-conversion-package-and-explicitly-authorized-training",
   "baseline": {
     "prompts": 36,
     "language_records": 12,
@@ -38,5 +38,10 @@
     "artifact": "runs/arcus3/conversion-phase5-001/converted",
     "training_updates": 0,
     "depth_enabled": false
+  },
+  "expanded_qualification": {
+    "max_updates": 8,
+    "active": false,
+    "report": "runs/arcus3/expanded-preflight-phase6-002/qualification-report.json"
   }
 }

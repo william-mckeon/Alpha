@@ -1,8 +1,8 @@
 param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [Parameter(Mandatory=$true)][string]$Root,
-      [ValidateSet("probe","baseline","application","preflight","train","conversion")][string]$Mode="probe",
+      [ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","package","verify-package")][string]$Mode="probe",
       [string]$RequestsFile="", [switch]$PersistMemory,
-      [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="")
+      [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="")
 $ErrorActionPreference='Stop'
 $workspace=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $workspace
@@ -12,9 +12,10 @@ if ($project.authorization.inference -ne $true -or $project.authorization.cloud 
 if ($Mode -in @('preflight','train') -and ($project.authorization.training -ne $true -or $project.training_scope -ne 'dense-control-v1')) { throw 'Bounded dense training scope required' }
 if ($project.donor.revision -ne '31b70e2e869a7173562077fd711b654946d38674') { throw 'Donor pin mismatch' }
 if ($StopAt -le [DateTimeOffset]::Now -or ($StopAt-[DateTimeOffset]::Now).TotalSeconds -gt 1800) { throw 'Future deadline within 30 minutes required' }
-if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion)-[a-z0-9-]+$') { throw 'Isolated donor-probe root required' }
+if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion|expanded-preflight|release)-[a-z0-9-]+$') { throw 'Isolated donor-probe root required' }
 if ($Mode -eq 'conversion' -and (!$project.authorization.conversion -or $project.authorization.training -or $project.conversion_scope -ne 'selective-experts-parity-v1')) { throw 'Construction-only scope required' }
 if ($AdapterPath -and $ConvertedPath) { throw 'Choose one model variant' }
+if ($Mode -eq 'expanded-preflight' -and (!$project.authorization.expanded_preflight -or $project.expanded_scope -ne 'qualification-v1' -or !$ConvertedPath -or !$DataRoot)) { throw 'Bounded expanded qualification scope, parent and data required' }
 $rootPath=Join-Path $workspace $Root
 if (Test-Path -LiteralPath $rootPath) { throw 'Use a fresh probe root; never clear existing pauses' }
 if ($runtime.image_id -notmatch '^sha256:[0-9a-f]{64}$') { throw 'Verified image ID required' }
@@ -30,7 +31,7 @@ $donorPath=(Resolve-Path ('artifacts/arcus3/donor/'+$project.donor.revision)).Pa
 New-Item -ItemType Directory -Path $rootPath | Out-Null
 $name='arcus3-donor-'+(Get-Date -Format 'yyyyMMdd-HHmmss')
 $deadlineUtc=$StopAt.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'")
-$entryScript=if ($Mode -eq 'conversion') {'scripts/convert_arcus3.py'} elseif ($Mode -eq 'preflight') {'scripts/benchmark_arcus3.py'} elseif ($Mode -eq 'train') {'scripts/train_arcus3.py'} elseif ($Mode -eq 'application') {'scripts/chat_arcus3.py'} elseif ($Mode -eq 'baseline') {'scripts/evaluate_arcus3.py'} else {'scripts/probe_arcus3_donor.py'}
+$entryScript=if ($Mode -eq 'verify-package') {'scripts/verify_alpha_3.py'} elseif ($Mode -eq 'package') {'scripts/package_alpha_3.py'} elseif ($Mode -eq 'expanded-preflight') {'scripts/qualify_arcus3_training.py'} elseif ($Mode -eq 'conversion') {'scripts/convert_arcus3.py'} elseif ($Mode -eq 'preflight') {'scripts/benchmark_arcus3.py'} elseif ($Mode -eq 'train') {'scripts/train_arcus3.py'} elseif ($Mode -eq 'application') {'scripts/chat_arcus3.py'} elseif ($Mode -eq 'baseline') {'scripts/evaluate_arcus3.py'} else {'scripts/probe_arcus3_donor.py'}
 $argsDocker=@('run','-d','--name',$name,'--gpus','all','--network','none','--memory',$runtime.memory,'--memory-swap',$runtime.memory,'--cpus',"$($runtime.cpus)",'--pids-limit',"$($runtime.pids)",'--cap-drop','ALL','--security-opt','no-new-privileges',
  '-e','ARCUS3_CONTROLLED_DOCKER=1','-e','ALPHA_JOB_CONTROL=/job-control',
  '--mount',"type=volume,source=$($runtime.gpu_lock_volume),target=/job-control",
@@ -48,7 +49,7 @@ if ($RequestsFile -or $PersistMemory) {
 }
 if ($Mode -in @('preflight','train') -and !$DataRoot) { throw 'Reviewed data root required' }
 if ($Mode -eq 'train' -and !$PreflightReport) { throw 'Measured preflight report required' }
-foreach ($mountSpec in @(@{source=$ConvertedPath;target='/converted';option='--converted'},@{source=$DataRoot;target='/data';option=''},@{source=$PreflightReport;target='/preflight.json';option='--preflight-report'},@{source=$AdapterPath;target='/adapter';option='--adapter'},@{source=$ResumePath;target='/resume';option='--resume'})) {
+foreach ($mountSpec in @(@{source=$PackagePath;target='/package';option='--package'},@{source=$ExpandedPath;target='/expanded';option='--expanded'},@{source=$ConvertedPath;target='/converted';option='--converted'},@{source=$DataRoot;target='/data';option=''},@{source=$PreflightReport;target='/preflight.json';option='--preflight-report'},@{source=$AdapterPath;target='/adapter';option='--adapter'},@{source=$ResumePath;target='/resume';option='--resume'})) {
  if ($mountSpec.source) {
   $mountPath=(Resolve-Path -LiteralPath $mountSpec.source).Path
   $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)

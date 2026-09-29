@@ -1,4 +1,4 @@
-param([ValidateSet("probe","baseline","application","preflight","train","conversion")][string]$Mode="probe")
+param([ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","package","verify-package")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()
@@ -12,6 +12,8 @@ function global:Get-Content {
   $fixture.authorization | Add-Member -NotePropertyName conversion -NotePropertyValue $true -Force
   $fixture | Add-Member -NotePropertyName conversion_scope -NotePropertyValue 'selective-experts-parity-v1' -Force
   $fixture.training_scope='dense-control-v1'
+  $fixture.authorization | Add-Member -NotePropertyName expanded_preflight -NotePropertyValue $true -Force
+  $fixture | Add-Member -NotePropertyName expanded_scope -NotePropertyValue 'qualification-v1' -Force
   return ($fixture | ConvertTo-Json -Depth 12)
  }
  return $text
@@ -35,7 +37,7 @@ function global:docker {
 $root='runs/arcus3/donor-probe-deadline-fixture-'+(Get-Date -Format yyyyMMddHHmmss)
 try {
  try {
-  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root -Mode $Mode -DataRoot artifacts/arcus3/data/dense-control-v2 -PreflightReport artifacts/arcus3/data/dense-control-v2/manifest.json
+  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root -Mode $Mode -DataRoot artifacts/arcus3/data/dense-control-v2 -PreflightReport artifacts/arcus3/data/dense-control-v2/manifest.json -ConvertedPath runs/arcus3/conversion-phase5-001/converted
   throw 'Expected deadline termination failure receipt'
  } catch { if ($_.Exception.Message -notmatch 'Probe exited 137') { throw } }
  $kills=@($global:Arcus3FixtureCalls | Where-Object { $_ -like 'kill *' })

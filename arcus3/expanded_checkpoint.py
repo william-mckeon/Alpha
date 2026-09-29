@@ -1,0 +1,44 @@
+"""Immutable trainable deltas only; optimizer state stays local."""
+import json
+import os
+import uuid
+from pathlib import Path
+from arcus3.checkpoint import digest
+from baby_arcus.language_stream import atomic_json
+
+def save(root,model,optimizer,state):
+    import torch
+    from safetensors.torch import save_file
+    path=Path(root)/('step-'+str(state['updates'])+'-'+uuid.uuid4().hex);path.mkdir(parents=True)
+    save_file({n:p.detach().cpu().contiguous() for n,p in model.named_parameters() if p.requires_grad},str(path/'delta.safetensors'))
+    torch.save({**state,'optimizer':optimizer.state_dict(),'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all()},path/'state.pt')
+    for name in ('delta.safetensors','state.pt'):
+        with (path/name).open('rb') as f:os.fsync(f.fileno())
+    atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
+        'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
+        'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
+    atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
+    return path
+
+def verify(path,parent,data=None,config=None):
+    path=Path(path);m=json.loads((path/'manifest.json').read_text())
+    if m['schema']!='arcus3-expanded-delta-v1' or m['parent_sha256']!=parent:raise ValueError('Expanded parent mismatch')
+    if data is not None and m['data_sha256']!=data:raise ValueError('Expanded data mismatch')
+    if config is not None and m['config_sha256']!=config:raise ValueError('Expanded config mismatch')
+    if set(m['files'])!={'delta.safetensors','state.pt'}:raise ValueError('Incomplete expanded checkpoint')
+    for n,h in m['files'].items():
+        if digest(path/n)!=h:raise ValueError('Expanded checkpoint tamper')
+    return m
+
+def load_delta(path,model,parent,data=None,config=None):
+    from safetensors.torch import load_file
+    verify(path,parent,data,config);values=load_file(str(Path(path)/'delta.safetensors'))
+    if set(values)!={n for n,p in model.named_parameters() if p.requires_grad}:raise ValueError('Expanded delta keys mismatch')
+    model.load_state_dict(values,strict=False)
+
+def restore(path,model,optimizer,parent,data,config):
+    import torch
+    load_delta(path,model,parent,data,config)
+    s=torch.load(Path(path)/'state.pt',map_location='cpu',weights_only=True)
+    optimizer.load_state_dict(s.pop('optimizer'));torch.set_rng_state(s.pop('torch_rng'));torch.cuda.set_rng_state_all(s.pop('cuda_rng'))
+    return s

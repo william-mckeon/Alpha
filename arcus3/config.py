@@ -20,7 +20,7 @@ def safe_child(root, name):
 def authorize(project, operation):
     if project['donor']['repo_id'] != REPO or project['donor']['revision'] != REVISION:
         raise ValueError('Unapproved donor revision')
-    if operation not in ('download', 'inference','training','conversion') or project['authorization'].get(operation) is not True:
+    if operation not in ('download', 'inference','training','conversion','expanded_preflight') or project['authorization'].get(operation) is not True:
         raise ValueError('Operation not authorized')
     if any(project['authorization'].get(k) for k in ('cloud', 'publication')):
         raise ValueError('Cloud/publication not authorized by this runtime')
@@ -28,6 +28,16 @@ def authorize(project, operation):
         raise ValueError('Explicit bounded dense-control scope required')
     if operation == 'conversion' and (project['authorization'].get('training') or project.get('conversion_scope') != 'selective-experts-parity-v1'):
         raise ValueError('Construction-only conversion scope required')
+    if operation=='expanded_preflight' and (project['authorization'].get('training') or project.get('expanded_scope')!='qualification-v1'):
+        raise ValueError('Expanded qualification-only scope required')
+
+
+def validate_expanded(cfg):
+    if cfg.get('schema')!='arcus3-expanded-preflight-v1' or cfg.get('freeze')!='base-weights':raise ValueError('Expanded scope')
+    for key,cap in {'rank':8,'alpha':16,'max_length':512,'accumulation':2,'max_updates':8,'max_target_tokens':4096,'max_train_seconds':300,'save_every':2}.items():
+        if type(cfg.get(key)) is not int or not 1<=cfg[key]<=cap:raise ValueError('Expanded budget '+key)
+    if not 0<cfg['learning_rate']<=1e-4 or cfg['router_aux_coefficient']!=0.01:raise ValueError('Expanded objective')
+    return cfg
 
 
 def validate_conversion(cfg):

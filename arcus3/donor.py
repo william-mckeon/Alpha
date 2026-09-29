@@ -118,7 +118,8 @@ def verify(destination):
         raise ValueError('Missing original chat template')
     return manifest
 
-def load(destination, adapter=None, converted=None):
+def load(destination, adapter=None, converted=None, expanded=None):
+    if expanded and not converted:raise ValueError('Expanded deltas require converted parent')
     if adapter and converted: raise ValueError('Choose dense adapter or converted model, not both')
     if converted:
         from arcus3.checkpoint import verify_conversion
@@ -145,6 +146,14 @@ def load(destination, adapter=None, converted=None):
         model.load_state_dict(extras,strict=False)
         if inventory(model,cfg['layers'])['unique_parameters']!=cfg['expected_parameters']:
             raise ValueError('Converted parameter inventory mismatch')
+        model.eval()
+    if expanded:
+        from arcus3.adapters import attach_expanded
+        from arcus3.expanded_checkpoint import load_delta
+        cfg=read(Path(__file__).resolve().parents[1]/'configs/arcus3/expanded_preflight.json')
+        config_hash=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
+        attach_expanded(model,cfg)
+        load_delta(expanded,model,digest(Path(converted)/'manifest.json'),config=config_hash)
         model.eval()
     if adapter is not None:
         from arcus3.checkpoint import verify as verify_adapter

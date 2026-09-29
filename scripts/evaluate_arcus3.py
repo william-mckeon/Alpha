@@ -37,7 +37,7 @@ def run(args):
     with gpu_job(), torch.inference_mode():
         if not torch.cuda.is_available(): raise RuntimeError('CUDA required')
         torch.cuda.set_per_process_memory_fraction(.7)
-        model,tokenizer = load(args.donor,args.adapter,args.converted)
+        model,tokenizer = load(args.donor,args.adapter,args.converted,args.expanded)
         for item in manifest['language']:
             check_live(end,out)
             # Raw text, all tokens except the first are targets. No chat-template PPL.
@@ -66,7 +66,7 @@ def run(args):
                          'metrics':score(item,response)})
             (out/'transcripts.json').write_text(json.dumps(rows,indent=2))
             print(json.dumps({'completed':item['id'],'seconds':rows[-1]['seconds']}),flush=True)
-        report = {'schema':'arcus3-baseline-v1','adapter_manifest_sha256':sha(Path(args.adapter)/'manifest.json') if args.adapter else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'complete_generation':True,'execution_complete':False,
+        report = {'schema':'arcus3-baseline-v1','adapter_manifest_sha256':sha(Path(args.adapter)/'manifest.json') if args.adapter else None,'expanded_manifest_sha256':sha(Path(args.expanded)/'manifest.json') if args.expanded else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'complete_generation':True,'execution_complete':False,
                   'suite_sha256':sha('/app/evaluation/arcus3/baseline-v1.json'),
                   'settings_sha256':sha('/app/configs/arcus3/evaluation.json'),'tokenizer_revision':REVISION,
                   'precision':'bfloat16','orchestration':'langchain-runnable-in-langgraph',
@@ -81,5 +81,5 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--donor',default='/donor'); parser.add_argument('--output',default='/output')
     parser.add_argument('--deadline',required=True); parser.add_argument('--max-new-tokens',type=int,default=128)
-    parser.add_argument('--adapter');parser.add_argument('--converted')
+    parser.add_argument('--adapter');parser.add_argument('--converted');parser.add_argument('--expanded')
     run(parser.parse_args())

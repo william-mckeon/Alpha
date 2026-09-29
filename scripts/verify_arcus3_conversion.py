@@ -3,6 +3,10 @@ import torch
 
 
 def measure(model, tokenizer):
+    # Keep the batch convention explicit after tokenizer reload; padding_side is
+    # an inference setting and need not be persisted by save_pretrained.
+    tokenizer.pad_token=tokenizer.eos_token
+    tokenizer.padding_side='left'
     prompts=['Hi, how are you?', 'Write a simple Python for loop.',
              'The quick brown fox jumps over the lazy dog. '*8]
     result={}
