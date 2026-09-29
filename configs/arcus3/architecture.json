@@ -1,0 +1,14 @@
+{
+  "schema": "arcus3-selective-experts-v1",
+  "layers": [3, 7, 11, 15, 19, 23],
+  "experts": 2,
+  "top_k": 1,
+  "capacity_limit": null,
+  "depth_enabled": false,
+  "router_bias": false,
+  "router_initialization": "zeros-first-index-tie",
+  "output_scale": "unit",
+  "router_gradient": "selected-softmax-straight-through",
+  "context": 8192,
+  "expected_parameters": 2013390848
+}

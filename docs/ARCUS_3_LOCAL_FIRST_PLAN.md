@@ -401,3 +401,14 @@ capacity ceiling or superiority of expansion. See `ARCUS_3_PHASE_4_RESULTS.md` f
 the full evidence and limitations and `ARCUS_3_PHASE_5_FILE_PLAN.md` for the next
 construction/parity-only experiment. No further training is active or authorized
 by the completed control. Historical Alpha and the previous pilot remain preserved.
+
+## Phase 5 construction — September 29, 2026
+
+Constructed selective two-expert FFNs at layers 3,7,11,15,19,23 from the pristine
+donor (not the Phase 4 adapter). Including 24,576 router parameters, the exact
+count is 2,013,390,848. Production logits/losses/cached generations and artifact
+reload passed exact parity. This establishes a compatible initialization, not a
+quality improvement. Zero routers initially select the original experts; depth
+remains disabled. `ARCUS_3_PHASE_5_RESULTS.md` records live evaluation evidence.
+`ARCUS_3_PHASE_6_FILE_PLAN.md` specifies bounded training/memory/recovery
+qualification before the separate Phase 7 specialization campaign.

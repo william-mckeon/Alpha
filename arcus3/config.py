@@ -20,12 +20,24 @@ def safe_child(root, name):
 def authorize(project, operation):
     if project['donor']['repo_id'] != REPO or project['donor']['revision'] != REVISION:
         raise ValueError('Unapproved donor revision')
-    if operation not in ('download', 'inference','training') or project['authorization'].get(operation) is not True:
+    if operation not in ('download', 'inference','training','conversion') or project['authorization'].get(operation) is not True:
         raise ValueError('Operation not authorized')
     if any(project['authorization'].get(k) for k in ('cloud', 'publication')):
         raise ValueError('Cloud/publication not authorized by this runtime')
     if project['authorization'].get('training') and project.get('training_scope')!='dense-control-v1':
         raise ValueError('Explicit bounded dense-control scope required')
+    if operation == 'conversion' and (project['authorization'].get('training') or project.get('conversion_scope') != 'selective-experts-parity-v1'):
+        raise ValueError('Construction-only conversion scope required')
+
+
+def validate_conversion(cfg):
+    expected = {'schema':'arcus3-selective-experts-v1','layers':[3,7,11,15,19,23],
+                'experts':2,'top_k':1,'capacity_limit':None,'depth_enabled':False,
+                'router_bias':False,'router_initialization':'zeros-first-index-tie',
+                'output_scale':'unit','router_gradient':'selected-softmax-straight-through',
+                'context':8192,'expected_parameters':2013390848}
+    if cfg != expected: raise ValueError('Unapproved conversion architecture')
+    return cfg
 
 def validate_control(cfg):
     limits={'rank':(1,16),'alpha':(1,32),'max_length':(64,1024),'accumulation':(1,4),

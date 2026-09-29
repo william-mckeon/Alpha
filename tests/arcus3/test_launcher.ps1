@@ -1,4 +1,4 @@
-param([ValidateSet("probe","baseline","application","preflight","train")][string]$Mode="probe")
+param([ValidateSet("probe","baseline","application","preflight","train","conversion")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()
@@ -8,7 +8,9 @@ function global:Get-Content {
  $text=Microsoft.PowerShell.Management\Get-Content -LiteralPath $Path -Raw
  if ($Path -eq 'configs/arcus3/project.json') {
   $fixture=$text | ConvertFrom-Json
-  $fixture.authorization.training=$true
+  $fixture.authorization.training=($Mode -in @('preflight','train'))
+  $fixture.authorization | Add-Member -NotePropertyName conversion -NotePropertyValue $true -Force
+  $fixture | Add-Member -NotePropertyName conversion_scope -NotePropertyValue 'selective-experts-parity-v1' -Force
   $fixture.training_scope='dense-control-v1'
   return ($fixture | ConvertTo-Json -Depth 12)
  }
@@ -18,6 +20,7 @@ function global:docker {
  $global:LASTEXITCODE=0
  $global:Arcus3FixtureCalls.Add(($args -join ' '))
  switch ($args[0]) {
+  'image' { return }
   'ps' { return }
   'run' { return 'fixture-id' }
   'kill' { $global:Arcus3FixtureStopped=$true; return 'fixture-id' }

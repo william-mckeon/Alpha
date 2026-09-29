@@ -44,7 +44,8 @@ def render(root, report, rows):
     report['tool_metrics']['total']=len(tools)
     (root/'transcripts.json').write_text(json.dumps(rows,indent=2))
     (root/'scores.json').write_text(json.dumps(report,indent=2))
-    text=['# Arcus 3 matched evaluation'+(' — adapted dense control' if report.get('adapter_manifest_sha256') else ' — unchanged donor'),'',report['limitations'],'',
+    variant = 'converted experts' if report.get('conversion_manifest_sha256') else 'adapted dense control' if report.get('adapter_manifest_sha256') else 'unchanged donor'
+    text=['# Arcus 3 matched evaluation — '+variant,'',report['limitations'],'',
           'Read-only evaluation. Conversation fluency, relevance and coherence await human review.','',
           '```json',json.dumps({k:v for k,v in report.items() if k!='language_records'},indent=2),'```']
     for row in rows:
@@ -59,7 +60,7 @@ def compare_reports(baseline, candidate):
     return {'nll_delta':candidate['language']['nll']-baseline['language']['nll'],
             'perplexity_before':baseline['language']['perplexity'],'perplexity_after':candidate['language']['perplexity'],
             'categories':{key:{'before':value,'after':candidate['categories'][key]} for key,value in baseline['categories'].items()},
-            'adapter_manifest_sha256':candidate.get('adapter_manifest_sha256')}
+            'adapter_manifest_sha256':candidate.get('adapter_manifest_sha256'),'conversion_manifest_sha256':candidate.get('conversion_manifest_sha256')}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--deadline',required=True)

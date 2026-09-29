@@ -1,5 +1,7 @@
 """Dense control adapters; pristine donor tensors remain frozen."""
 def attach(model, settings):
+    if any('.experts.' in name for name, _ in model.named_parameters()):
+        raise ValueError('Expanded expert adapter training awaits Phase 6 qualification')
     from peft import LoraConfig, get_peft_model
     model=get_peft_model(model,LoraConfig(r=settings['rank'],lora_alpha=settings['alpha'],
         target_modules=settings['targets'],lora_dropout=0.0,bias='none',task_type='CAUSAL_LM'))

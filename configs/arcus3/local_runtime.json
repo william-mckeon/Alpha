@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:dense-control-v1",
-  "image_id": "sha256:093d6c43198ce74a1d867bfbe2326df0277f89935a893e209093fcf52b51c5fd",
+  "image": "arcus3:conversion-v1",
+  "image_id": "sha256:139c846549a990d3280f775810000eb7c82b58eb1400b4663216015cc0c1847e",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -32,5 +32,11 @@
     "max_train_seconds": 900,
     "preflight_required": true,
     "preflight_report": "runs/arcus3/preflight-phase4-001/training-report.json"
+  },
+  "conversion": {
+    "parameters": 2013390848,
+    "artifact": "runs/arcus3/conversion-phase5-001/converted",
+    "training_updates": 0,
+    "depth_enabled": false
   }
 }

@@ -5,6 +5,8 @@ COPY docker/baby-arcus/requirements.arcus3.txt /tmp/requirements.arcus3.txt
 RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.arcus3.txt
 COPY arcus3 /app/arcus3
 COPY scripts/probe_arcus3_donor.py /app/scripts/probe_arcus3_donor.py
+COPY scripts/convert_arcus3.py /app/scripts/convert_arcus3.py
+COPY scripts/verify_arcus3_conversion.py /app/scripts/verify_arcus3_conversion.py
 COPY scripts/train_arcus3.py /app/scripts/train_arcus3.py
 COPY scripts/benchmark_arcus3.py /app/scripts/benchmark_arcus3.py
 COPY scripts/chat_arcus3.py /app/scripts/chat_arcus3.py

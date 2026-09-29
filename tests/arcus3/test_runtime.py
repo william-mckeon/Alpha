@@ -6,6 +6,13 @@ from arcus3.config import authorize, deadline, check_live, REPO, REVISION
 from baby_arcus.process_lock import ProcessLock
 
 class RuntimeTests(unittest.TestCase):
+    def test_conversion_does_not_authorize_training(self):
+        p={'donor':{'repo_id':REPO,'revision':REVISION},'authorization':{'conversion':True,'training':False},
+           'conversion_scope':'selective-experts-parity-v1'}
+        authorize(p,'conversion')
+        with self.assertRaises(ValueError):authorize(p,'training')
+        p['authorization']['training']=True;p['training_scope']='dense-control-v1'
+        with self.assertRaises(ValueError):authorize(p,'conversion')
     def test_application_budgets(self):
         from arcus3.config import validate_application,read
         cfg=read(Path(__file__).resolve().parents[2]/'configs/arcus3/application.json')

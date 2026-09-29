@@ -9,6 +9,24 @@ from arcus3.config import REPO, REVISION, safe_child
 from arcus3.donor import digest, verify, download_lfs
 
 class DonorTests(unittest.TestCase):
+    def test_conversion_lineage_and_tamper(self):
+        from arcus3.checkpoint import verify_conversion
+        from arcus3.config import read
+        from arcus3.donor import load
+        with tempfile.TemporaryDirectory() as root:
+            base=Path(root)/'donor';base.mkdir();self.fixture(base)
+            extra=Path(root)/'converted';extra.mkdir()
+            cfg=read(Path(__file__).resolve().parents[2]/'configs/arcus3/architecture.json')
+            (extra/'architecture.json').write_text(json.dumps(cfg));(extra/'extra.safetensors').write_bytes(b'fixture')
+            m={'schema':'arcus3-conversion-v1','donor_revision':REVISION,'donor_manifest_sha256':digest(base/'manifest.json'),
+               'training_updates':0,'files':{n:digest(extra/n) for n in ('architecture.json','extra.safetensors')}}
+            (extra/'manifest.json').write_text(json.dumps(m));verify_conversion(extra,base)
+            with self.assertRaises(ValueError):load(base,adapter='unused',converted=extra)
+            m['donor_revision']='main';(extra/'manifest.json').write_text(json.dumps(m))
+            with self.assertRaises(ValueError):verify_conversion(extra,base)
+            m['donor_revision']=REVISION;(extra/'manifest.json').write_text(json.dumps(m))
+            (extra/'extra.safetensors').write_bytes(b'changed')
+            with self.assertRaises(ValueError):verify_conversion(extra,base)
     def fixture(self, root):
         files=Path(root)/'files'; files.mkdir()
         config={'model_type':'llama','hidden_size':2048,'intermediate_size':8192,'num_hidden_layers':24,

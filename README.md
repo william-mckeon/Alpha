@@ -282,3 +282,14 @@ and both real tool round trips still passed. See [full results](docs/ARCUS_3_PHA
 [data and training protocol](docs/ARCUS_3_DENSE_CONTROL_PROTOCOL.md), and
 [Phase 5 file inventory](docs/ARCUS_3_PHASE_5_FILE_PLAN.md). Training is now inactive.
 No expansion, RL, 16k extension or publication was performed.
+
+## Arcus 3 Phase 5 selective expert conversion
+
+The isolated conversion duplicates FFNs in six donor layers and adds token-local
+top-1 routers, totaling 2,013,390,848 stored parameters. Depth routing stays off.
+Production initialization and reload matched donor outputs exactly; the added
+experts are independent copies, not newly learned skills. See the
+[conversion protocol](docs/ARCUS_3_CONVERSION_PROTOCOL.md),
+[Phase 5 results](docs/ARCUS_3_PHASE_5_RESULTS.md), and
+[Phase 6 file inventory](docs/ARCUS_3_PHASE_6_FILE_PLAN.md).
+Use `-ConvertedPath` with baseline/application modes to select a verified artifact.

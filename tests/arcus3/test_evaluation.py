@@ -41,6 +41,7 @@ class EvaluationTests(unittest.TestCase):
         self.assertFalse(compatible({},{}))
         a={k:'x' for k in ('suite_sha256','tokenizer_revision','settings_sha256','precision','orchestration')}
         self.assertTrue(compatible(a,a))
+        self.assertTrue(compatible(a,{**a,'conversion_manifest_sha256':'converted'}))
         self.assertFalse(compatible(a,{**a,'tokenizer_revision':'old-alpha'}))
 
     def test_truncation_retained(self):

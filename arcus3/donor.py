@@ -118,7 +118,11 @@ def verify(destination):
         raise ValueError('Missing original chat template')
     return manifest
 
-def load(destination, adapter=None):
+def load(destination, adapter=None, converted=None):
+    if adapter and converted: raise ValueError('Choose dense adapter or converted model, not both')
+    if converted:
+        from arcus3.checkpoint import verify_conversion
+        verify_conversion(converted,destination)
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
     path = Path(destination) / 'files'
@@ -129,6 +133,19 @@ def load(destination, adapter=None):
     count = sum(p.numel() for p in model.parameters())
     if count != 1711376384 or model.lm_head.weight.data_ptr() != model.model.embed_tokens.weight.data_ptr():
         raise ValueError('Parameter inventory or weight tying mismatch')
+    if converted:
+        from arcus3.model import expand, inventory
+        from arcus3.config import validate_conversion
+        from safetensors.torch import load_file
+        cfg=validate_conversion(read(Path(converted)/'architecture.json'))
+        expand(model,cfg['layers'])
+        extras=load_file(str(Path(converted)/'extra.safetensors'))
+        expected={k for k in model.state_dict() if '.mlp.experts.1.' in k or '.mlp.router.' in k}
+        if set(extras)!=expected: raise ValueError('Conversion tensor keys mismatch')
+        model.load_state_dict(extras,strict=False)
+        if inventory(model,cfg['layers'])['unique_parameters']!=cfg['expected_parameters']:
+            raise ValueError('Converted parameter inventory mismatch')
+        model.eval()
     if adapter is not None:
         from arcus3.checkpoint import verify as verify_adapter
         from peft import PeftModel
