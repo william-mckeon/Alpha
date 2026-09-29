@@ -22,6 +22,10 @@ def run(args):
     end = deadline(args.deadline)
     out = Path(args.output)
     manifest,prompts = load_suite('/app')
+    tier=getattr(args,'tier','full')
+    if tier=='light':
+        prompts=[p for category in ('instructions','tool') for p in prompts if category in p['category']][:4]
+        if not prompts:prompts=load_suite('/app')[1][:4]
     cfg = read('/app/configs/arcus3/evaluation.json')
     if args.max_new_tokens != cfg['max_new_tokens']:
         raise ValueError('Frozen token budget mismatch')
@@ -39,6 +43,10 @@ def run(args):
         if not torch.cuda.is_available(): raise RuntimeError('CUDA required')
         torch.cuda.set_per_process_memory_fraction(.7)
         model,tokenizer = load(args.donor,args.adapter,args.converted,args.expanded)
+        if getattr(args,'phase8_initialization',False):
+            if not args.converted or args.expanded or args.adapter:raise ValueError('Phase 8 initialization requires pristine conversion only')
+            from arcus3.adapters import train_added_experts
+            train_added_experts(model);model.requires_grad_(False).eval()
         for item in manifest['language']:
             check_live(end,out)
             # Raw text, all tokens except the first are targets. No chat-template PPL.
@@ -67,10 +75,11 @@ def run(args):
                          'metrics':score(item,response)})
             (out/'transcripts.json').write_text(json.dumps(rows,indent=2))
             print(json.dumps({'completed':item['id'],'seconds':rows[-1]['seconds']}),flush=True)
-        report = {'schema':'arcus3-baseline-v1','adapter_manifest_sha256':sha(Path(args.adapter)/'manifest.json') if args.adapter else None,'expanded_manifest_sha256':sha(Path(args.expanded)/'manifest.json') if args.expanded else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'complete_generation':True,'execution_complete':False,
+        report = {'schema':'arcus3-baseline-v1','tier':tier,'adapter_manifest_sha256':sha(Path(args.adapter)/'manifest.json') if args.adapter else None,'expanded_manifest_sha256':sha(Path(args.expanded)/'manifest.json') if args.expanded else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'complete_generation':True,'execution_complete':False,
                   'suite_sha256':sha('/app/evaluation/arcus3/baseline-v1.json'),
                   'settings_sha256':sha('/app/configs/arcus3/evaluation.json'),'tokenizer_revision':REVISION,
-                  'precision':'bfloat16','orchestration':'langchain-runnable-in-langgraph',
+                  'phase8_initialization':getattr(args,'phase8_initialization',False),
+                  'precision':'bf16-backbone-fp32-added-experts' if getattr(args,'phase8_initialization',False) or (args.expanded and read(Path(args.expanded)/'manifest.json').get('campaign')=='backbone-adaptation-v1') else 'bfloat16','orchestration':'langchain-runnable-in-langgraph',
                   'unique_parameters':sum(p.numel() for p in model.parameters()),'depth':depth_metadata(model),
                   'language':aggregate(language),'language_records':language,'categories':summarize(rows),
                   'resources':{'seconds':time.monotonic()-started,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),
@@ -83,4 +92,6 @@ if __name__=='__main__':
     parser.add_argument('--donor',default='/donor'); parser.add_argument('--output',default='/output')
     parser.add_argument('--deadline',required=True); parser.add_argument('--max-new-tokens',type=int,default=128)
     parser.add_argument('--adapter');parser.add_argument('--converted');parser.add_argument('--expanded')
+    parser.add_argument('--tier',choices=['light','developmental','full'],default='full')
+    parser.add_argument('--phase8-initialization',action='store_true')
     run(parser.parse_args())

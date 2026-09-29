@@ -2,6 +2,7 @@
 import json
 import os
 import uuid
+import random
 from pathlib import Path
 from arcus3.checkpoint import digest
 from baby_arcus.language_stream import atomic_json
@@ -9,14 +10,21 @@ from baby_arcus.language_stream import atomic_json
 def save(root,model,optimizer,state):
     import torch
     from safetensors.torch import save_file
+    if state.get('campaign')=='backbone-adaptation-v1':
+        import shutil
+        Path(root).mkdir(parents=True,exist_ok=True)
+        estimated=sum(p.numel()*p.element_size() for p in model.parameters() if p.requires_grad)*3+64*1024*1024
+        if shutil.disk_usage(root).free<estimated+2*1024**3:raise RuntimeError('Insufficient checkpoint disk headroom; preserve latest durable state')
     path=Path(root)/('step-'+str(state['updates'])+'-'+uuid.uuid4().hex);path.mkdir(parents=True)
     save_file({n:p.detach().cpu().contiguous() for n,p in model.named_parameters() if p.requires_grad},str(path/'delta.safetensors'))
-    torch.save({**state,'optimizer':optimizer.state_dict(),'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all()},path/'state.pt')
+    torch.save({**state,'optimizer':optimizer.state_dict(),'python_rng':random.getstate(),
+                'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all()},path/'state.pt')
     for name in ('delta.safetensors','state.pt'):
         with (path/name).open('rb') as f:os.fsync(f.fileno())
     atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
         'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
         'campaign':state.get('campaign'),
+        'trainable_names':[n for n,p in model.named_parameters() if p.requires_grad],
         'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
     atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
     return path
@@ -42,4 +50,5 @@ def restore(path,model,optimizer,parent,data,config):
     load_delta(path,model,parent,data,config)
     s=torch.load(Path(path)/'state.pt',map_location='cpu',weights_only=True)
     optimizer.load_state_dict(s.pop('optimizer'));torch.set_rng_state(s.pop('torch_rng'));torch.cuda.set_rng_state_all(s.pop('cuda_rng'))
+    if 'python_rng' in s:random.setstate(s.pop('python_rng'))
     return s

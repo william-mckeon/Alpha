@@ -9,6 +9,24 @@ def normalized(text):return ' '.join(re.findall(r'\w+',text.lower()))
 def identity(messages):
     return hashlib.sha256(json.dumps(messages,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
+
+def encode_record(tokenizer, record, max_length, forbidden):
+    """Shared preparation for reviewed text or chat; never supervise rejected preferences."""
+    if 'messages' in record:
+        if excluded(record['messages'],forbidden):return []
+        row=encode(tokenizer,record['messages'],max_length)
+        return [row] if row else []
+    text=record.get('text')
+    if not isinstance(text,str):raise ValueError('Normalize tools/preferences explicitly before preparation')
+    if excluded([{'content':text}],forbidden):return []
+    ids=tokenizer(text,add_special_tokens=False)['input_ids'];rows=[]
+    for offset in range(0,len(ids),max_length):
+        part=ids[offset:offset+max_length]
+        if len(part)<2:continue
+        rows.append({'input_ids':part,'labels':[-100]+part[1:],'target_tokens':len(part)-1,
+                     'sha256':hashlib.sha256(json.dumps(part).encode()).hexdigest()})
+    return rows
+
 def excluded(messages, forbidden):
     texts=[normalized(m['content']) for m in messages]
     for text in texts:

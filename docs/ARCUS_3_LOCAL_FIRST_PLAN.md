@@ -16,7 +16,9 @@ Phase 3's application integration are complete; see
 [Phase 2 results](ARCUS_3_BASELINE_RESULTS.md) and
 [Phase 3 live results](ARCUS_3_PHASE_3_RESULTS.md). Phase 4–7 results are recorded
 in their corresponding result documents; [Phase 8's inventory](ARCUS_3_PHASE_8_FILE_PLAN.md)
-describes the next proposed reduced-depth experiment.
+describes frozen-backbone adaptation with explicit donor teaching. The original
+reduced-depth phase is now Phase 9, context extension Phase 10, and final validation
+and release Phase 11. Completed phase numbers and historical artifacts are unchanged.
 Phase-specific inventories refine the preliminary engineering inventory
 below and include project metadata, handoff documents and bounded donor probes.
 
@@ -162,9 +164,10 @@ The Phase 0 file inventory is [ARCUS_3_PHASE_0_FILE_PLAN.md](ARCUS_3_PHASE_0_FIL
 | 5 — Construct approximately 2B | Expand six FFNs into two copied experts each, retain 18 dense layers, use top-1 dropless routing and disable depth skipping. | Actual parameter inventory and donor parity before training. |
 | 6 — Qualify local training | Test full optimizer steps, memory, checkpoint save/resume, pauses and deadline handling on the expanded model. | Reproducible recovery and measured affordable throughput. |
 | 7 — Specialize experts; enable full-capacity depth path | Implement depth routing with capacity fixed at 1.0, then compare expanded adaptation against the dense control on matched data and target-token budgets. No FFN skipping. | Depth-on/full-capacity parity with depth off, retained language ability and useful measured gains; route balance alone is insufficient. |
-| 8 — Reduce depth capacity | Experiment with gradual FFN skipping against the Phase 7 full-depth control. | Causal cached/full parity plus measured speed/quality tradeoffs. |
-| 9 — Extend context | Establish 8k behavior, then test a pinned extension at 12k and 16k with long examples and short-context replay. | Demonstrated context behavior, not only a larger configuration value. |
-| 10 — Validate and release | Run the frozen suite, export/reload checks, document attribution and limitations, then separately authorize a private Arcus 3.0 release. | Immutable remote revision, file hashes and privacy verified. |
+| 8 — Frozen-backbone adaptation and donor teaching | Freeze the retained pretrained backbone; adapt experts, expert routers and depth gates using reviewed training data, verified task targets and explicit donor distillation. Stage expert adaptation, gate learning and joint adaptation with a full-depth control. | Frozen-weight hashes, verified trainability and recovery, measured retention and developmental/task outcomes, bounded exposure and resource accounting. No claim of full training from a fixed update count. |
+| 9 — Reduce depth capacity | Experiment with gradual FFN skipping against the verified Phase 8 full-depth control. | Causal cached/full parity plus measured speed/quality tradeoffs. |
+| 10 — Extend context | Establish 8k behavior, then test a pinned extension at 12k and 16k with long examples and short-context replay. | Demonstrated context behavior, not only a larger configuration value. |
+| 11 — Validate and release | Run the frozen suite, export/reload checks, document attribution and limitations, then separately authorize a private trained Arcus 3.0 release. | Immutable remote revision, file hashes and privacy verified. |
 
 Every training experiment needs an explicit token budget and deadline. Preserve
 input-token, supervised-target-token, repeat-exposure, update and wall-time counts.
@@ -428,3 +431,14 @@ Phase 5 initialization is selected, not the disposable qualification delta.
 Standalone package parity passed; remote upload/verification remains in progress.
 `ALPHA_3_RELEASE.md` records the distinction. Historical pauses remain intact;
 long training, RL, depth activation, 16k changes and cloud spending remain separate.
+
+## Phase 8 implementation and qualification — September 29, 2026
+
+The full added-expert variant now has two-update production qualification and exact
+checkpoint replay evidence. The backbone stays frozen; gate learning is a local
+teacher contribution proxy while execution remains full depth. Phase 8 is not
+complete: the agreed first stage is up to 10 million input tokens, with a 12T
+long-term ceiling and reviewed decisions between stages. User training windows,
+checkpoint storage and the reviewed combined data recipe remain unresolved.
+See `ARCUS_3_PHASE_8_RESULTS.md`. Phase 9 remains reduced-depth experiments,
+Phase 10 context extension, and Phase 11 final trained-model validation/release.

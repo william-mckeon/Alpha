@@ -10,7 +10,8 @@ with depth capacity fixed at **1.0 (100%)**. This is a full-depth control: every
 eligible token executes its FFN, all 24 transformer layers remain, and no token
 is skipped or block repeated. Capacity is not a layer count or recursion count.
 Depth scores may be observed, but full-capacity execution alone does not establish
-that the gate learned useful skipping. Reduced-capacity experiments remain Phase 8.
+that the gate learned useful skipping. Reduced-capacity experiments are now Phase 9,
+after the new Phase 8 frozen-backbone adaptation and donor teaching phase.
 Require parity against depth disabled for logits, losses, cached/full generation
 and gradients before training. Record gate parameters, trainability and gradient
 presence explicitly; do not invent a gate-training objective or claim speedups.

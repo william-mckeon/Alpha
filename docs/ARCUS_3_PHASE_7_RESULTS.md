@@ -144,9 +144,10 @@ tasks, not a long-horizon web/coding-agent benchmark.
 
 Expanded raw-text perplexity is lower, while dense assistant-target loss and one
 comprehension item are better. With one seed and tiny cohorts this is mixed
-evidence, not a general superiority finding. No model was promoted. Phase 8 must
-be framed as a separately qualified efficiency experiment, not assumed capability
-growth from learned depth (the current gates are frozen).
+evidence, not a general superiority finding. No model was promoted. The original
+Phase 8 efficiency experiment is now Phase 9. New Phase 8 adds frozen-backbone
+adaptation and donor teaching; it does not assume capability growth from learned
+depth (the current gates are frozen).
 
 Implementation uses a dedicated campaign entry point and shared dense/expanded
 serializers rather than changing the legacy dense training command. Existing

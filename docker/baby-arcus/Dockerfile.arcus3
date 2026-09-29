@@ -4,6 +4,8 @@ WORKDIR /app
 COPY docker/baby-arcus/requirements.arcus3.txt /tmp/requirements.arcus3.txt
 RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.arcus3.txt
 COPY arcus3 /app/arcus3
+COPY scripts/*arcus3*.py /app/scripts/
+COPY baby_arcus/gpu_job_control.py baby_arcus/process_lock.py /app/baby_arcus/
 COPY scripts/probe_arcus3_donor.py /app/scripts/probe_arcus3_donor.py
 COPY scripts/publish_alpha_3.py /app/scripts/publish_alpha_3.py
 COPY scripts/verify_alpha_3.py /app/scripts/verify_alpha_3.py

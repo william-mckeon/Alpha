@@ -316,3 +316,26 @@ frozen parameters to this local experimental variant; the HF initialization stay
 unchanged. See [Phase 7 evidence](docs/ARCUS_3_PHASE_7_RESULTS.md),
 [protocol](docs/ARCUS_3_SPECIALIZATION_PROTOCOL.md) and
 [Phase 8 file inventory](docs/ARCUS_3_PHASE_8_FILE_PLAN.md).
+
+The revised next phase freezes the pretrained backbone and adapts experts,
+routers and depth gates with task training and explicit donor teaching. The old
+Phase 8 reduced-depth experiment moves to [Phase 9](docs/ARCUS_3_PHASE_9_FILE_PLAN.md),
+context extension to Phase 10, and final validation/release to Phase 11. This
+roadmap update does not launch training or change the initialization being uploaded.
+
+## Phase 8 frozen-backbone qualification
+
+Phase 8 keeps all 1,711,376,384 donor weights frozen and trains the six added
+expert-1 FFNs, routers and gates: 302,026,758 trainable parameters. Two disposable
+full-expert updates and a separate exact weights/optimizer/data-cursor replay have
+passed. This is qualification, not completion of the 10-million-token first stage
+or the 12-trillion-token ceiling. Depth executes at 1.0; learned gate scores are a
+contribution proxy, not demonstrated skipping capability.
+
+See [Phase 8 protocol](docs/ARCUS_3_BACKBONE_ADAPTATION_PROTOCOL.md),
+[data/storage inventory](docs/ARCUS_3_PHASE_8_DATA_MANIFEST.md),
+[pause/resume guide](docs/ARCUS_3_TRAINING_WINDOWS.md) and
+[results](docs/ARCUS_3_PHASE_8_RESULTS.md). Combined sources, user training hours
+and checkpoint storage remain launch gates. The source metadata inventory is about
+14.2 TB of public repository supersets, not a required full download or exact donor
+corpus. No historical checkpoint or evaluation was removed.

@@ -1,0 +1,1 @@
+{"schema":"arcus3-phase8-evaluation-v1","early":[100,500,1000],"light_every":1000,"developmental_every":10000,"full_every":100000,"baseline":true,"stage_end":true,"nll_regression_limit":0.2,"legacy_suite":"configs/arcus3/evaluation.json"}

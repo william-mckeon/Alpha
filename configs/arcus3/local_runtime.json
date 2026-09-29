@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:phase7-v4",
-  "image_id": "sha256:c4280e59565b6d38e5879dd1cb2be8b56d338383200204db7960186bd1e422a9",
+  "image": "arcus3:phase8-v5",
+  "image_id": "sha256:c10245031a8ba24d004b274ea6f781edc0edc32a425ffcee5d10f3f0ea51aec4",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -50,5 +50,13 @@
     "active": false,
     "updates_per_arm": 64,
     "report": "runs/arcus3/dense-control-phase7-matched-001/campaign-report.json"
+  },
+  "backbone_adaptation": {
+    "trainable_parameters": 302026758,
+    "max_measured_sequence_length": 123,
+    "campaign_enabled": false,
+    "replay_report": "runs/arcus3/adaptation-phase8-replay-001/replay-report.json",
+    "active": false,
+    "qualification_updates": 2
   }
 }

@@ -151,6 +151,13 @@ def load(destination, adapter=None, converted=None, expanded=None):
         from arcus3.adapters import attach_expanded
         from arcus3.expanded_checkpoint import load_delta
         campaign=read(Path(expanded)/'manifest.json').get('campaign')
+        if campaign=='backbone-adaptation-v1':
+            from arcus3.adapters import train_added_experts
+            train_added_experts(model)
+            # load_delta verifies every manifest file; do not reread multi-GB optimizer state twice.
+            load_delta(expanded,model,digest(Path(converted)/'manifest.json'))
+            model.requires_grad_(False).eval()
+            return model,tokenizer
         if campaign not in (None,'matched-64-v1'):raise ValueError('Unknown expanded campaign')
         cfg=read(Path(__file__).resolve().parents[1]/('configs/arcus3/specialization.json' if campaign else 'configs/arcus3/expanded_preflight.json'))
         if campaign:

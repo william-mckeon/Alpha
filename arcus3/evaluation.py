@@ -98,5 +98,5 @@ def summarize(records):
 def compatible(a,b):
     # Architecture/adapter identity is recorded separately. Matching a converted
     # model against its dense parent is intentional, not an identity mismatch.
-    return all(a.get(k) is not None and a[k]==b.get(k) for k in
+    return a.get('tier','full')==b.get('tier','full') and all(a.get(k) is not None and a[k]==b.get(k) for k in
                ('suite_sha256','tokenizer_revision','settings_sha256','precision','orchestration'))

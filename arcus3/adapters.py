@@ -37,3 +37,25 @@ def attach_expanded(model, settings):
                     setattr(expert,name,ExpertLoRA(base))
     if not count:raise ValueError('Expanded model required')
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def train_added_experts(model):
+    """Phase 8: original expert 0 is part of the frozen donor backbone."""
+    from arcus3.routing import SelectiveExperts
+    from arcus3.depth import FullDepthGate
+    model.requires_grad_(False)
+    blocks = [m for m in model.modules() if isinstance(m, SelectiveExperts)]
+    if not blocks:
+        raise ValueError('Expanded model required')
+    for block in blocks:
+        if any('lora_' in n for n, _ in block.named_parameters()):
+            raise ValueError('Full expert adaptation requires pristine conversion, not LoRA')
+        if not hasattr(block, 'depth_gate'):
+            block.depth_gate = FullDepthGate(block.router.in_features, block.router.weight.device)
+        block.experts[1].float().requires_grad_(True)
+        block.router.float().requires_grad_(True)
+        block.depth_gate.requires_grad_(True)
+    names = [n for n, p in model.named_parameters() if p.requires_grad]
+    if any(not any(part in n for part in ('.experts.1.', '.router.', '.depth_gate.')) for n in names):
+        raise ValueError('Unexpected trainable backbone tensor')
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
