@@ -1,5 +1,5 @@
 # Frozen evaluation byte identities must survive Windows and Linux checkouts.
 evaluation/alpha_developmental/prompts-v1.jsonl text eol=crlf
 baby_arcus/developmental_tasks.py text eol=lf
-evaluation/arcus3/* -text
-configs/arcus3/evaluation.json -text
+evaluation/arcus3/* -text whitespace=cr-at-eol
+configs/arcus3/evaluation.json -text whitespace=cr-at-eol
