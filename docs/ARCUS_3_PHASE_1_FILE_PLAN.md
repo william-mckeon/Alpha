@@ -1,7 +1,8 @@
 # Arcus 3.0 Phase 1 — establish the unchanged pretrained donor
 
-Proposed next-phase inventory, September 28, 2026. Phase 0 is verified; Phase 1 is
-not implemented or launched by documenting this inventory. Scope: acquire the pinned
+Original inventory, September 28, 2026; subsequently authorized for implementation
+and live tests. See [actual validation status](ARCUS_3_PHASE_1_RESULTS.md).
+Scope: acquire the pinned
 donor, preserve its format, and demonstrate bounded reproducible Docker CUDA inference.
 No expert expansion, training, RL, context extension or cloud work in this phase.
 
@@ -36,6 +37,14 @@ No expert expansion, training, RL, context extension or cloud work in this phase
 
 This inventory refines the broader preliminary plan with a dedicated donor probe,
 runtime tests and Phase 1 results. No generic old Alpha loader needs modification.
+Implementation additionally includes `tests/arcus3/test_launcher.ps1` to exercise
+the actual PowerShell deadline/cleanup flow with a mocked Docker command, and the
+requested next-phase inventory `docs/ARCUS_3_PHASE_2_FILE_PLAN.md`.
+It also updates `.gitignore` to exclude generated `artifacts/arcus3/`, including
+large partial downloads; provenance and verification results remain in source docs.
+The user's LangChain/LangGraph requirement adds `arcus3/orchestration.py` and
+`tests/arcus3/test_orchestration.py`, plus pinned framework dependencies and a real
+direct-versus-orchestrated generation check. Full agent integration remains later.
 
 ## Generated outputs, not manually maintained source
 

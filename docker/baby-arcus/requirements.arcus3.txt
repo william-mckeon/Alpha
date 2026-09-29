@@ -1,0 +1,10 @@
+transformers==4.46.3
+tokenizers==0.20.3
+huggingface-hub==0.36.2
+safetensors==0.6.2
+accelerate==1.1.1
+psutil==7.2.2
+langchain==1.0.7
+langchain-core==1.0.7
+langgraph==1.0.5
+langsmith==0.4.59

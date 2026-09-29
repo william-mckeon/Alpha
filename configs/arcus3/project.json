@@ -1,21 +1,43 @@
 {
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
-  "phase": 0,
-  "status": "preservation-and-isolation",
+  "phase": 1,
+  "status": "phase1-validated",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
-    "incorporated": false,
+    "incorporated": true,
     "weight_lineage": "pretrained-donor-only"
   },
   "historical_research": [
-    {"root": "runs/test2/alpha-tool-correction-60k-001", "role": "research-reference-not-weight-parent", "updates": 53192},
-    {"root": "runs/foundation/arcus-128m-pilot-002", "role": "research-reference-not-weight-parent", "updates": 2}
+    {
+      "root": "runs/test2/alpha-tool-correction-60k-001",
+      "role": "research-reference-not-weight-parent",
+      "updates": 53192
+    },
+    {
+      "root": "runs/foundation/arcus-128m-pilot-002",
+      "role": "research-reference-not-weight-parent",
+      "updates": 2
+    }
   ],
-  "paths": {"configs": "configs/arcus3", "runs": "runs/arcus3", "artifacts": "artifacts/arcus3"},
-  "context": {"initial_configured_tokens": 8192, "later_objective_tokens": 16384, "demonstrated_tokens": null},
-  "authorization": {"download": false, "training": false, "cloud": false, "publication": false},
+  "paths": {
+    "configs": "configs/arcus3",
+    "runs": "runs/arcus3",
+    "artifacts": "artifacts/arcus3"
+  },
+  "context": {
+    "initial_configured_tokens": 8192,
+    "later_objective_tokens": 16384,
+    "demonstrated_tokens": null
+  },
+  "authorization": {
+    "download": true,
+    "training": false,
+    "cloud": false,
+    "publication": false,
+    "inference": true
+  },
   "active_run": null,
   "deadline": null,
   "policy": {
@@ -28,5 +50,11 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Planning metadata only; later launchers must enforce authorization. No old deadline is extended. No donor weights or model code incorporated in Phase 0."
+  "note": "User authorized Phase 1 implementation and live donor inference testing. No training, cloud or publication authorized.",
+  "verification": {
+    "report": "runs/arcus3/donor-probe-phase1-003/report.json",
+    "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
+    "unique_parameters": 1711376384,
+    "langchain_langgraph_token_parity": true
+  }
 }

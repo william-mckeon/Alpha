@@ -55,3 +55,5 @@ symbols/
 
 # Generated Hugging Face export copies; recreated by scripts/package_alpha_hf.py
 artifacts/huggingface/
+# Pinned donor downloads, partial transfers and generated Arcus 3 model artifacts.
+artifacts/arcus3/

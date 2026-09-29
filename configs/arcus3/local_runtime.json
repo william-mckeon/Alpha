@@ -1,0 +1,14 @@
+{
+  "image": "arcus3:donor-v1",
+  "image_id": "sha256:2bf2aa27f861c6e010af89718d0be4c4cc8dcaeb13686b570714b2b3ab1a18b1",
+  "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
+  "memory": "8g",
+  "cpus": 2,
+  "pids": 128,
+  "cuda_fraction": 0.7,
+  "gpu_lock_volume": "arcus-alpha-three-stage_alpha-job-control",
+  "memory_watchdog": false,
+  "max_seconds": 1800,
+  "max_new_tokens": 128,
+  "mode": "donor-inference-only"
+}

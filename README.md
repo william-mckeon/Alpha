@@ -3,8 +3,12 @@
 Current direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
 starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B
 expert expansion. See the [Phase 0 handoff](docs/ARCUS_3_PHASE_0_HANDOFF.md) and
-[Phase 1 file inventory](docs/ARCUS_3_PHASE_1_FILE_PLAN.md). Donor execution and
-training have not started; the project metadata does not authorize either.
+[Phase 1 file inventory](docs/ARCUS_3_PHASE_1_FILE_PLAN.md). Phase 1 donor acquisition
+and bounded Docker CUDA inference passed, including identical direct versus
+LangChain/LangGraph outputs after reload. Training, cloud work and publication
+remain disabled. See
+[Phase 1 validation](docs/ARCUS_3_PHASE_1_RESULTS.md) and the
+[Phase 2 baseline inventory](docs/ARCUS_3_PHASE_2_FILE_PLAN.md).
 
 Alpha 2.0's [53,192-update snapshot](docs/ALPHA_2_SNAPSHOT_RELEASE.md) is privately
 published with verified hashes. Its 128,353,994-parameter training remains paused.

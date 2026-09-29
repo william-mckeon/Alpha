@@ -1,0 +1,12 @@
+{
+  "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "revision": "31b70e2e869a7173562077fd711b654946d38674",
+  "expected_unique_parameters": 1711376384,
+  "license": "Apache-2.0",
+  "configured_context": 8192,
+  "trust_remote_code": false,
+  "weights_format": "safetensors",
+  "manifest": "artifacts/arcus3/donor/31b70e2e869a7173562077fd711b654946d38674/manifest.json",
+  "verified_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
+  "weight_sha256": "f55217be716b6a997b97b9d8d7eb6fad02e00858f5010ec24f64603c3a98a0e8"
+}

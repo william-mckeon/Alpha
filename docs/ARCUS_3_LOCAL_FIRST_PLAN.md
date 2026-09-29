@@ -1,14 +1,17 @@
 # Arcus 3.0: local-first SmolLM2 conversion plan
 
-Status: proposed implementation plan, September 28, 2026. No donor weights were
-downloaded, converted or trained for this plan. No cloud resources were purchased.
+Status: phases 0 and 1 implemented and validated, September 28, 2026 local time.
+Pinned donor weights were downloaded and tested unchanged in Docker CUDA.
+No weights were converted or trained and no cloud resources were purchased.
 The 128M foundation pilot and the existing Alpha 2.0 snapshot remain separate.
 This is a targeted review of relevant code and recorded conversation decisions,
 not a claim that every repository file or every historical message was audited.
 
 Phase 0 is implemented and verified: [handoff](ARCUS_3_PHASE_0_HANDOFF.md).
-The next scoped work is [Phase 1](ARCUS_3_PHASE_1_FILE_PLAN.md); later phases remain
-proposed. Phase-specific inventories refine the preliminary engineering inventory
+Phase 1 implementation and live donor validation passed; see
+[results](ARCUS_3_PHASE_1_RESULTS.md). Later phases remain proposed, beginning with
+[Phase 2's baseline inventory](ARCUS_3_PHASE_2_FILE_PLAN.md).
+Phase-specific inventories refine the preliminary engineering inventory
 below and include project metadata, handoff documents and bounded donor probes.
 
 ## Outcome and donor
@@ -72,6 +75,22 @@ prefill/decode latency and memory. Attention remains dense in every layer. This
 proposal does not automatically add recurrence or the old body/sensory abilities.
 Existing application tools/memory can connect through a text/tool backend; learned
 vision, motor and continuity heads would need a separate bridge and training plan.
+
+LangChain and LangGraph remain part of the application direction, as explicitly
+reconfirmed by the user during Phase 1. The minimal `arcus3/orchestration.py` bridge
+runs a local LangChain Runnable inside a LangGraph StateGraph without changing
+the donor weights or chat template. Phase 1 checks message preservation and direct
+versus orchestrated generation. Tool-agent binding, persistence and application
+memory integration still belong to Phase 3; library compatibility alone is not
+evidence of reliable autonomous tool use.
+
+LangChain and LangGraph remain part of the application direction, as explicitly
+reconfirmed by the user during Phase 1. The minimal `arcus3/orchestration.py` bridge
+runs a local LangChain Runnable inside a LangGraph StateGraph without changing
+the donor weights or chat template. Phase 1 checks message preservation and direct
+versus orchestrated generation. Tool-agent binding, persistence and application
+memory integration still belong to Phase 3; library compatibility alone is not
+evidence of reliable autonomous tool use.
 
 ## Specific compatibility findings in the existing code
 

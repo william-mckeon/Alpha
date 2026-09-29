@@ -1,0 +1,12 @@
+# Before build, verify this local tag against local_runtime.json base_image_id.
+FROM arcus-foundation:nanotron-v1
+WORKDIR /app
+COPY docker/baby-arcus/requirements.arcus3.txt /tmp/requirements.arcus3.txt
+RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.arcus3.txt
+COPY arcus3 /app/arcus3
+COPY scripts/probe_arcus3_donor.py /app/scripts/probe_arcus3_donor.py
+COPY configs/arcus3 /app/configs/arcus3
+COPY tests/arcus3 /app/tests/arcus3
+ENV PYTHONPATH=/app HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONUNBUFFERED=1
+ENV OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 TOKENIZERS_PARALLELISM=false
+ENTRYPOINT ["python3"]

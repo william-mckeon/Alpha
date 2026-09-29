@@ -3,8 +3,22 @@ Copyright 2026 William McKeon
 
 Licensed under the Apache License, Version 2.0 (see LICENSE).
 
+Arcus 3.0 donor experiment (separate from the historical original weights below):
+HuggingFaceTB/SmolLM2-1.7B-Instruct, revision
+31b70e2e869a7173562077fd711b654946d38674, by Hugging Face / HuggingFaceTB.
+Its model card declares Apache-2.0. Preserve its original model card, tokenizer,
+chat template and configuration with acquired weights. The Phase 1 donor is
+unchanged; this is not a claim that these pretrained weights are original Arcus
+weights or that Hugging Face endorses Arcus. Transformers and Accelerate are
+Hugging Face Apache-2.0 libraries; their installed license records remain in the
+pinned runtime. No PEFT code or adapted weights are incorporated in Phase 1.
+The Arcus 3 orchestration bridge uses LangChain, langchain-core and LangGraph by
+the LangChain project. Preserve their installed license/attribution records.
+The Arcus 3 orchestration bridge uses LangChain, langchain-core and LangGraph by
+the LangChain project. Preserve their installed license/attribution records.
+
 ================================================================================
-Provenance
+Historical from-scratch provenance (Alpha 2.0 and earlier)
 ================================================================================
 
 Arcus is an **original, from-scratch** Mixture-of-Depths-and-Experts (MoDE)
@@ -14,7 +28,7 @@ from any other model's weights:
   - The MoDE mechanism (Mixture-of-Depths + Mixture-of-Experts) is an independent
     implementation, built on top of the BoeNet research project (the author's own).
   - The tokenizer is OpenAI's `tiktoken` `o200k_base` encoding (used as a library;
-    Arcus ships no model weights from any third party).
+Arcus ships no model weights from any third party).
 
 ================================================================================
 Archived code (legacy/)
