@@ -3,9 +3,17 @@ import argparse
 import hashlib
 import json
 import os
+import logging
 from pathlib import Path
 os.environ['HF_HUB_DISABLE_XET']='1'
 os.environ['HF_HUB_DISABLE_PROGRESS_BARS']='1'
+# Transport retry warnings can contain presigned URLs. Emit only our sanitized status.
+logging.getLogger('huggingface_hub').setLevel(logging.CRITICAL)
+logging.getLogger('httpx').setLevel(logging.CRITICAL)
+
+def upload_metadata(api,repo,package,names):
+    return api.upload_folder(repo_id=repo,folder_path=str(package),allow_patterns=names,
+                             commit_message='Complete verified Alpha 3.0 expert initialization')
 
 def staged_weights(api,repo,package,names,expected):
     """One durable shard commit at a time; metadata/manifest remain the final commit."""
@@ -54,7 +62,7 @@ def main(package):
     names=sorted(m['files'])+['manifest.json']
     staged_weights(api,repo,p,names,m['files'])
     metadata=[n for n in names if not n.endswith('.safetensors')]
-    commit=api.upload_folder(repo_id=repo,folder_path=str(p),allow_patterns=metadata,num_threads=1,commit_message='Complete verified Alpha 3.0 expert initialization')
+    commit=upload_metadata(api,repo,p,metadata)
     revision=commit.oid;info=api.model_info(repo,revision=revision,files_metadata=True)
     if not info.private:raise ValueError('Privacy verification failed')
     siblings={f.rfilename:f for f in info.siblings}

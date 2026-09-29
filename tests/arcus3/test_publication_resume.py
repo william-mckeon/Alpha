@@ -1,9 +1,18 @@
 import tempfile,unittest
 from pathlib import Path
 from types import SimpleNamespace as NS
-from scripts.publish_alpha_3 import staged_weights
+from scripts.publish_alpha_3 import staged_weights,upload_metadata
 
 class PublicationResumeTests(unittest.TestCase):
+    def test_metadata_matches_installed_api(self):
+        import inspect
+        from huggingface_hub import HfApi
+        class API:
+            def upload_folder(self,**kwargs):
+                inspect.signature(HfApi.upload_folder).bind(None,**kwargs)
+                return kwargs
+        result=upload_metadata(API(),'repo',Path('.'),['manifest.json'])
+        self.assertEqual(result['allow_patterns'],['manifest.json'])
     def test_skip_verified_and_commit_remaining_sequentially(self):
         class API:
             def __init__(self):self.files=[NS(rfilename='a.safetensors',lfs=NS(sha256='a'))];self.calls=[]
