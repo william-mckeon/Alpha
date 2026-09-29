@@ -1,0 +1,11 @@
+{
+  "schema": "arcus3-phase8-sample-v1",
+  "input_token_shares": {"general": 0.4, "code": 0.2, "math": 0.1, "instruction_tools": 0.2, "local": 0.1},
+  "sources": {
+    "code": {"repo_id":"bigcode/the-stack-dedup","revision":"17cad72c886a2858e08d4c349a00d6466f54df63","path":"data/python/data-00000-of-00144.parquet","terms":"Gated access required; preserve original code licenses; sample admits explicit permissive licenses only."},
+    "general": {"repo_id":"HuggingFaceFW/fineweb-edu","revision":"87f09149ef4734204d70ed1d046ddc9ca3f2b8f9","path":"data/CC-MAIN-2013-20/train-00000-of-00014.parquet","terms":"ODC-By 1.0 and Common Crawl terms; source attribution retained."},
+    "math": {"repo_id":"HuggingFaceTB/finemath","revision":"e92b25a616738fe95dc186b64dfb19f9c8525594","path":"finemath-4plus/train-00000-of-00064.parquet","terms":"ODC-By 1.0 and Common Crawl terms; source attribution retained."},
+    "instruction_tools": {"repo_id":"HuggingFaceTB/smoltalk","revision":"5feaf2fd3ffca7c237fc38d1861bc30365d48ffa","path":"data/smol-constraints/train-00000-of-00001.parquet","terms":"Apache-2.0 component. Sample covers instructions; donor tool component review remains pending."},
+    "local": {"path":"runs/test2/tool-correction-data-v4/records.jsonl","terms":"User-authorized local records; train split only; no upload."}
+  }
+}

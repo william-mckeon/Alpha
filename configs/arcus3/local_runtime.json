@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:phase8-v5",
-  "image_id": "sha256:c10245031a8ba24d004b274ea6f781edc0edc32a425ffcee5d10f3f0ea51aec4",
+  "image": "arcus3:phase8-chat-v2",
+  "image_id": "sha256:2132cca7a0120afe809946fff20e2738938a52a1bf72d1f575fadddca9105385",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,

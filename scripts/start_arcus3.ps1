@@ -1,7 +1,7 @@
 param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [Parameter(Mandatory=$true)][string]$Root,
       [ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","adaptation")][string]$Mode="probe",
-      [string]$RequestsFile="", [switch]$PersistMemory, [switch]$Phase8Initialization,
+      [string]$RequestsFile="", [string]$WindowPolicy="", [switch]$PersistMemory, [switch]$Phase8Initialization,
       [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="", [string]$TeacherPath="", [string]$EvaluationRoot="", [ValidateSet('light','developmental','full')][string]$EvaluationTier='full')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path $PSScriptRoot -Parent
@@ -16,7 +16,14 @@ if ($StopAt -le [DateTimeOffset]::Now -or ($StopAt-[DateTimeOffset]::Now).TotalS
 if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion|expanded-preflight|release|teacher|adaptation)-[a-z0-9-]+$') { throw 'Isolated donor-probe root required' }
 if ($Mode -eq 'adaptation') {
  $adaptation=Get-Content configs/arcus3/backbone_adaptation.json -Raw | ConvertFrom-Json
- $windows=Get-Content configs/arcus3/training_windows.json -Raw | ConvertFrom-Json
+ $policyPath=if ($WindowPolicy) {$WindowPolicy} else {'configs/arcus3/training_windows.json'}
+ $windows=Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json
+ $storage=Get-Content configs/arcus3/phase8_storage.json -Raw | ConvertFrom-Json
+ if (!$storage.ready) { throw 'External storage has not been verified' }
+ if ($windows.mode -eq 'chat-deadline') {
+  if (!$WindowPolicy -or !$windows.start_at -or !$windows.stop_at) { throw 'Explicit chat session policy required' }
+  if ([DateTimeOffset]::Now -lt [DateTimeOffset]$windows.start_at -or $StopAt -gt [DateTimeOffset]$windows.stop_at) { throw 'Outside explicit session deadline' }
+ }
  if (!$adaptation.campaign_enabled -or !$windows.enabled) { throw 'Campaign and training windows are not enabled' }
 }
 if ($Mode -in @('adaptation','adaptation-qualification') -and (!$ConvertedPath -or !$DataRoot -or !$TeacherPath)) { throw 'Adaptation requires parent, data and teacher cache' }
@@ -70,6 +77,12 @@ foreach ($mountSpec in @(@{source=$TeacherPath;target='/teacher';option='--teach
  }
 }
 if ($Mode -in @('adaptation-qualification','teacher-qualification')) { $argsDocker+='--qualification' }
+if ($WindowPolicy) {
+ if ($Mode -ne 'adaptation') { throw 'Session policy only applies to adaptation' }
+ $policyFull=(Resolve-Path -LiteralPath $WindowPolicy).Path
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$policyFull,target=/session-policy.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--windows','/session-policy.json')
+}
 if ($Mode -eq 'baseline') { $argsDocker+=@('--tier',$EvaluationTier) }
 if ($Phase8Initialization) {
  if ($Mode -ne 'baseline' -or !$ConvertedPath -or $ExpandedPath) { throw 'Initial Phase 8 evaluation requires pristine conversion' }

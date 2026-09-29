@@ -1,0 +1,9 @@
+{
+  "schema": "arcus3-phase8-storage-v1",
+  "ready": false,
+  "external_root": null,
+  "migration_receipt": null,
+  "local_preparation_limit_bytes": 1073741824,
+  "local_preparation_limit_input_tokens": 100000,
+  "policy": "Prepare bounded local sample; wait for external drive before sustained training. Preserve all historical checkpoints."
+}

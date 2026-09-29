@@ -53,7 +53,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Full added-expert qualification completed two disposable updates with exact weights/optimizer/cursor replay; full Phase 8 campaign awaits data, training windows and checkpoint storage. Phase 7 remains complete; HF initialization upload is separate.",
+  "note": "Phase 8 qualification passed; balanced partial sample and teacher cache verified. Chat start/resume requires a deadline. Campaign awaits gated code access, full recipe review, external storage and sequence qualification. No automatic starts.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -84,7 +84,8 @@
     "phase8_qualification": "runs/arcus3/adaptation-phase8-replay-001/qualification-summary.json",
     "phase8_initial_baseline": "runs/arcus3/baseline-phase8-initial-001/scores.json",
     "phase8_trained_baseline": "runs/arcus3/baseline-phase8-trained-001/scores.json",
-    "phase8_application": "runs/arcus3/application-phase8-trained-001/application-report.json"
+    "phase8_application": "runs/arcus3/application-phase8-trained-001/application-report.json",
+    "phase8_sample_validation": "runs/arcus3/phase8-balanced-sample-003/sample-validation.json"
   },
   "training_scope": "dense-control-v1",
   "conversion_scope": "selective-experts-parity-v1",

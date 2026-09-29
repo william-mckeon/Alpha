@@ -26,6 +26,12 @@ def due(updates, schedule, final=False):
 
 def in_window(settings, now=None):
     if not settings['enabled']:return False
+    if settings.get('mode')=='chat-deadline':
+        start=datetime.fromisoformat(settings['start_at'].replace('Z','+00:00'))
+        end=datetime.fromisoformat(settings['stop_at'].replace('Z','+00:00'))
+        if start.tzinfo is None or end.tzinfo is None or not 0<(end-start).total_seconds()<=86400:
+            raise ValueError('Explicit bounded timezone-aware session required')
+        return start <= (now or datetime.now(timezone.utc)) < end
     local=(now or datetime.now(timezone.utc)).astimezone(ZoneInfo(settings['timezone']))
     minute=local.hour*60+local.minute
     for window in settings['windows']:
@@ -38,6 +44,7 @@ def window_end(settings, now=None):
     from datetime import timedelta
     now=now or datetime.now(timezone.utc)
     if not in_window(settings,now):raise ValueError('Outside enabled window')
+    if settings.get('mode')=='chat-deadline':return datetime.fromisoformat(settings['stop_at'].replace('Z','+00:00')).astimezone(timezone.utc)
     local=now.astimezone(ZoneInfo(settings['timezone']));minute=local.hour*60+local.minute
     ends=[]
     for w in settings['windows']:

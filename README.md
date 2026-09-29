@@ -335,7 +335,10 @@ contribution proxy, not demonstrated skipping capability.
 See [Phase 8 protocol](docs/ARCUS_3_BACKBONE_ADAPTATION_PROTOCOL.md),
 [data/storage inventory](docs/ARCUS_3_PHASE_8_DATA_MANIFEST.md),
 [pause/resume guide](docs/ARCUS_3_TRAINING_WINDOWS.md) and
-[results](docs/ARCUS_3_PHASE_8_RESULTS.md). Combined sources, user training hours
-and checkpoint storage remain launch gates. The source metadata inventory is about
+[results](docs/ARCUS_3_PHASE_8_RESULTS.md). The user selected
+[balanced data and chat-controlled deadlines](docs/ARCUS_3_PHASE_8_CHAT_AND_SAMPLE.md).
+Say start/resume with a stop time; pause requests a durable optimizer-boundary save.
+There are no automatic daily starts. Source access/review, sequence-length
+qualification and external checkpoint storage remain launch gates. The source metadata inventory is about
 14.2 TB of public repository supersets, not a required full download or exact donor
 corpus. No historical checkpoint or evaluation was removed.

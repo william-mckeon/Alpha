@@ -1,1 +1,1 @@
-{"schema":"arcus3-training-windows-v1","enabled":false,"timezone":"America/New_York","windows":[],"grace_seconds":300,"note":"Await user hours; qualification is bounded manually. No scheduler installed."}
+{"schema":"arcus3-training-windows-v1","mode":"chat-deadline","enabled":false,"timezone":"America/New_York","windows":[],"grace_seconds":300,"automatic_start":false,"note":"Each explicit chat start/resume requires its own timezone-aware deadline. No recurring schedule. Pause saves at optimizer boundary; confirm GPU release only after exit."}

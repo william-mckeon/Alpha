@@ -1,8 +1,16 @@
 # Training windows, pause/resume and checkpoint use
 
-Phase 8 scheduling is disabled until the user supplies daily hours in
-America/New_York. Windows use weekdays 0=Monday through 6=Sunday and same-day
-HH:MM start/end values. Split overnight windows into two entries. The worker
+The user selected chat-controlled sessions, not recurring daily hours. This
+conversation is the control: "start until [time]" or "resume until [time]" selects
+one explicit deadline in America/New_York; ask for the deadline if omitted.
+"Pause training" and "stop training" both request a graceful checkpoint. Do not
+report training stopped until the owned container has exited and the checkpoint
+is verified. No automatic daily start or restart is installed.
+
+The session supervisor creates a timezone-aware, expiring per-session policy
+only after the campaign, data and external-storage readiness gates pass. The
+launcher mounts that policy into the worker. Global windows remain disabled.
+Legacy fixed-hour windows remain supported for historical workflows. The worker
 checks the window between optimizer updates; the launcher requests a graceful
 save five minutes before its hard deadline. Only its own container is killed at
 the hard deadline if it has not exited. No free-memory watchdog is reintroduced.
@@ -11,7 +19,8 @@ the hard deadline if it has not exited. No free-memory watchdog is reintroduced.
 
 Resolve the reviewed combined-data recipe, teacher cache, measured sequence length,
 checkpoint storage and qualified runtime first. Campaign-enabled remains false
-until these conditions are satisfied. Model jobs use Docker CUDA and the shared
+until these conditions are satisfied. The user chose to prepare a sample and wait
+for the disconnected external drive before sustained training. Model jobs use Docker CUDA and the shared
 GPU lock. Do not invoke the Python model trainer directly on Windows.
 
 `run_arcus3_phase8_session.py` supervises one foreground window via the PowerShell
@@ -66,6 +75,11 @@ learning from it remain a separate workflow.
 
 Full-expert checkpoints are about 3.624 GB each, including optimizer state.
 Historical checkpoints are never deleted. Before the first long session, provide
-an external storage location or explicitly agree a policy for new rolling saves.
+the external storage location, copy the selected data/teacher/checkpoint files,
+verify every copied file hash, and record a migration receipt before marking
+`configs/arcus3/phase8_storage.json` ready. Keep originals until separately reviewed.
 The current approximately 22 GB free drive cannot retain a lengthy campaign at
 64-update checkpoint intervals. Disk-headroom checks pause rather than fill it.
+No rolling-deletion policy was authorized. Initial local preparation is capped
+at 100,000 input tokens and 1 GiB including teacher targets. Partial categories
+remain explicitly incomplete and cannot satisfy the campaign gate.

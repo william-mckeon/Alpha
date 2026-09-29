@@ -17,11 +17,12 @@ def seal(root,provenance,qualification=False):
     if not qualification and meta['scope']!='combined-phase8':raise ValueError('Full combined data scope required')
     shards=[];records=tokens=0
     for path in sorted(root.glob('train-*.jsonl')):
-        for line in path.open(encoding='utf-8'):
-            row=json.loads(line)
-            if len(row['input_ids'])!=len(row['labels']) or len(row['input_ids'])<2:raise ValueError('Invalid token record')
-            if not any(t!=-100 for t in row['labels'][1:]):raise ValueError('No supervised target')
-            records+=1;tokens+=len(row['input_ids'])
+        with path.open(encoding='utf-8') as handle:
+            for line in handle:
+                row=json.loads(line)
+                if len(row['input_ids'])!=len(row['labels']) or len(row['input_ids'])<2:raise ValueError('Invalid token record')
+                if not any(t!=-100 for t in row['labels'][1:]):raise ValueError('No supervised target')
+                records+=1;tokens+=len(row['input_ids'])
         shards.append({'path':path.name,'sha256':digest(path),'bytes':path.stat().st_size})
     if not shards or not records:raise ValueError('Empty training data')
     result={'schema':'arcus3-corpus-v1','qualification_only':qualification,'provenance':meta,'shards':shards,'records':records,'input_tokens_per_pass':tokens,
@@ -50,27 +51,35 @@ def combine(recipe_path, donor, output, max_tokens=10_000_000):
             if not s.get('reviewed') or s['weight']<=0 or digest(s['path'])!=s['sha256']:raise ValueError('Unreviewed or changed source')
             handles.append(Path(s['path']).open(encoding='utf-8'))
         rng=random.Random(recipe.get('seed',2101));active=list(range(len(sources)));counts={s['name']:0 for s in sources};total=0;shard=0;stream=None;size=0
+        weight_total=sum(s['weight'] for s in sources)
+        quotas={s['name']:int(max_tokens*s['weight']/weight_total) for s in sources}
         while active and total<max_tokens:
             i=rng.choices(active,weights=[sources[k]['weight'] for k in active],k=1)[0]
             line=handles[i].readline()
             if not line:active.remove(i);continue
-            rows=encode_record(tok,json.loads(line),recipe.get('max_length',512),exclusions)
+            record=json.loads(line)
+            if record.get('split','train') not in ('train','training'):continue
+            rows=encode_record(tok,record,recipe.get('max_length',512),exclusions)
             for row in rows:
-                if total+len(row['input_ids'])>max_tokens:continue
+                if counts[sources[i]['name']]+len(row['input_ids'])>quotas[sources[i]['name']]:continue
                 if seen.execute('INSERT OR IGNORE INTO seen VALUES (?)',(row['sha256'],)).rowcount==0:continue
                 row['source']=sources[i]['name'];encoded=(json.dumps(row)+'\n').encode()
                 if stream is None or size+len(encoded)>4*1024*1024:
                     if stream:stream.close()
                     stream=(root/f'train-{shard:05d}.jsonl').open('wb');shard+=1;size=0
                 stream.write(encoded);size+=len(encoded);total+=len(row['input_ids']);counts[sources[i]['name']]+=len(row['input_ids'])
+            if quotas[sources[i]['name']]-counts[sources[i]['name']]<2:active.remove(i)
         if stream:stream.close()
     finally:
         for f in handles:f.close()
         if 'stream' in locals() and stream and not stream.closed:stream.close()
         seen.commit();seen.close()
+    if any(counts[s['name']]<quotas[s['name']]*.99 for s in sources):
+        atomic_json(root/'incomplete-mixture.json',{'counts':counts,'quotas':quotas,'campaign_ready':False})
+        raise ValueError('Source exhausted before token mixture reached 99 percent of each quota')
     atomic_json(root/'provenance.json',{'tokenizer_sha256':digest(Path(donor)/'files/tokenizer.json'),
         'sources_sha256':digest(recipe_path),'evaluation_exclusions_sha256':digest(recipe['exclusions_file']),
-        'reviewed':True,'scope':'combined-phase8','source_input_tokens':counts,'mixing':'seeded document sampling; finite sources, no automatic repeats'})
+        'reviewed':True,'scope':'combined-phase8','source_input_tokens':counts,'source_token_quotas':quotas,'mixing':'token-capped category sampling; finite sources, no automatic repeats'})
     return seal(root,root/'provenance.json')
 
 if __name__=='__main__':

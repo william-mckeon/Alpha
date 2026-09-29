@@ -2,8 +2,14 @@
   "schema": "arcus3-phase8-sources-v1",
   "scope": "all-donor-data-categories-plus-local-data",
   "ready": false,
-  "mixture_weights": null,
-  "cache_limit_bytes": 21474836480,
+  "mixture_weights": {
+    "local": 0.1,
+    "general": 0.4,
+    "math": 0.1,
+    "instruction_tools": 0.2,
+    "code": 0.2
+  },
+  "cache_limit_bytes": 1073741824,
   "sources": [
     {
       "repo_id": "HuggingFaceFW/fineweb-edu",
@@ -68,5 +74,6 @@
       "subset": "re-audit masks and held-out overlap with donor tokenizer"
     }
   ],
-  "note": "Do not substitute the 135M recipe or download all repositories. Public superset size is not exact donor training-corpus size. Full campaign fails closed until source revisions, mixing and provenance are reviewed."
+  "note": "Do not substitute the 135M recipe or download all repositories. Public superset size is not exact donor training-corpus size. Full campaign fails closed until source revisions, mixing and provenance are reviewed.",
+  "mixture_unit": "student-input-tokens"
 }
