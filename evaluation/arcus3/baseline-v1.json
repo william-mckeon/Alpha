@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "prompts": "evaluation/alpha_developmental/prompts-v1.jsonl",
+  "files": {
+    "evaluation/alpha_developmental/prompts-v1.jsonl": "e0929fc98a1e9a6e9d7c4054c13a450261b664b49ef520d46162410510a6d2be",
+    "evaluation/arcus3/rubric-v1.json": "a3ecf89ddb35e38730854644b53ee8a380fcb0a151cdeb837986310b9c7bbade",
+    "configs/arcus3/evaluation.json": "241e0e208b00b95c960ee26033da5477a4b43159b67d8661516849c65be79460",
+    "baby_arcus/developmental_tasks.py": "b3810154bcd5e191fc661c6f7128130aa9f672ef662bd5ab689a56e7ae942755"
+  },
+  "language": [
+    {
+      "id": "language-0",
+      "domain": "language",
+      "text": "Rain collected in the garden overnight. In the morning, the soil was damp and the leaves held small drops of water. Maya carried her notebook outside and recorded the temperature before planting the seeds."
+    },
+    {
+      "id": "language-1",
+      "domain": "language",
+      "text": "A library lends books to readers. Each book has a due date, and readers can usually renew it if nobody else is waiting. Returning books on time helps other people find the material they need."
+    },
+    {
+      "id": "language-2",
+      "domain": "language",
+      "text": "The train left the station at noon. A passenger placed a small bag beneath the seat and opened a newspaper. Outside the window, the buildings gradually gave way to fields and trees."
+    },
+    {
+      "id": "language-3",
+      "domain": "language",
+      "text": "To explain an idea clearly, begin with the main point. Give an example that connects the idea to something familiar. If a word has several meanings, explain which meaning is intended."
+    },
+    {
+      "id": "code-4",
+      "domain": "code",
+      "text": "def total(values):\n    result = 0\n    for value in values:\n        result += value\n    return result\n"
+    },
+    {
+      "id": "code-5",
+      "domain": "code",
+      "text": "def first_even(values):\n    for value in values:\n        if value % 2 == 0:\n            return value\n    return None\n"
+    },
+    {
+      "id": "code-6",
+      "domain": "code",
+      "text": "names = [\"Ada\", \"Lin\", \"Mira\"]\nfor index, name in enumerate(names):\n    print(index, name)\n"
+    },
+    {
+      "id": "code-7",
+      "domain": "code",
+      "text": "def describe(items):\n    if not items:\n        return \"empty\"\n    return \"contains \" + str(len(items)) + \" items\"\n"
+    },
+    {
+      "id": "tool-8",
+      "domain": "tool",
+      "text": "{\"name\":\"echo\",\"arguments\":{\"text\":\"hello\"}}"
+    },
+    {
+      "id": "tool-9",
+      "domain": "tool",
+      "text": "{\"name\":\"lookup\",\"arguments\":{\"key\":\"color\"}}"
+    },
+    {
+      "id": "tool-10",
+      "domain": "tool",
+      "text": "{\"name\":\"calculate\",\"arguments\":{\"expression\":\"2+3\"}}"
+    },
+    {
+      "id": "tool-11",
+      "domain": "tool",
+      "text": "{\"name\":\"search\",\"arguments\":{\"query\":\"Python range\"}}"
+    }
+  ],
+  "provenance": "36 preserved project developmental prompts; 12 project-authored diagnostic text/code/tool fixtures frozen before donor evaluation. No external corpus downloaded. Reserved for evaluation only; pretrained-donor contamination unknown. Tool strings overlap skill prompts intentionally and are not an independent benchmark.",
+  "limitations": "Small synthetic diagnostic cohort, not a benchmark or evidence of general mastery. Raw-text perplexity is tokenizer- and corpus-specific and cannot be matched against historical Alpha perplexity. Human fluency/coherence/relevance are unscored. No long-context, live-web, multi-action agent or RL competence established."
+}

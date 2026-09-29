@@ -1,8 +1,8 @@
 {
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
-  "phase": 1,
-  "status": "phase1-validated",
+  "phase": 2,
+  "status": "phase2-diagnostic-baseline-validated",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -50,11 +50,13 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "User authorized Phase 1 implementation and live donor inference testing. No training, cloud or publication authorized.",
+  "note": "User authorized Phase 2 frozen read-only evaluation and live testing. No training, cloud or publication.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
     "unique_parameters": 1711376384,
-    "langchain_langgraph_token_parity": true
+    "langchain_langgraph_token_parity": true,
+    "baseline_report": "runs/arcus3/baseline-phase2-001/scores.json",
+    "baseline_suite_sha256": "c847b0a6325509313d6662886067b3467cea5b2eb2cc2c19f014dc21490eb448"
   }
 }

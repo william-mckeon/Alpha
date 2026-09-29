@@ -1,3 +1,4 @@
+param([ValidateSet("probe","baseline")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()
@@ -20,7 +21,7 @@ function global:docker {
 $root='runs/arcus3/donor-probe-deadline-fixture-'+(Get-Date -Format yyyyMMddHHmmss)
 try {
  try {
-  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root
+  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root -Mode $Mode
   throw 'Expected deadline termination failure receipt'
  } catch { if ($_.Exception.Message -notmatch 'Probe exited 137') { throw } }
  $kills=@($global:Arcus3FixtureCalls | Where-Object { $_ -like 'kill *' })

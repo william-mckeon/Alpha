@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "exact": "Strip surrounding whitespace only; case and punctuation remain significant.",
+  "python": "Restricted Docker fixed tests; syntax alone never counts as success.",
+  "tools": "Separate JSON object parsing, strict schema, expected arguments, accepted fixture execution, task success.",
+  "human": [
+    "relevance",
+    "fluency",
+    "coherence"
+  ],
+  "repetition": "Fraction of repeated word four-grams.",
+  "truncation": "Budget reached without EOS; retained as incomplete."
+}

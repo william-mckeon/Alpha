@@ -1,0 +1,10 @@
+{
+  "schema": "arcus3-evaluation-v1",
+  "system": "You are Arcus, a helpful AI assistant.",
+  "max_input_tokens": 512,
+  "max_new_tokens": 128,
+  "decoding": "greedy",
+  "precision": "bfloat16",
+  "orchestration": "langchain-runnable-in-langgraph",
+  "training": false
+}

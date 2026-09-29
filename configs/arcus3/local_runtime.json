@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:donor-v1",
-  "image_id": "sha256:2bf2aa27f861c6e010af89718d0be4c4cc8dcaeb13686b570714b2b3ab1a18b1",
+  "image": "arcus3:baseline-v1",
+  "image_id": "sha256:1d5fbcb26de597458417541b444646b6bf14d6796989bdd7e3ac85af6451213a",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -10,5 +10,12 @@
   "memory_watchdog": false,
   "max_seconds": 1800,
   "max_new_tokens": 128,
-  "mode": "donor-inference-only"
+  "mode": "read-only-probe-or-baseline",
+  "baseline": {
+    "prompts": 36,
+    "language_records": 12,
+    "max_input_tokens": 512,
+    "max_new_tokens": 128,
+    "executor_tasks": 6
+  }
 }

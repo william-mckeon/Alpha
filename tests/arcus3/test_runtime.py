@@ -30,3 +30,12 @@ class RuntimeTests(unittest.TestCase):
                 with self.assertRaises(Exception): ProcessLock(path)
             finally: first.close()
             second=ProcessLock(path); second.close()
+    def test_executor_deadline_margin(self):
+        from scripts.report_arcus3 import executor_budget
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaises(RuntimeError):
+                executor_budget(datetime.now(timezone.utc)+timedelta(seconds=60),root)
+            executor_budget(datetime.now(timezone.utc)+timedelta(seconds=120),root)
+            (Path(root)/'pause-inference').touch()
+            with self.assertRaises(RuntimeError):
+                executor_budget(datetime.now(timezone.utc)+timedelta(seconds=120),root)

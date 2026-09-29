@@ -378,3 +378,12 @@ figure was a suggested research envelope, not a validated cost-to-completion.
 No spending is authorized by this document. Local work also uses electricity and
 time. Make the next funded decision from measured benefit over the dense donor,
 not from parameter count or routing activity alone.
+# Phase 2 implementation status — September 29, 2026
+
+The frozen dense-donor diagnostic baseline is implemented and live-tested.
+See `ARCUS_3_BASELINE_PROTOCOL.md` for the fixed inputs and scoring contract,
+`ARCUS_3_BASELINE_RESULTS.md` for measured results and limitations, and
+`ARCUS_3_PHASE_3_FILE_PLAN.md` for application integration. All 36 developmental
+generations used LangChain Runnable inside LangGraph. No weights were trained,
+expanded or published; historical Alpha remains paused. The 12 synthetic loss
+fixtures are small diagnostics, not representative external benchmark coverage.

@@ -245,3 +245,16 @@ Mapping, separate developmental evaluation, pause handling and gated private rel
 The [final developmental dashboard](runs/diagnostics/alpha-development-final-20260928-140825/REPORT.html)
 contains all 108 responses from matched 40k, 45k and 53,192 evaluations, mapping,
 separate descriptive language measurements and pending human-review fields.
+# Arcus 3 Phase 2 baseline
+
+The unchanged donor baseline completed with LangChain/LangGraph generation.
+See [protocol](docs/ARCUS_3_BASELINE_PROTOCOL.md),
+[measured results](docs/ARCUS_3_BASELINE_RESULTS.md) and
+[Phase 3 file inventory](docs/ARCUS_3_PHASE_3_FILE_PLAN.md).
+Full local transcripts are in `runs/arcus3/baseline-phase2-001/report.md`.
+
+```powershell
+& scripts/start_arcus3.ps1 -Mode baseline -Root runs/arcus3/baseline-unique-id -StopAt ([DateTimeOffset]::Now.AddMinutes(20))
+```
+
+This is read-only evaluation, not authorization to train or resume Alpha.

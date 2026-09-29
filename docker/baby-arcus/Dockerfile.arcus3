@@ -5,6 +5,11 @@ COPY docker/baby-arcus/requirements.arcus3.txt /tmp/requirements.arcus3.txt
 RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.arcus3.txt
 COPY arcus3 /app/arcus3
 COPY scripts/probe_arcus3_donor.py /app/scripts/probe_arcus3_donor.py
+COPY scripts/evaluate_arcus3.py /app/scripts/evaluate_arcus3.py
+COPY scripts/report_arcus3.py /app/scripts/report_arcus3.py
+COPY evaluation/arcus3 /app/evaluation/arcus3
+COPY evaluation/alpha_developmental /app/evaluation/alpha_developmental
+COPY baby_arcus/developmental_tasks.py /app/baby_arcus/developmental_tasks.py
 COPY configs/arcus3 /app/configs/arcus3
 COPY tests/arcus3 /app/tests/arcus3
 ENV PYTHONPATH=/app HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONUNBUFFERED=1
