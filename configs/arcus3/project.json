@@ -1,8 +1,8 @@
 {
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
-  "phase": 6,
-  "status": "phase6-qualified-release-uploading",
+  "phase": 7,
+  "status": "phase7-complete",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -38,7 +38,8 @@
     "publication": false,
     "inference": true,
     "conversion": false,
-    "expanded_preflight": false
+    "expanded_preflight": false,
+    "specialization": false
   },
   "active_run": null,
   "deadline": null,
@@ -52,7 +53,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Eight-update qualification and exact replay passed. No further training authorized. Private Alpha 3.0 initialization upload is in progress, remote verification pending.",
+  "note": "Matched 64-update dense/expanded experiment, full-capacity depth parity, frozen evaluations and live application tests completed. No further training authorized; original Alpha 3.0 upload remains separate.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -76,9 +77,13 @@
     "expanded_qualification_report": "runs/arcus3/expanded-preflight-phase6-002/qualification-report.json",
     "expanded_baseline_report": "runs/arcus3/baseline-phase6-qualified-001/scores.json",
     "alpha3_package_report": "runs/arcus3/release-alpha3-001/package-report.json",
-    "expanded_application_report": "runs/arcus3/application-phase6-qualified-002/application-report.json"
+    "expanded_application_report": "runs/arcus3/application-phase6-qualified-002/application-report.json",
+    "phase7_report": "runs/arcus3/dense-control-phase7-matched-001/campaign-report.json",
+    "phase7_depth_parity": "runs/arcus3/conversion-phase7-depth-parity-001/depth-parity.json",
+    "phase7_resume_verification": "runs/arcus3/dense-control-phase7-resume-verification-001/resume-verification.json"
   },
   "training_scope": "dense-control-v1",
   "conversion_scope": "selective-experts-parity-v1",
-  "expanded_scope": "qualification-v1"
+  "expanded_scope": "qualification-v1",
+  "specialization_scope": "matched-64-v1"
 }

@@ -1,6 +1,6 @@
 param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [Parameter(Mandatory=$true)][string]$Root,
-      [ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","package","verify-package")][string]$Mode="probe",
+      [ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package")][string]$Mode="probe",
       [string]$RequestsFile="", [switch]$PersistMemory,
       [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="")
 $ErrorActionPreference='Stop'
@@ -16,6 +16,7 @@ if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|de
 if ($Mode -eq 'conversion' -and (!$project.authorization.conversion -or $project.authorization.training -or $project.conversion_scope -ne 'selective-experts-parity-v1')) { throw 'Construction-only scope required' }
 if ($AdapterPath -and $ConvertedPath) { throw 'Choose one model variant' }
 if ($Mode -eq 'expanded-preflight' -and (!$project.authorization.expanded_preflight -or $project.expanded_scope -ne 'qualification-v1' -or !$ConvertedPath -or !$DataRoot)) { throw 'Bounded expanded qualification scope, parent and data required' }
+if ($Mode -eq 'specialization' -and (!$project.authorization.specialization -or $project.specialization_scope -ne 'matched-64-v1' -or !$ConvertedPath -or !$DataRoot)) { throw 'Matched campaign scope, parent and data required' }
 $rootPath=Join-Path $workspace $Root
 if (Test-Path -LiteralPath $rootPath) { throw 'Use a fresh probe root; never clear existing pauses' }
 if ($runtime.image_id -notmatch '^sha256:[0-9a-f]{64}$') { throw 'Verified image ID required' }
@@ -32,6 +33,8 @@ New-Item -ItemType Directory -Path $rootPath | Out-Null
 $name='arcus3-donor-'+(Get-Date -Format 'yyyyMMdd-HHmmss')
 $deadlineUtc=$StopAt.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'")
 $entryScript=if ($Mode -eq 'verify-package') {'scripts/verify_alpha_3.py'} elseif ($Mode -eq 'package') {'scripts/package_alpha_3.py'} elseif ($Mode -eq 'expanded-preflight') {'scripts/qualify_arcus3_training.py'} elseif ($Mode -eq 'conversion') {'scripts/convert_arcus3.py'} elseif ($Mode -eq 'preflight') {'scripts/benchmark_arcus3.py'} elseif ($Mode -eq 'train') {'scripts/train_arcus3.py'} elseif ($Mode -eq 'application') {'scripts/chat_arcus3.py'} elseif ($Mode -eq 'baseline') {'scripts/evaluate_arcus3.py'} else {'scripts/probe_arcus3_donor.py'}
+if ($Mode -eq 'specialization') { $entryScript='scripts/train_arcus3_specialization.py' }
+if ($Mode -eq 'verify-depth') { $entryScript='scripts/verify_arcus3_depth.py' }
 $argsDocker=@('run','-d','--name',$name,'--gpus','all','--network','none','--memory',$runtime.memory,'--memory-swap',$runtime.memory,'--cpus',"$($runtime.cpus)",'--pids-limit',"$($runtime.pids)",'--cap-drop','ALL','--security-opt','no-new-privileges',
  '-e','ARCUS3_CONTROLLED_DOCKER=1','-e','ALPHA_JOB_CONTROL=/job-control',
  '--mount',"type=volume,source=$($runtime.gpu_lock_volume),target=/job-control",

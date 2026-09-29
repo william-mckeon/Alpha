@@ -16,6 +16,7 @@ def save(root,model,optimizer,state):
         with (path/name).open('rb') as f:os.fsync(f.fileno())
     atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
         'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
+        'campaign':state.get('campaign'),
         'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
     atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
     return path

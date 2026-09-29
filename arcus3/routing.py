@@ -17,6 +17,7 @@ class SelectiveExperts(nn.Module):
         self.last_aux = None
 
     def forward(self, hidden):
+        if hasattr(self,'depth_gate'): hidden=self.depth_gate(hidden)
         shape = hidden.shape
         flat = hidden.reshape(-1, shape[-1])
         probabilities = self.router(flat.to(self.router.weight.dtype)).float().softmax(-1)

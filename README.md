@@ -305,3 +305,14 @@ The 2,013,390,848-parameter Phase 5 initialization passed standalone export/relo
 parity and is uploading privately as Alpha 3.0. The qualification delta is separate.
 [Release status](docs/ALPHA_3_RELEASE.md) distinguishes local verification from
 pending remote verification. No further training is active or authorized.
+
+## Phase 7 full-capacity depth and matched adaptation
+
+Depth routing now executes at capacity 1.0 with frozen gate scores and no skipped
+FFNs. A fresh dense control and expanded model each completed 64 updates with
+14,781 assistant-target tokens. Both improved held-out loss; dense was slightly
+ahead, so added capacity has not demonstrated superiority. The gates add 12,294
+frozen parameters to this local experimental variant; the HF initialization stays
+unchanged. See [Phase 7 evidence](docs/ARCUS_3_PHASE_7_RESULTS.md),
+[protocol](docs/ARCUS_3_SPECIALIZATION_PROTOCOL.md) and
+[Phase 8 file inventory](docs/ARCUS_3_PHASE_8_FILE_PLAN.md).

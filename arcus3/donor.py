@@ -150,7 +150,15 @@ def load(destination, adapter=None, converted=None, expanded=None):
     if expanded:
         from arcus3.adapters import attach_expanded
         from arcus3.expanded_checkpoint import load_delta
-        cfg=read(Path(__file__).resolve().parents[1]/'configs/arcus3/expanded_preflight.json')
+        campaign=read(Path(expanded)/'manifest.json').get('campaign')
+        if campaign not in (None,'matched-64-v1'):raise ValueError('Unknown expanded campaign')
+        cfg=read(Path(__file__).resolve().parents[1]/('configs/arcus3/specialization.json' if campaign else 'configs/arcus3/expanded_preflight.json'))
+        if campaign:
+            from arcus3.model import enable_full_depth
+            from arcus3.config import validate_depth,validate_specialization
+            validate_specialization(cfg)
+            arch=validate_depth(read(Path(__file__).resolve().parents[1]/'configs/arcus3/architecture-phase7.json'))
+            enable_full_depth(model,arch['layers'],arch['depth_capacity'])
         config_hash=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
         attach_expanded(model,cfg)
         load_delta(expanded,model,digest(Path(converted)/'manifest.json'),config=config_hash)

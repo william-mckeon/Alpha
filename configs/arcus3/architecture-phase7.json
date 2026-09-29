@@ -1,0 +1,1 @@
+{"schema":"arcus3-depth-full-v1","layers":[3,7,11,15,19,23],"depth_enabled":true,"depth_capacity":1.0,"depth_trainable":false,"depth_parameters":12294,"initialization_parameters":2013403142,"context":8192}

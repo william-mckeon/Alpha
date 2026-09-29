@@ -20,7 +20,7 @@ def safe_child(root, name):
 def authorize(project, operation):
     if project['donor']['repo_id'] != REPO or project['donor']['revision'] != REVISION:
         raise ValueError('Unapproved donor revision')
-    if operation not in ('download', 'inference','training','conversion','expanded_preflight') or project['authorization'].get(operation) is not True:
+    if operation not in ('download', 'inference','training','conversion','expanded_preflight','specialization') or project['authorization'].get(operation) is not True:
         raise ValueError('Operation not authorized')
     if any(project['authorization'].get(k) for k in ('cloud', 'publication')):
         raise ValueError('Cloud/publication not authorized by this runtime')
@@ -30,6 +30,23 @@ def authorize(project, operation):
         raise ValueError('Construction-only conversion scope required')
     if operation=='expanded_preflight' and (project['authorization'].get('training') or project.get('expanded_scope')!='qualification-v1'):
         raise ValueError('Expanded qualification-only scope required')
+    if operation=='specialization' and project.get('specialization_scope')!='matched-64-v1':
+        raise ValueError('Matched campaign scope required')
+
+def validate_specialization(cfg):
+    validate_control(cfg)
+    if cfg['schema']!='arcus3-specialization-v1' or cfg['max_updates']!=64 or cfg['milestones']!=[16,32,64]:
+        raise ValueError('Fixed matched campaign required')
+    if cfg['router_aux_coefficient']!=.01 or cfg['nll_regression_limit']!=.2 or cfg['max_length']!=512 or cfg['accumulation']!=2:
+        raise ValueError('Unapproved campaign objective')
+    return cfg
+
+def validate_depth(cfg):
+    expected={'schema':'arcus3-depth-full-v1','layers':[3,7,11,15,19,23],
+              'depth_enabled':True,'depth_capacity':1.0,'depth_trainable':False,
+              'depth_parameters':12294,'initialization_parameters':2013403142,'context':8192}
+    if cfg!=expected:raise ValueError('Phase 7 full-depth architecture mismatch')
+    return cfg
 
 
 def validate_expanded(cfg):

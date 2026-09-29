@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:release-v4",
-  "image_id": "sha256:326e2f9f5701b8925678944cf0e74847ed4218973c85859e9100d07a756c68ef",
+  "image": "arcus3:phase7-v4",
+  "image_id": "sha256:c4280e59565b6d38e5879dd1cb2be8b56d338383200204db7960186bd1e422a9",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -43,5 +43,12 @@
     "max_updates": 8,
     "active": false,
     "report": "runs/arcus3/expanded-preflight-phase6-002/qualification-report.json"
+  },
+  "specialization": {
+    "depth_capacity": 1.0,
+    "depth_trainable": false,
+    "active": false,
+    "updates_per_arm": 64,
+    "report": "runs/arcus3/dense-control-phase7-matched-001/campaign-report.json"
   }
 }

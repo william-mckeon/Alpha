@@ -1,4 +1,4 @@
-param([ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","package","verify-package")][string]$Mode="probe")
+param([ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","specialization","package","verify-package")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()
@@ -14,6 +14,8 @@ function global:Get-Content {
   $fixture.training_scope='dense-control-v1'
   $fixture.authorization | Add-Member -NotePropertyName expanded_preflight -NotePropertyValue $true -Force
   $fixture | Add-Member -NotePropertyName expanded_scope -NotePropertyValue 'qualification-v1' -Force
+  $fixture.authorization | Add-Member -NotePropertyName specialization -NotePropertyValue $true -Force
+  $fixture | Add-Member -NotePropertyName specialization_scope -NotePropertyValue 'matched-64-v1' -Force
   return ($fixture | ConvertTo-Json -Depth 12)
  }
  return $text

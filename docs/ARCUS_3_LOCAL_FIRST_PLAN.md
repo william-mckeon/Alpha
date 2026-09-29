@@ -1,8 +1,10 @@
 # Arcus 3.0: local-first SmolLM2 conversion plan
 
-Status: phases 0–3 implemented and locally validated, September 29, 2026.
-Pinned donor weights were downloaded and tested unchanged in Docker CUDA.
-No weights were converted or trained and no cloud resources were purchased.
+Status: phases 0–7 implemented and locally validated, September 29, 2026.
+Phase 7 is a bounded experiment, not a claim of fully specialized experts.
+Final Phase 7 evaluation evidence is maintained in
+`ARCUS_3_PHASE_7_RESULTS.md`. Pinned donor weights, expert conversion and adaptation
+were tested locally in Docker CUDA. No cloud resources were purchased.
 The 128M foundation pilot and the existing Alpha 2.0 snapshot remain separate.
 This is a targeted review of relevant code and recorded conversation decisions,
 not a claim that every repository file or every historical message was audited.
@@ -12,8 +14,9 @@ Phase 1 implementation and live donor validation passed; see
 [results](ARCUS_3_PHASE_1_RESULTS.md). Phase 2's small diagnostic baseline and
 Phase 3's application integration are complete; see
 [Phase 2 results](ARCUS_3_BASELINE_RESULTS.md) and
-[Phase 3 live results](ARCUS_3_PHASE_3_RESULTS.md). Later phases remain proposed,
-beginning with [Phase 4's dense-control inventory](ARCUS_3_PHASE_4_FILE_PLAN.md).
+[Phase 3 live results](ARCUS_3_PHASE_3_RESULTS.md). Phase 4–7 results are recorded
+in their corresponding result documents; [Phase 8's inventory](ARCUS_3_PHASE_8_FILE_PLAN.md)
+describes the next proposed reduced-depth experiment.
 Phase-specific inventories refine the preliminary engineering inventory
 below and include project metadata, handoff documents and bounded donor probes.
 
@@ -158,8 +161,8 @@ The Phase 0 file inventory is [ARCUS_3_PHASE_0_FILE_PLAN.md](ARCUS_3_PHASE_0_FIL
 | 4 — Dense adaptation control | Review/deduplicate data, exclude evaluation records, and run a bounded dense-donor LoRA control after a basic memory preflight. | Measured learning and retention with an explicit token/time budget. |
 | 5 — Construct approximately 2B | Expand six FFNs into two copied experts each, retain 18 dense layers, use top-1 dropless routing and disable depth skipping. | Actual parameter inventory and donor parity before training. |
 | 6 — Qualify local training | Test full optimizer steps, memory, checkpoint save/resume, pauses and deadline handling on the expanded model. | Reproducible recovery and measured affordable throughput. |
-| 7 — Specialize experts | Compare expanded adaptation against the dense control on matched data and target-token budgets. | Retained language ability and useful measured gains; route balance alone is insufficient. |
-| 8 — Add depth routing | Introduce gradual FFN skipping with a full-depth control. | Causal cached/full parity plus measured speed/quality tradeoffs. |
+| 7 — Specialize experts; enable full-capacity depth path | Implement depth routing with capacity fixed at 1.0, then compare expanded adaptation against the dense control on matched data and target-token budgets. No FFN skipping. | Depth-on/full-capacity parity with depth off, retained language ability and useful measured gains; route balance alone is insufficient. |
+| 8 — Reduce depth capacity | Experiment with gradual FFN skipping against the Phase 7 full-depth control. | Causal cached/full parity plus measured speed/quality tradeoffs. |
 | 9 — Extend context | Establish 8k behavior, then test a pinned extension at 12k and 16k with long examples and short-context replay. | Demonstrated context behavior, not only a larger configuration value. |
 | 10 — Validate and release | Run the frozen suite, export/reload checks, document attribution and limitations, then separately authorize a private Arcus 3.0 release. | Immutable remote revision, file hashes and privacy verified. |
 

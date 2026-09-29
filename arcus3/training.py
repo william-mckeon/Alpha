@@ -20,13 +20,16 @@ def train(model,optimizer,rows,cfg,state,output,check_live,save_fn=save):
             if state['target_tokens']+targets+row['target_tokens']>cfg['max_target_tokens']:break
             batch.append(row);targets+=row['target_tokens']
         if not batch:reason='token_budget';break
-        optimizer.zero_grad(set_to_none=True);total_loss=0.0;aux_total=0.0;routes={}
+        optimizer.zero_grad(set_to_none=True);total_loss=0.0;aux_total=0.0;routes={};depth_slots={}
         for row in batch:
             x=torch.tensor([row['input_ids']],device='cuda');y=torch.tensor([row['labels']],device='cuda')
             from arcus3.routing import SelectiveExperts
             routers=[(n,m) for n,m in model.named_modules() if isinstance(m,SelectiveExperts)]
             for _,m in routers:m.collect_aux=bool(cfg.get('router_aux_coefficient'));m.last_aux=None
             task_loss=model(input_ids=x,labels=y,use_cache=False).loss.float()
+            for n,m in routers:
+                if hasattr(m,'depth_gate'):
+                    depth_slots[n]=depth_slots.get(n,0)+m.depth_gate.last_observation['executed_slots']
             loss=task_loss*row['target_tokens']
             if cfg.get('router_aux_coefficient'):
                 aux=torch.stack([m.last_aux for _,m in routers]).mean()
@@ -42,12 +45,14 @@ def train(model,optimizer,rows,cfg,state,output,check_live,save_fn=save):
         norm=torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad],1.0,error_if_nonfinite=True)
         optimizer.step()
         state['updates']+=1;state['cursor']+=len(batch);state['target_tokens']+=targets
+        state['input_tokens']=state.get('input_tokens',0)+sum(len(r['input_ids']) for r in batch)
         state['training_seconds']=prior_seconds+time.monotonic()-start
         row={'updates':state['updates'],'target_tokens':state['target_tokens'],'loss':total_loss/targets,
              'gradient_norm':float(norm),'seconds':time.monotonic()-start}
         if routers:
             row.update(router_aux=aux_total/len(batch),routes=routes,
                 router_gradient_sum=sum(float(m.router.weight.grad.abs().sum()) for _,m in routers if m.router.weight.grad is not None))
+        if depth_slots:row['depth_executed_slots']=depth_slots;row['depth_skipped_slots']=0
         records.append(row);print(json.dumps(row),flush=True)
         if state['updates']%cfg['save_every']==0:save_fn(Path(output)/'checkpoints',model,optimizer,state)
     checkpoint=save_fn(Path(output)/'checkpoints',model,optimizer,state)

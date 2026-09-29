@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import authorize, read, deadline, check_live, REVISION
 from arcus3.donor import verify, load
+from arcus3.model import depth_metadata
 from arcus3.evaluation import load_suite, sha, aggregate, masked_nll, messages_for, score, summarize
 from arcus3.orchestration import invoke_messages
 from baby_arcus.gpu_job_control import gpu_job
@@ -70,7 +71,7 @@ def run(args):
                   'suite_sha256':sha('/app/evaluation/arcus3/baseline-v1.json'),
                   'settings_sha256':sha('/app/configs/arcus3/evaluation.json'),'tokenizer_revision':REVISION,
                   'precision':'bfloat16','orchestration':'langchain-runnable-in-langgraph',
-                  'unique_parameters':sum(p.numel() for p in model.parameters()),
+                  'unique_parameters':sum(p.numel() for p in model.parameters()),'depth':depth_metadata(model),
                   'language':aggregate(language),'language_records':language,'categories':summarize(rows),
                   'resources':{'seconds':time.monotonic()-started,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),
                                'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024},

@@ -10,6 +10,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import authorize, read, deadline, check_live, validate_application
 from arcus3.evaluation import sha
 from arcus3.donor import load, verify
+from arcus3.model import depth_metadata
 from arcus3.chat_model import ArcusChatModel
 from arcus3.memory import ConversationMemory
 from arcus3.orchestration import application_turn
@@ -79,7 +80,7 @@ def run(args):
         selected_delta=args.expanded or args.adapter
         checkpoint_updates=read(Path(selected_delta)/'manifest.json')['updates'] if selected_delta else 0
         report={'schema':'arcus3-application-v1','adapter':args.adapter,'expanded_manifest_sha256':sha(Path(args.expanded)/'manifest.json') if args.expanded else None,'conversion_manifest_sha256':sha(Path(args.converted)/'manifest.json') if args.converted else None,'training_updates':checkpoint_updates,'updates_this_invocation':0,'unique_parameters':sum(p.numel() for p in model.parameters()),
-                'requests':transcripts,'generations':generations,'persist_memory':args.persist_memory,
+                'requests':transcripts,'generations':generations,'persist_memory':args.persist_memory,'depth':depth_metadata(model),
                 'seconds':time.monotonic()-started,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),
                 'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024}
         (out/'application-report.json').write_text(json.dumps(report,indent=2))

@@ -13,7 +13,7 @@ class QualificationTests(unittest.TestCase):
         if os.environ.get('ARCUS3_CONTROLLED_DOCKER')!='1':self.skipTest('Docker CUDA only')
         import torch
         from transformers import LlamaConfig,LlamaForCausalLM
-        from arcus3.model import expand
+        from arcus3.model import expand,enable_full_depth
         from arcus3.adapters import attach_expanded
         from arcus3.training import train
         from arcus3.expanded_checkpoint import save,restore
@@ -23,6 +23,7 @@ class QualificationTests(unittest.TestCase):
             m=LlamaForCausalLM(LlamaConfig(vocab_size=32,hidden_size=16,intermediate_size=32,num_hidden_layers=1,num_attention_heads=2,num_key_value_heads=2)).cuda().eval();expand(m,[0])
             x=torch.tensor([[1,2,3,4]],device='cuda')
             with torch.no_grad():before=m(x).logits.clone()
+            enable_full_depth(m,[0])
             attach_expanded(m,{'rank':2,'alpha':4})
             with torch.no_grad():self.assertTrue(torch.equal(before,m(x).logits))
             frozen={n:p.clone() for n,p in m.named_parameters() if not p.requires_grad}
