@@ -2,6 +2,15 @@
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+def session_deadline(stop_at,settings,now=None):
+    """Explicit deadline overrides the bounded default for a chat start/resume."""
+    from datetime import timedelta
+    now=now or datetime.now(timezone.utc)
+    end=datetime.fromisoformat(stop_at.replace('Z','+00:00')) if stop_at else now+timedelta(seconds=settings.get('default_session_seconds',7200))
+    if end.tzinfo is None or not 0<(end-now).total_seconds()<=86400:
+        raise ValueError('Session deadline must be timezone-aware, future and within 24 hours')
+    return end
+
 def accept_evaluation(state,result,checkpoint_sha,suite_sha,settings_sha,limit=.2):
     import copy,math
     if not state['evaluation_pending']:raise ValueError('No pending evaluation')

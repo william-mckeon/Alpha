@@ -4,7 +4,7 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import read
-from arcus3.campaign import in_window,window_end
+from arcus3.campaign import in_window,window_end,session_deadline
 from baby_arcus.language_stream import atomic_json
 
 def run(a):
@@ -15,8 +15,7 @@ def run(a):
     chat=windows.get('mode')=='chat-deadline'
     if not chat and not in_window(windows):raise ValueError('Training window not enabled')
     if not read('configs/arcus3/phase8_sources.json')['ready']:raise ValueError('Combined sources not ready')
-    end=datetime.fromisoformat(a.stop_at.replace('Z','+00:00'))
-    if end.tzinfo is None or not 0<(end-datetime.now(timezone.utc)).total_seconds()<=86400:raise ValueError('Session deadline required within 24 hours')
+    end=session_deadline(a.stop_at,windows)
     if not chat:end=min(end,window_end(windows))
     root=Path(a.root)
     if root.exists():raise ValueError('Fresh session root required')
@@ -52,5 +51,6 @@ def run(a):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser()
-    for name in ('root','data','teacher','converted','qualification-report','stop-at'):p.add_argument('--'+name,required=True)
+    for name in ('root','data','teacher','converted','qualification-report'):p.add_argument('--'+name,required=True)
+    p.add_argument('--stop-at',help='Optional timezone-aware deadline; otherwise use the configured two-hour default')
     p.add_argument('--resume');run(p.parse_args())

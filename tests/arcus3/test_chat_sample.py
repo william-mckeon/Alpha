@@ -4,6 +4,14 @@ from arcus3.campaign import in_window,window_end
 from scripts.prepare_arcus3_phase8_sample import quotas,local_eligible
 
 class ChatSampleTests(unittest.TestCase):
+    def test_default_and_override_deadline(self):
+        from arcus3.campaign import session_deadline
+        now=datetime(2026,9,29,18,tzinfo=timezone.utc)
+        self.assertEqual(session_deadline(None,{'default_session_seconds':7200},now),datetime(2026,9,29,20,tzinfo=timezone.utc))
+        self.assertEqual(session_deadline('2026-09-29T21:00:00Z',{},now),datetime(2026,9,29,21,tzinfo=timezone.utc))
+        with self.assertRaises(ValueError):session_deadline('2026-09-29T17:00:00Z',{},now)
+        with self.assertRaises(ValueError):session_deadline('2026-09-29T21:00:00',{},now)
+        with self.assertRaises(ValueError):session_deadline(None,{'default_session_seconds':90000},now)
     def test_combiner_token_quotas_and_heldout_failure(self):
         import tempfile,json
         from pathlib import Path

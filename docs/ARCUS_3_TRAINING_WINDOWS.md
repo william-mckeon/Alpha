@@ -2,7 +2,13 @@
 
 The user selected chat-controlled sessions, not recurring daily hours. This
 conversation is the control: "start until [time]" or "resume until [time]" selects
-one explicit deadline in America/New_York; ask for the deadline if omitted.
+one explicit deadline in America/New_York. Plain "start training" or "resume"
+uses a two-hour session by default; "until [time]" overrides it. "Keep going until
+[time]" while running changes the requested end time through a graceful checkpoint,
+verified exit and resumed session if necessary; never launch a competing worker
+or pretend a running worker's fixed deadline changed. Plain start while already
+running reports its status without launching a duplicate. Plain resume selects
+the latest verified checkpoint. All commands retain data/storage readiness gates.
 "Pause training" and "stop training" both request a graceful checkpoint. Do not
 report training stopped until the owned container has exited and the checkpoint
 is verified. No automatic daily start or restart is installed.

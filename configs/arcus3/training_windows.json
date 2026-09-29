@@ -1,1 +1,11 @@
-{"schema":"arcus3-training-windows-v1","mode":"chat-deadline","enabled":false,"timezone":"America/New_York","windows":[],"grace_seconds":300,"automatic_start":false,"note":"Each explicit chat start/resume requires its own timezone-aware deadline. No recurring schedule. Pause saves at optimizer boundary; confirm GPU release only after exit."}
+{
+  "schema": "arcus3-training-windows-v1",
+  "mode": "chat-deadline",
+  "enabled": false,
+  "timezone": "America/New_York",
+  "windows": [],
+  "grace_seconds": 300,
+  "automatic_start": false,
+  "note": "Chat start/resume defaults to two hours. Until [time] overrides the deadline in America/New_York. Stop/pause save gracefully. No automatic daily starts. Readiness gates still apply.",
+  "default_session_seconds": 7200
+}
