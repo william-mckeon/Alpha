@@ -47,7 +47,7 @@ def run(args):
     with gpu_job(),torch.inference_mode():
         if not torch.cuda.is_available(): raise RuntimeError('CUDA required')
         torch.cuda.set_per_process_memory_fraction(.7)
-        model,tokenizer=load(args.donor)
+        model,tokenizer=load(args.donor,args.adapter)
         def generate(messages):
             check_live(end,out)
             serialized=tokenizer.apply_chat_template(messages,tokenize=False,add_generation_prompt=True)
@@ -75,7 +75,7 @@ def run(args):
                                 'tool_calls':state['tool_calls'],'messages':messages_to_dict(state['messages'])})
             (out/'application-transcripts.json').write_text(json.dumps(transcripts,indent=2))
             print(json.dumps({'session':request['session'],'status':state['status'],'tool_calls':state['tool_calls']}),flush=True)
-        report={'schema':'arcus3-application-v1','training_updates':0,'unique_parameters':sum(p.numel() for p in model.parameters()),
+        report={'schema':'arcus3-application-v1','adapter':args.adapter,'training_updates':0,'unique_parameters':sum(p.numel() for p in model.parameters()),
                 'requests':transcripts,'generations':generations,'persist_memory':args.persist_memory,
                 'seconds':time.monotonic()-started,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),
                 'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024}
@@ -85,4 +85,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--donor',default='/donor');p.add_argument('--output',default='/output')
     p.add_argument('--deadline',required=True);p.add_argument('--max-new-tokens',type=int,default=128)
     p.add_argument('--requests');p.add_argument('--persist-memory',action='store_true')
+    p.add_argument('--adapter')
     run(p.parse_args())

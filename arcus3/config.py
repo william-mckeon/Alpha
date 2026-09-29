@@ -20,10 +20,21 @@ def safe_child(root, name):
 def authorize(project, operation):
     if project['donor']['repo_id'] != REPO or project['donor']['revision'] != REVISION:
         raise ValueError('Unapproved donor revision')
-    if operation not in ('download', 'inference') or project['authorization'].get(operation) is not True:
+    if operation not in ('download', 'inference','training') or project['authorization'].get(operation) is not True:
         raise ValueError('Operation not authorized')
-    if any(project['authorization'].get(k) for k in ('training', 'cloud', 'publication')):
-        raise ValueError('Phase 1 cannot authorize training, cloud or publication')
+    if any(project['authorization'].get(k) for k in ('cloud', 'publication')):
+        raise ValueError('Cloud/publication not authorized by this runtime')
+    if project['authorization'].get('training') and project.get('training_scope')!='dense-control-v1':
+        raise ValueError('Explicit bounded dense-control scope required')
+
+def validate_control(cfg):
+    limits={'rank':(1,16),'alpha':(1,32),'max_length':(64,1024),'accumulation':(1,4),
+            'max_updates':(1,64),'max_target_tokens':(1,32768),'max_train_seconds':(1,900),'save_every':(1,8)}
+    for name,(low,high) in limits.items():
+        if type(cfg.get(name)) is not int or not low<=cfg[name]<=high:raise ValueError('Control budget: '+name)
+    if cfg['targets']!=['gate_proj','up_proj','down_proj'] or not 0<cfg['learning_rate']<=1e-4:
+        raise ValueError('Unapproved adapter configuration')
+    return cfg
 
 def deadline(value):
     value = re.sub(r'\.(\d+)(?=Z|[+-]\d{2}:\d{2}$)',

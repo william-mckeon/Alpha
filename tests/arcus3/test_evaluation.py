@@ -6,6 +6,11 @@ from arcus3.evaluation import aggregate, compatible, load_suite, score, summariz
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_comparison_rejects_incomplete(self):
+        from scripts.report_arcus3 import compare_reports
+        a={k:'x' for k in ('suite_sha256','tokenizer_revision','settings_sha256','precision','orchestration')}
+        a['execution_complete']=False
+        with self.assertRaises(ValueError):compare_reports(a,a)
     def test_weighted_loss(self):
         result=aggregate([{'nll_sum':2,'target_tokens':1},{'nll_sum':12,'target_tokens':3}])
         self.assertEqual(result['nll'],3.5)

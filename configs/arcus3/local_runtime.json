@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:application-v1",
-  "image_id": "sha256:5245e90a27eb6fcc53f385c678d71f71ad595d54f87d64c46b2fb12bec3b644e",
+  "image": "arcus3:dense-control-v1",
+  "image_id": "sha256:093d6c43198ce74a1d867bfbe2326df0277f89935a893e209093fcf52b51c5fd",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -10,7 +10,7 @@
   "memory_watchdog": false,
   "max_seconds": 1800,
   "max_new_tokens": 128,
-  "mode": "read-only-probe-baseline-application",
+  "mode": "probe-baseline-application-and-explicitly-authorized-dense-control",
   "baseline": {
     "prompts": 36,
     "language_records": 12,
@@ -25,5 +25,12 @@
     "max_model_calls_per_turn": 3,
     "max_tool_calls_per_turn": 2,
     "persist_memory_default": false
+  },
+  "dense_control": {
+    "max_updates": 64,
+    "max_target_tokens": 32768,
+    "max_train_seconds": 900,
+    "preflight_required": true,
+    "preflight_report": "runs/arcus3/preflight-phase4-001/training-report.json"
   }
 }

@@ -118,7 +118,7 @@ def verify(destination):
         raise ValueError('Missing original chat template')
     return manifest
 
-def load(destination):
+def load(destination, adapter=None):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
     path = Path(destination) / 'files'
@@ -129,4 +129,9 @@ def load(destination):
     count = sum(p.numel() for p in model.parameters())
     if count != 1711376384 or model.lm_head.weight.data_ptr() != model.model.embed_tokens.weight.data_ptr():
         raise ValueError('Parameter inventory or weight tying mismatch')
+    if adapter is not None:
+        from arcus3.checkpoint import verify as verify_adapter
+        from peft import PeftModel
+        verify_adapter(adapter)
+        model=PeftModel.from_pretrained(model,adapter,is_trainable=False).eval()
     return model, tokenizer

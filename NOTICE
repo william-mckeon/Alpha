@@ -49,3 +49,10 @@ LightEval 0.6.2 model API, Hugging Face; upstream files carry MIT and Apache-2.0
 Their original license files remain in the installed source/packages. Runtime APIs
 are imported, not relicensed. Dataset terms remain separate; see
 docs/ARCUS_SMOLLM2_DATA_PROVENANCE.md.
+Arcus 3 Phase 4 uses PEFT 0.13.2 (Hugging Face, Apache-2.0) for separate LoRA
+adapters. The bounded control uses only the Smol-Constraints subset of
+HuggingFaceTB/smoltalk at revision 5feaf2fd3ffca7c237fc38d1861bc30365d48ffa.
+The upstream card identifies this new synthetic subset as Apache-2.0; this does
+not assert that every other component in SmolTalk has the same license.
+Source attribution, card digest, file hashes and selected rows accompany the
+local data manifest. Donor attribution and all earlier notices remain applicable.

@@ -273,3 +273,12 @@ tool round trips passed live Docker CUDA tests. See
 
 Use `-RequestsFile` for your own bounded JSON request list; `-PersistMemory` is
 explicit opt-in. This does not train the model or resume historical Alpha.
+
+## Arcus 3 Phase 4 dense control
+
+The bounded local LoRA control completed 64 updates with 14,781 assistant-target
+tokens. Matched diagnostics showed small gains; live LangChain/LangGraph memory
+and both real tool round trips still passed. See [full results](docs/ARCUS_3_PHASE_4_RESULTS.md),
+[data and training protocol](docs/ARCUS_3_DENSE_CONTROL_PROTOCOL.md), and
+[Phase 5 file inventory](docs/ARCUS_3_PHASE_5_FILE_PLAN.md). Training is now inactive.
+No expansion, RL, 16k extension or publication was performed.

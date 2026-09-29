@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import deadline, check_live
-from arcus3.evaluation import summarize, aggregate, sha, load_suite
+from arcus3.evaluation import summarize, aggregate, sha, load_suite,compatible
 from baby_arcus.services.coding_executor import execute
 
 
@@ -44,14 +44,22 @@ def render(root, report, rows):
     report['tool_metrics']['total']=len(tools)
     (root/'transcripts.json').write_text(json.dumps(rows,indent=2))
     (root/'scores.json').write_text(json.dumps(report,indent=2))
-    text=['# Arcus 3 frozen dense donor baseline','',report['limitations'],'',
-          'No training updates. Conversation fluency, relevance and coherence await human review.','',
+    text=['# Arcus 3 matched evaluation'+(' — adapted dense control' if report.get('adapter_manifest_sha256') else ' — unchanged donor'),'',report['limitations'],'',
+          'Read-only evaluation. Conversation fluency, relevance and coherence await human review.','',
           '```json',json.dumps({k:v for k,v in report.items() if k!='language_records'},indent=2),'```']
     for row in rows:
         text += ['', '## '+row['id'],'', '**Prompt:** '+row['prompt'],'','**Response:**','',
                  '````text',row['response'],'````','','**Measurements:**',
                  '```json',json.dumps(row['metrics'],indent=2),'```']
     (root/'report.md').write_text('\n'.join(text),encoding='utf-8')
+
+def compare_reports(baseline, candidate):
+    if not compatible(baseline,candidate):raise ValueError('Incompatible evaluation identities')
+    if not baseline['execution_complete'] or not candidate['execution_complete']:raise ValueError('Incomplete evaluation')
+    return {'nll_delta':candidate['language']['nll']-baseline['language']['nll'],
+            'perplexity_before':baseline['language']['perplexity'],'perplexity_after':candidate['language']['perplexity'],
+            'categories':{key:{'before':value,'after':candidate['categories'][key]} for key,value in baseline['categories'].items()},
+            'adapter_manifest_sha256':candidate.get('adapter_manifest_sha256')}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--deadline',required=True)

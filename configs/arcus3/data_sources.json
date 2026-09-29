@@ -1,0 +1,12 @@
+{
+ "repo_id":"HuggingFaceTB/smoltalk",
+ "revision":"5feaf2fd3ffca7c237fc38d1861bc30365d48ffa",
+ "subset":"smol-constraints",
+ "license":"apache-2.0 for this new synthetic subset, per upstream card",
+ "license_url":"https://huggingface.co/datasets/HuggingFaceTB/smoltalk/blob/5feaf2fd3ffca7c237fc38d1861bc30365d48ffa/README.md",
+ "selected_rows":{"test":64,"train":256},
+ "files":{
+   "test":{"path":"data/smol-constraints/test-00000-of-00001.parquet","bytes":886974,"sha256":"318f76c556e1d25acbaf777d923c91494e2aa70f3cd96207e029648e7c8bee4c"},
+   "train":{"path":"data/smol-constraints/train-00000-of-00001.parquet","bytes":16862908,"sha256":"3369eaff911d3511ee21561a3b8607e1acfd773a6ade80f4759490ffdcce7ba4"}
+ }
+}

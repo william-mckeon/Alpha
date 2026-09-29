@@ -390,3 +390,14 @@ See `ARCUS_3_BASELINE_PROTOCOL.md` for the fixed inputs and scoring contract,
 generations used LangChain Runnable inside LangGraph. No weights were trained,
 expanded or published; historical Alpha remains paused. The 12 synthetic loss
 fixtures are small diagnostics, not representative external benchmark coverage.
+
+## Phase 4 completion — September 29, 2026
+
+The dense LoRA control completed 64 updates, 14,781 assistant-target tokens, with
+5,898,240 trainable adapter parameters. The frozen donor remained unchanged.
+Matched loss and two six-item diagnostic scores improved slightly; live application
+memory and real tool round trips remained successful. This does not establish a
+capacity ceiling or superiority of expansion. See `ARCUS_3_PHASE_4_RESULTS.md` for
+the full evidence and limitations and `ARCUS_3_PHASE_5_FILE_PLAN.md` for the next
+construction/parity-only experiment. No further training is active or authorized
+by the completed control. Historical Alpha and the previous pilot remain preserved.

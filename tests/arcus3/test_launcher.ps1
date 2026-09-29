@@ -1,8 +1,19 @@
-param([ValidateSet("probe","baseline","application")][string]$Mode="probe")
+param([ValidateSet("probe","baseline","application","preflight","train")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()
 $global:Arcus3FixtureStopped=$false
+function global:Get-Content {
+ param([string]$Path,[switch]$Raw)
+ $text=Microsoft.PowerShell.Management\Get-Content -LiteralPath $Path -Raw
+ if ($Path -eq 'configs/arcus3/project.json') {
+  $fixture=$text | ConvertFrom-Json
+  $fixture.authorization.training=$true
+  $fixture.training_scope='dense-control-v1'
+  return ($fixture | ConvertTo-Json -Depth 12)
+ }
+ return $text
+}
 function global:docker {
  $global:LASTEXITCODE=0
  $global:Arcus3FixtureCalls.Add(($args -join ' '))
@@ -21,7 +32,7 @@ function global:docker {
 $root='runs/arcus3/donor-probe-deadline-fixture-'+(Get-Date -Format yyyyMMddHHmmss)
 try {
  try {
-  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root -Mode $Mode
+  & (Join-Path $PSScriptRoot '../../scripts/start_arcus3.ps1') -StopAt ([DateTimeOffset]::Now.AddSeconds(2)) -Root $root -Mode $Mode -DataRoot artifacts/arcus3/data/dense-control-v2 -PreflightReport artifacts/arcus3/data/dense-control-v2/manifest.json
   throw 'Expected deadline termination failure receipt'
  } catch { if ($_.Exception.Message -notmatch 'Probe exited 137') { throw } }
  $kills=@($global:Arcus3FixtureCalls | Where-Object { $_ -like 'kill *' })
@@ -30,4 +41,4 @@ try {
  if (!(Test-Path 'runs/test2/alpha-tool-correction-60k-001/pause-training')) { throw 'Historical pause missing' }
  @{status='passed';fixture_only=$true;calls=$global:Arcus3FixtureCalls} | ConvertTo-Json -Depth 4 | Set-Content "$root/fixture-result.json"
  Write-Output "PASS: actual launcher deadline/own-container cleanup fixture; evidence $root"
-} finally { Remove-Item Function:/docker }
+} finally { Remove-Item Function:/docker; Remove-Item Function:/Get-Content }
