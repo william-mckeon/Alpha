@@ -258,3 +258,18 @@ Full local transcripts are in `runs/arcus3/baseline-phase2-001/report.md`.
 ```
 
 This is read-only evaluation, not authorization to train or resume Alpha.
+# Arcus 3 Phase 3 application
+
+Local donor chat now uses a LangChain BaseChatModel and a bounded LangGraph tool
+loop, with session-isolated memory and optional persistence. Real echo/arithmetic
+tool round trips passed live Docker CUDA tests. See
+[application protocol](docs/ARCUS_3_APPLICATION_PROTOCOL.md),
+[live results](docs/ARCUS_3_PHASE_3_RESULTS.md), and
+[Phase 4 inventory](docs/ARCUS_3_PHASE_4_FILE_PLAN.md).
+
+```powershell
+& scripts/start_arcus3.ps1 -Mode application -Root runs/arcus3/application-unique-id -StopAt ([DateTimeOffset]::Now.AddMinutes(20))
+```
+
+Use `-RequestsFile` for your own bounded JSON request list; `-PersistMemory` is
+explicit opt-in. This does not train the model or resume historical Alpha.

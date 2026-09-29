@@ -39,3 +39,14 @@ def deadline(value):
 def check_live(end, output):
     if datetime.now(timezone.utc) >= end or (Path(output) / 'pause-inference').exists():
         raise RuntimeError('Inference paused or deadline reached')
+
+
+def validate_application(settings):
+    limits={'max_input_tokens':(128,2048),'max_new_tokens':(1,128),'max_model_calls':(1,4),
+            'max_tool_calls':(0,4),'max_turns':(1,8),'max_history_chars':(100,24000)}
+    for key,(low,high) in limits.items():
+        if type(settings.get(key)) is not int or not low<=settings[key]<=high:
+            raise ValueError('Invalid application budget: '+key)
+    if settings.get('tools')!=['echo','calculate'] or settings.get('persist_memory') is not False:
+        raise ValueError('Default application must use approved tools and ephemeral memory')
+    return settings

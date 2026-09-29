@@ -1,4 +1,4 @@
-param([ValidateSet("probe","baseline")][string]$Mode="probe")
+param([ValidateSet("probe","baseline","application")][string]$Mode="probe")
 # Integration fixture for actual launcher control flow; Docker is mocked, no GPU job.
 $ErrorActionPreference='Stop'
 $global:Arcus3FixtureCalls=[Collections.Generic.List[string]]::new()

@@ -6,6 +6,12 @@ from arcus3.config import authorize, deadline, check_live, REPO, REVISION
 from baby_arcus.process_lock import ProcessLock
 
 class RuntimeTests(unittest.TestCase):
+    def test_application_budgets(self):
+        from arcus3.config import validate_application,read
+        cfg=read(Path(__file__).resolve().parents[2]/'configs/arcus3/application.json')
+        validate_application(cfg)
+        for overrides in ({'max_tool_calls':100},{'max_input_tokens':16384},{'persist_memory':True},{'tools':['shell']}):
+            with self.assertRaises(ValueError):validate_application({**cfg,**overrides})
     def test_authorization(self):
         p={'donor':{'repo_id':REPO,'revision':REVISION},'authorization':{}}
         with self.assertRaises(ValueError): authorize(p,'inference')

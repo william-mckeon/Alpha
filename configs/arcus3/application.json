@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "max_input_tokens": 2048,
+  "max_new_tokens": 128,
+  "max_model_calls": 3,
+  "max_tool_calls": 2,
+  "max_turns": 4,
+  "max_history_chars": 12000,
+  "tools": ["echo", "calculate"],
+  "persist_memory": false
+}

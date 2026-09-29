@@ -1,6 +1,6 @@
 # Arcus 3.0: local-first SmolLM2 conversion plan
 
-Status: phases 0 and 1 implemented and validated, September 28, 2026 local time.
+Status: phases 0–3 implemented and locally validated, September 29, 2026.
 Pinned donor weights were downloaded and tested unchanged in Docker CUDA.
 No weights were converted or trained and no cloud resources were purchased.
 The 128M foundation pilot and the existing Alpha 2.0 snapshot remain separate.
@@ -9,8 +9,11 @@ not a claim that every repository file or every historical message was audited.
 
 Phase 0 is implemented and verified: [handoff](ARCUS_3_PHASE_0_HANDOFF.md).
 Phase 1 implementation and live donor validation passed; see
-[results](ARCUS_3_PHASE_1_RESULTS.md). Later phases remain proposed, beginning with
-[Phase 2's baseline inventory](ARCUS_3_PHASE_2_FILE_PLAN.md).
+[results](ARCUS_3_PHASE_1_RESULTS.md). Phase 2's small diagnostic baseline and
+Phase 3's application integration are complete; see
+[Phase 2 results](ARCUS_3_BASELINE_RESULTS.md) and
+[Phase 3 live results](ARCUS_3_PHASE_3_RESULTS.md). Later phases remain proposed,
+beginning with [Phase 4's dense-control inventory](ARCUS_3_PHASE_4_FILE_PLAN.md).
 Phase-specific inventories refine the preliminary engineering inventory
 below and include project metadata, handoff documents and bounded donor probes.
 
