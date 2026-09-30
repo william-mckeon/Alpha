@@ -26,7 +26,7 @@ class ChatSampleTests(unittest.TestCase):
                 path=root/(name+'.jsonl');path.write_text(''.join(json.dumps({'text':name+str(i).zfill(9),'split':'train'})+'\n' for i in range(10)))
                 sources.append({'name':name,'path':str(path),'sha256':digest(path),'weight':.5,'reviewed':True})
             recipe=root/'recipe.json';recipe.write_text(json.dumps({'ready':True,'local_sources':sources,'exclusions_file':str(exclusions),'max_length':10}))
-            with patch('transformers.AutoTokenizer.from_pretrained',return_value=Tokenizer()):
+            with patch('arcus3.tokenizer_contract.load_tokenizer',return_value=Tokenizer()):
                 result=combine(recipe,root,root/'out',100)
                 self.assertEqual(result['provenance']['source_input_tokens'],{'a':50,'b':50})
                 path=Path(sources[0]['path']);path.write_text(json.dumps({'text':'abcdefghij','split':'test'})+'\n');sources[0]['sha256']=digest(path)

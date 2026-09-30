@@ -38,3 +38,8 @@ The source configuration intentionally has ready=false and unresolved mixture
 weights. Qualification data is four short previously reviewed donor-source records,
 453 input tokens total, explicitly marked qualification-only. It cannot satisfy
 the combined-data campaign gate.
+
+
+## September 29 full-context readiness correction
+
+See [current Phase 8 readiness](ARCUS_3_PHASE_8_READINESS.md) for the latest user-authorized scope, exact donor tokenizer, 8,192-token qualification, Desktop checkpoint storage and pending launch gates. Earlier references to denied dataset access, mandatory external-drive setup or completed campaign readiness are superseded. Historical results remain unchanged. Phase 9 does not start until the required Phase 8 training and review are complete.

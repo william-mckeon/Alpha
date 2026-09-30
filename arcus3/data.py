@@ -44,20 +44,29 @@ class ExclusionIndex:
     def __init__(self,items):
         self.exact={normalized(x) for x in items}-{''}
         self.long=[x for x in self.exact if len(x)>=24]
+        # Reuse the immutable second-sequence index and character counts. The
+        # matching rule is unchanged; rebuilding these for every row was costly.
+        self.matchers=[SequenceMatcher(None,'',x) for x in self.long]
     def matches(self,messages):
         for message in messages:
             text=normalized(message['content'])
             if text in self.exact:return True
-            for item in self.long:
+            for item,matcher in zip(self.long,self.matchers):
                 if item in text:return True
                 # SequenceMatcher cannot exceed 2*min(lengths)/sum(lengths).
                 if 2*min(len(text),len(item)) < .85*(len(text)+len(item)):continue
-                matcher=SequenceMatcher(None,text,item)
+                matcher.set_seq1(text)
                 if matcher.quick_ratio()>=.85 and matcher.ratio()>=.85:return True
         return False
 
 def encode(tokenizer,messages,max_length):
     if not messages or messages[-1]['role']!='assistant':raise ValueError('Assistant completion required')
+    for message in messages:
+        if message['role'] not in ('system','user','assistant') or not isinstance(message['content'],str):
+            raise ValueError('Invalid message')
+    # Reject oversized conversations in one pass instead of tokenizing every
+    # progressively longer prefix before discovering that none can be used.
+    if len(chat_ids(tokenizer,messages,False))>max_length:return None
     ids=[];labels=[]
     for index,message in enumerate(messages):
         if message['role'] not in ('system','user','assistant') or not isinstance(message['content'],str):

@@ -1,0 +1,4 @@
+FROM arcus3:production-v1
+COPY scripts/evaluate_arcus3_production.py /app/scripts/evaluate_arcus3_production.py
+COPY scripts/patch_arcus3_lighteval_generation.py /app/scripts/patch_arcus3_lighteval_generation.py
+RUN python3 /app/scripts/patch_arcus3_lighteval_generation.py

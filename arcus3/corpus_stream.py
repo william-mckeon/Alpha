@@ -10,7 +10,7 @@ from arcus3.checkpoint import digest
 from arcus3.config import read, safe_child
 
 class CorpusStream:
-    def __init__(self, root, state=None):
+    def __init__(self, root, state=None, repeat=True):
         self.root=Path(root);self.manifest=read(self.root/'manifest.json')
         if self.manifest.get('schema')!='arcus3-corpus-v1' or not self.manifest.get('shards'):
             raise ValueError('Pinned corpus manifest required')
@@ -21,7 +21,7 @@ class CorpusStream:
         if self.state['manifest_sha256']!=self.sha:raise ValueError('Corpus identity changed')
         if not 0<=self.state['shard']<len(self.manifest['shards']) or self.state['offset']<0:
             raise ValueError('Invalid cursor')
-        self.verified=set()
+        self.verified=set();self.repeat=repeat
 
     def snapshot(self):return copy.deepcopy(self.state)
 
@@ -42,5 +42,8 @@ class CorpusStream:
                 return row
             self.state['offset']=0;self.state['shard']+=1
             if self.state['shard']==len(self.manifest['shards']):
+                if not self.repeat:
+                    self.state['shard']-=1;self.state['offset']=item['bytes']
+                    raise StopIteration('Sealed batch exhausted')
                 self.state['shard']=0;self.state['epoch']+=1
         raise ValueError('Empty corpus')

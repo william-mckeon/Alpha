@@ -1,6 +1,15 @@
 # arcus
 
-Current direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
+Current production work (September 30, 2026): Phase 8's frozen-backbone pipeline
+is implemented and has passed full donor-context training qualification. Both
+startup benchmarks completed, production updates resumed, and the new checkpoint
+at 6,016 cumulative updates passed independent payload hash verification.
+See the [live rollout evidence](docs/ARCUS_3_PRODUCTION_ROLLOUT.md),
+[production contract](docs/ARCUS_3_PRODUCTION.md), and
+[file inventory](docs/ARCUS_3_PRODUCTION_FILE_INVENTORY.md). The first production
+review is at 100M cumulative input tokens; 12T remains a later ceiling.
+
+Historical direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
 starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B
 expert expansion. See the [Phase 0 handoff](docs/ARCUS_3_PHASE_0_HANDOFF.md) and
 [Phase 1 file inventory](docs/ARCUS_3_PHASE_1_FILE_PLAN.md). Phase 1 donor acquisition
@@ -342,3 +351,6 @@ There are no automatic daily starts. Source access/review, sequence-length
 qualification and external checkpoint storage remain launch gates. The source metadata inventory is about
 14.2 TB of public repository supersets, not a required full download or exact donor
 corpus. No historical checkpoint or evaluation was removed.
+
+
+Arcus 3 Phase 8 launch readiness and measured context limits are recorded in [the current readiness report](docs/ARCUS_3_PHASE_8_READINESS.md). Training is not complete; the published Alpha 3.0 package remains the verified initialization.

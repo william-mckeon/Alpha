@@ -52,3 +52,8 @@ Delete: **none**. Preserve all existing architectures, checkpoints, evaluation
 prompts and the Alpha 3.0 immutable package. If expert specialization has not
 demonstrated a useful gain, treat depth work as an independent efficiency experiment
 and disclose that limitation. No RL, context extension or new release is implied.
+
+
+## September 29 full-context readiness correction
+
+See [current Phase 8 readiness](ARCUS_3_PHASE_8_READINESS.md) for the latest user-authorized scope, exact donor tokenizer, 8,192-token qualification, Desktop checkpoint storage and pending launch gates. Earlier references to denied dataset access, mandatory external-drive setup or completed campaign readiness are superseded. Historical results remain unchanged. Phase 9 does not start until the required Phase 8 training and review are complete.

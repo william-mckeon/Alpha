@@ -108,3 +108,8 @@ Sample manifest SHA256:
 Teacher manifest SHA256:
 `91a961e17309789c27e648e645a0d1c883744970f22aadcec69340ee1d9aad8f`.
 Teacher forward passes do not qualify 512-token backward-pass training memory.
+
+
+## September 29 full-context readiness correction
+
+See [current Phase 8 readiness](ARCUS_3_PHASE_8_READINESS.md) for the latest user-authorized scope, exact donor tokenizer, 8,192-token qualification, Desktop checkpoint storage and pending launch gates. Earlier references to denied dataset access, mandatory external-drive setup or completed campaign readiness are superseded. Historical results remain unchanged. Phase 9 does not start until the required Phase 8 training and review are complete.

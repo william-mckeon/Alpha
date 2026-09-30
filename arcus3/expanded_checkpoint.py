@@ -24,9 +24,16 @@ def save(root,model,optimizer,state):
     atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
         'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
         'campaign':state.get('campaign'),
+        'retention_policy':state.get('retention_policy'),
+        'retention_milestone_limit':2 if state.get('production') else None,
+        'production':state.get('production'),
+        'retention_pinned':bool(set(state.get('evaluation_pending',[])) & {'baseline-full','full','developmental'}),
         'trainable_names':[n for n,p in model.named_parameters() if p.requires_grad],
         'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
     atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
+    if state.get('retention_policy')=='latest-two-plus-major-evaluations-v1':
+        from arcus3.checkpoint_retention import register_and_prune
+        register_and_prune(root,path,milestone_limit=2 if state.get('production') else None)
     return path
 
 def verify(path,parent,data=None,config=None):

@@ -1,9 +1,20 @@
 {
   "schema": "arcus3-phase8-storage-v1",
-  "ready": false,
-  "external_root": null,
+  "ready": true,
+  "external_root": "C:\\Users\\willi\\OneDrive\\Desktop\\alpha V3.0",
   "migration_receipt": null,
-  "local_preparation_limit_bytes": 1073741824,
-  "local_preparation_limit_input_tokens": 100000,
-  "policy": "Prepare bounded local sample; wait for external drive before sustained training. Preserve all historical checkpoints."
+  "local_preparation_limit_bytes": 21474836480,
+  "local_preparation_limit_input_tokens": 10000000,
+  "policy": "Desktop alpha V3.0 selected by user. New managed recovery checkpoints: latest two plus full/developmental milestones. Historical cleanup authorized only after verifying latest two per lineage and preserving required dependencies. Disk guard remains active.",
+  "checkpoint_root": "C:\\Users\\willi\\OneDrive\\Desktop\\alpha V3.0\\checkpoints-phase8-pilot-001",
+  "retention": {
+    "recovery_generations": 2,
+    "preserve_evaluation_tiers": [
+      "full",
+      "developmental"
+    ],
+    "historical_checkpoints": "audit-before-cleanup; preserve latest two per lineage and required parents",
+    "minimum_free_bytes": 2147483648
+  },
+  "historical_cleanup_receipt": "runs/arcus3/phase8-history-60k-cleanup-receipt.json"
 }

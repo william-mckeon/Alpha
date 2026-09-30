@@ -1,9 +1,12 @@
 """Coarse-grained KL: top-k teacher probabilities and one residual bucket."""
 def targets(logits, k=32):
     import torch
-    logp = logits.detach().float().log_softmax(-1)
-    values, indices = logp.topk(min(k, logits.shape[-1]-1), dim=-1)
-    return {'indices':indices.cpu(), 'probabilities':values.exp().cpu()}
+    indices=[];probabilities=[]
+    for part in logits.detach().split(256,dim=0):
+        logp=part.float().log_softmax(-1)
+        values,ids=logp.topk(min(k,logits.shape[-1]-1),dim=-1)
+        indices.append(ids.cpu());probabilities.append(values.exp().cpu())
+    return {'indices':torch.cat(indices), 'probabilities':torch.cat(probabilities)}
 
 
 def loss(logits, target, mask):

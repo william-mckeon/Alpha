@@ -89,3 +89,8 @@ The current approximately 22 GB free drive cannot retain a lengthy campaign at
 No rolling-deletion policy was authorized. Initial local preparation is capped
 at 100,000 input tokens and 1 GiB including teacher targets. Partial categories
 remain explicitly incomplete and cannot satisfy the campaign gate.
+
+
+## September 29 full-context readiness correction
+
+See [current Phase 8 readiness](ARCUS_3_PHASE_8_READINESS.md) for the latest user-authorized scope, exact donor tokenizer, 8,192-token qualification, Desktop checkpoint storage and pending launch gates. Earlier references to denied dataset access, mandatory external-drive setup or completed campaign readiness are superseded. Historical results remain unchanged. Phase 9 does not start until the required Phase 8 training and review are complete.

@@ -5,14 +5,32 @@ def update(model, optimizer, row, teacher, cfg):
     from arcus3.distillation import loss as teacher_loss
     blocks=[m for m in model.modules() if isinstance(m,SelectiveExperts)]
     model.train();model.config.use_cache=False
-    # Avoid checkpoint recomputation retaining teaching graphs; qualification measures this path.
+    if cfg.get('activation_checkpointing',False):
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={'use_reentrant':False})
     optimizer.zero_grad(set_to_none=True)
-    for m in blocks:m.collect_aux=True;m.collect_teaching=True;m.last_aux=None;m.last_teaching=None
+    for m in blocks:m.collect_aux=True;m.collect_teaching=True;m.last_aux=None;m.last_teaching=None;m.teaching_chunk_size=cfg.get('teaching_chunk_size',0);m.expert_chunk_size=cfg.get('expert_chunk_size',0)
     try:
         x=torch.tensor([row['input_ids']],device='cuda');y=torch.tensor([row['labels']],device='cuda')
-        out=model(input_ids=x,labels=y,use_cache=False)
-        task=out.loss.float();mask=y[0,1:]!=-100
-        distill=teacher_loss(out.logits[0,:-1],teacher,mask)
+        mask=y[0,1:]!=-100
+        if cfg.get('loss_chunk_size',0):
+            from torch.utils.checkpoint import checkpoint
+            hidden=model.model(input_ids=x,use_cache=False).last_hidden_state[0,:-1]
+            count=mask.sum();pieces=[];chunk=cfg['loss_chunk_size']
+            for start in range(0,len(hidden),chunk):
+                labels=y[0,start+1:start+1+chunk];selected=labels!=-100
+                if not selected.any():continue
+                target={k:v[start:start+chunk] for k,v in teacher.items()}
+                def part_loss(h,labels,selected,indices,probabilities):
+                    logits=model.lm_head(h)
+                    ce=torch.nn.functional.cross_entropy(logits.float(),labels,reduction='sum',ignore_index=-100)
+                    kl=teacher_loss(logits,{'indices':indices,'probabilities':probabilities},selected)*selected.sum()
+                    return torch.stack([ce,kl])
+                pieces.append(checkpoint(part_loss,hidden[start:start+chunk],labels,selected,target['indices'],target['probabilities'],use_reentrant=False))
+            task,distill=torch.stack(pieces).sum(0)/count
+        else:
+            out=model(input_ids=x,labels=y,use_cache=False)
+            task=out.loss.float()
+            distill=teacher_loss(out.logits[0,:-1],teacher,mask)
         local=torch.stack([m.last_teaching[0] for m in blocks]).mean()
         gate=torch.stack([m.last_teaching[1] for m in blocks]).mean()
         route=torch.stack([m.last_aux for m in blocks]).mean()

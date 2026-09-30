@@ -127,7 +127,8 @@ def load(destination, adapter=None, converted=None, expanded=None):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
     path = Path(destination) / 'files'
-    tokenizer = AutoTokenizer.from_pretrained(path, local_files_only=True, trust_remote_code=False)
+    from arcus3.tokenizer_contract import load_tokenizer
+    tokenizer = load_tokenizer(destination)
     model = AutoModelForCausalLM.from_pretrained(path, local_files_only=True, trust_remote_code=False,
                 use_safetensors=True, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True,
                 attn_implementation='sdpa').to('cuda').eval()

@@ -6,8 +6,9 @@ from arcus3.config import read,safe_child
 from arcus3.checkpoint import digest
 from arcus3.expanded_checkpoint import verify
 
-def select(root):
-    root=Path(root);pointer=read(root/'checkpoints/latest.json');cp=safe_child(root/'checkpoints',pointer['generation'])
+def select(root,checkpoint_root=None):
+    root=Path(root);base=Path(checkpoint_root) if checkpoint_root else root/'checkpoints'
+    pointer=read(base/'latest.json');cp=safe_child(base,pointer['generation'])
     if digest(cp/'manifest.json')!=pointer['manifest_sha256']:raise ValueError('Latest pointer mismatch')
     manifest=read(cp/'manifest.json')
     if manifest.get('campaign')!='backbone-adaptation-v1':raise ValueError('Different campaign')
@@ -16,4 +17,4 @@ def select(root):
             'note':'Pass this generation as ResumePath to an authorized new adaptation session; old pause flags remain intact.'}
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);print(json.dumps(select(p.parse_args().root),indent=2))
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--checkpoint-root');a=p.parse_args();print(json.dumps(select(a.root,a.checkpoint_root),indent=2))

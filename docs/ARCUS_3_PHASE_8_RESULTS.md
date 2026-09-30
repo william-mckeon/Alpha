@@ -105,3 +105,8 @@ Phase 9's inventory is in `docs/ARCUS_3_PHASE_9_FILE_PLAN.md`. It begins only
 after Phase 8 training and review, using an explicitly selected verified parent.
 No files, historical checkpoints or releases need deletion. The separate Alpha
 3.0 initialization upload must not be confused with this trained qualification.
+
+
+## September 29 full-context readiness correction
+
+See [current Phase 8 readiness](ARCUS_3_PHASE_8_READINESS.md) for the latest user-authorized scope, exact donor tokenizer, 8,192-token qualification, Desktop checkpoint storage and pending launch gates. Earlier references to denied dataset access, mandatory external-drive setup or completed campaign readiness are superseded. Historical results remain unchanged. Phase 9 does not start until the required Phase 8 training and review are complete.

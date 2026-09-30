@@ -1,6 +1,6 @@
 {
-  "image": "arcus3:phase8-chat-v2",
-  "image_id": "sha256:2132cca7a0120afe809946fff20e2738938a52a1bf72d1f575fadddca9105385",
+  "image": "arcus3:phase8-context-v6",
+  "image_id": "sha256:258b4fe4b52debba2eaf8cd202aaf2958160d2d10e62fb8c1a8b6f0c73235d62",
   "base_image_id": "sha256:b0977c166da170df299aad52e15701254a5dfa2ade3bba37a19aaba85ad07411",
   "memory": "8g",
   "cpus": 2,
@@ -53,10 +53,13 @@
   },
   "backbone_adaptation": {
     "trainable_parameters": 302026758,
-    "max_measured_sequence_length": 123,
-    "campaign_enabled": false,
-    "replay_report": "runs/arcus3/adaptation-phase8-replay-001/replay-report.json",
-    "active": false,
-    "qualification_updates": 2
-  }
+    "max_measured_sequence_length": 8192,
+    "campaign_enabled": true,
+    "replay_report": "runs/arcus3/adaptation-phase8-8192-qualification-001/report.json",
+    "active": true,
+    "qualification_updates": 2,
+    "context_memory_report": "runs/arcus3/adaptation-context-probe-006/context-report.json",
+    "full_context_replay_verified": true
+  },
+  "cuda_allocator_config": "expandable_segments:True"
 }

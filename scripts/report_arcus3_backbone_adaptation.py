@@ -6,12 +6,12 @@ from arcus3.config import read
 from arcus3.checkpoint import digest
 from arcus3.expanded_checkpoint import verify
 
-def report(root,replay=None):
-    root=Path(root);r=read(root/'report.json')
+def report(root,replay=None,checkpoint_root=None):
+    root=Path(root);r=read(root/'report.json');base=Path(checkpoint_root) if checkpoint_root else root/'checkpoints'
     if replay:
-        proof=read(replay);pointer=read(root/'checkpoints/latest.json');cp=root/'checkpoints'/pointer['generation']
+        proof=read(replay);pointer=read(base/'latest.json');cp=base/pointer['generation']
         from arcus3.config import safe_child
-        cp=safe_child(root/'checkpoints',pointer['generation']);m=read(cp/'manifest.json')
+        cp=safe_child(base,pointer['generation']);m=read(cp/'manifest.json')
         verify(cp,m['parent_sha256'])
         if digest(cp/'manifest.json')!=pointer['manifest_sha256'] or proof['checkpoint_manifest_sha256']!=pointer['manifest_sha256'] or proof.get('qualified') is not True:
             raise ValueError('Replay proof does not match durable checkpoint')
@@ -25,7 +25,7 @@ def report(root,replay=None):
                 'qualification_report_sha256':digest(root/'report.json'),'replay_report_sha256':digest(replay),
                 'note':'Original post-save fingerprint error repaired; separate read-only checkpoint replay passed. Two-update qualification only.'}
     if 'checkpoint' in r:
-        cp=root/'checkpoints'/Path(r['checkpoint']).name
+        cp=base/Path(r['checkpoint']).name
         verify(cp,r['state']['parent_sha256'],r['state']['data_sha256'],r['state']['config_sha256'])
         if digest(cp/'manifest.json')!=r['checkpoint_manifest_sha256']:raise ValueError('Report checkpoint mismatch')
     return {'qualified':r.get('qualified',False),'campaign_complete':r.get('complete',False),'reason':r.get('reason'),
@@ -35,7 +35,7 @@ def report(root,replay=None):
             'peak_cuda_bytes':r.get('peak_cuda_bytes'),'seconds':r.get('seconds')}
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--replay');p.add_argument('--output');a=p.parse_args();result=report(a.root,a.replay)
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--replay');p.add_argument('--checkpoint-root');p.add_argument('--output');a=p.parse_args();result=report(a.root,a.replay,a.checkpoint_root)
     if a.output:
         from baby_arcus.language_stream import atomic_json
         atomic_json(a.output,result)

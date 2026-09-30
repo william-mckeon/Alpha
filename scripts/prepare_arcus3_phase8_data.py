@@ -37,13 +37,13 @@ def inventory(root):
 def combine(recipe_path, donor, output, max_tokens=10_000_000):
     """Bounded deterministic mixing of hash-pinned, reviewed local source shards."""
     import random,hashlib,sqlite3
-    from transformers import AutoTokenizer
+    from arcus3.tokenizer_contract import load_tokenizer
     from arcus3.data import encode_record
     recipe=read(recipe_path)
     if recipe.get('ready') is not True or not recipe.get('local_sources'):raise ValueError('Reviewed source recipe not ready')
     if not 1<=max_tokens<=10_000_000:raise ValueError('Preparation stage cap exceeded')
     root=Path(output);root.mkdir(parents=True,exist_ok=False)
-    tok=AutoTokenizer.from_pretrained(Path(donor)/'files',local_files_only=True,trust_remote_code=False)
+    tok=load_tokenizer(donor)
     exclusions=read(recipe['exclusions_file']);sources=recipe['local_sources'];handles=[]
     seen=sqlite3.connect(root/'dedup.sqlite');seen.execute('CREATE TABLE seen (id TEXT PRIMARY KEY)')
     try:

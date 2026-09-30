@@ -1,0 +1,12 @@
+{
+  "repository": "huggingface/smollm",
+  "revision": "f54818907404ec3d6bb150357b7d0dea333f1aea",
+  "files": {
+    "README.md": "9a6fffe1d439dd7d33fea67a2caf374e986833fadc52aa9f803495e3070ba02b",
+    "tasks.py": "6899e7565b529ef2200e500fd9814c46bbdf42f9576f069d6de8a4dc2b9355b1",
+    "math_utils.py": "a8cea086bab6352284a6b88433549f76b7b10047b080f11e2faa6a4a755f0690",
+    "requirements.txt": "ba46e5fee8cc181869cc546da15f7530c018158939bd63a1ebc19e45b83407fe",
+    "smollm2_base.txt": "8fcfe4540d863edf5bc488ac1c3af91f544451e17927b5ea01e1e9d835326065",
+    "smollm2_instruct.txt": "bcb5f10c3e900ff7879afb39790eb06888f8260ebc7b9689d9f2e343d931c6d5"
+  }
+}

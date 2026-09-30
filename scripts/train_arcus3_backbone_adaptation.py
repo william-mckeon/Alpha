@@ -12,15 +12,17 @@ from arcus3.donor import load,verify
 from arcus3.adapters import train_added_experts
 from arcus3.backbone_adaptation import update
 from arcus3.expanded_checkpoint import save,restore,verify as verify_delta
-from scripts.qualify_arcus3_training import frozen_digest
 from baby_arcus.language_stream import atomic_json
 from baby_arcus.gpu_job_control import gpu_job
 
 def main(a):
     if os.environ.get('ARCUS3_CONTROLLED_DOCKER')!='1' or not Path('/.dockerenv').exists():raise RuntimeError('Docker CUDA only')
     import torch
+    from scripts.qualify_arcus3_training import frozen_digest
     from safetensors.torch import load_file
     cfg=validate(read(a.config));out=Path(a.output);out.mkdir(parents=True,exist_ok=True)
+    checkpoint_root=Path(a.checkpoint_root) if a.checkpoint_root else out/'checkpoints'
+    checkpoint_root.mkdir(parents=True,exist_ok=True)
     if a.qualification:end=deadline(a.deadline)
     else:
         from datetime import datetime,timezone
@@ -33,9 +35,14 @@ def main(a):
             raise ValueError('Matching passed qualification required')
         qualification_sha=hashlib.sha256(json.dumps({**cfg,'campaign_enabled':False},sort_keys=True).encode()).hexdigest()
         if qualified.get('config_sha256')!=qualification_sha:raise ValueError('Requalify changed training objective/runtime policy')
-    teacher=read(Path(a.teacher)/'manifest.json');stream=CorpusStream(a.data)
+    from arcus3.production import validate_policy,identity,transition,token_due,thresholds
+    production=validate_policy(read(a.production_policy)) if getattr(a,'production_policy',None) else None
+    teacher=read(Path(a.teacher)/'manifest.json');stream=CorpusStream(a.data,repeat=not bool(production))
+    from arcus3.tokenizer_contract import validate_data
+    token_contract=validate_data(a.donor,stream.manifest)
+    if production and cfg['max_length']!=token_contract['context_tokens']:raise ValueError('Production context must exactly match donor')
     if not a.qualification and stream.manifest['qualification_only']:raise ValueError('Combined corpus not ready')
-    if not a.qualification and len(teacher['files'])<stream.manifest['records']:raise ValueError('Teacher cache incomplete for this prepared stage')
+    if not a.qualification and teacher.get('teacher_input_tokens')!=stream.manifest['input_tokens_per_pass']:raise ValueError('Teacher cache incomplete for this prepared stage')
     if teacher['data_sha256']!=stream.sha or teacher['top_k']!=cfg['teacher_top_k']:raise ValueError('Teacher/data mismatch')
     if digest(Path(a.converted)/'manifest.json')!=cfg['parent_sha256']:raise ValueError('Parent mismatch')
     verify(a.donor)
@@ -46,7 +53,8 @@ def main(a):
     state={'campaign':'backbone-adaptation-v1','updates':0,'input_tokens':0,'target_tokens':0,'cursor':0,
            'parent_sha256':cfg['parent_sha256'],'data_sha256':stream.sha,'config_sha256':config_sha,
            'teacher_sha256':teacher_sha,'stream':stream.snapshot(),'config':cfg,'evaluation_pending':[],'evaluation_completed':[],
-           'scheduler':'constant-lr','scaler':None,'accumulation_position':0}
+           'scheduler':'constant-lr','scaler':None,'accumulation_position':0,
+           'retention_policy':None if a.qualification else 'latest-two-plus-major-evaluations-v1'}
     report={'schema':'arcus3-phase8-report-v1','qualification':a.qualification,'qualified':False,'complete':False,'records':[]}
     atomic_json(out/'report.json',report)
     def live():
@@ -58,64 +66,90 @@ def main(a):
         if name not in teacher['files'] or digest(path)!=teacher['files'][name]:raise ValueError('Teacher cache missing or changed')
         return load_file(str(path))
     torch.set_num_threads(2);torch.manual_seed(cfg['seed']);torch.use_deterministic_algorithms(True)
-    torch.backends.cuda.enable_flash_sdp(False);torch.backends.cuda.enable_mem_efficient_sdp(False);torch.backends.cuda.enable_math_sdp(True)
+    flash=cfg.get('attention_backend','math')=='flash'
+    torch.backends.cuda.enable_flash_sdp(flash);torch.backends.cuda.enable_mem_efficient_sdp(False);torch.backends.cuda.enable_math_sdp(not flash)
     with gpu_job():
         torch.cuda.set_per_process_memory_fraction(.7);torch.cuda.reset_peak_memory_stats();start=time.monotonic()
         model,_=load(a.donor,converted=a.converted);count=train_added_experts(model)
         optimizer=torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],lr=cfg['learning_rate'],foreach=False)
         frozen=frozen_digest(model);report.update(trainable_parameters=count,total_parameters=sum(p.numel() for p in model.parameters()))
         if a.resume:
-            state=restore(a.resume,model,optimizer,cfg['parent_sha256'],stream.sha,config_sha)
-            if state['teacher_sha256']!=teacher_sha:raise ValueError('Teacher changed on resume')
-            stream=CorpusStream(a.data,state['stream'])
+            old_manifest=read(Path(a.resume)/'manifest.json')
+            migration=getattr(a,'transition',None)
+            state=restore(a.resume,model,optimizer,cfg['parent_sha256'],old_manifest['data_sha256'] if migration else stream.sha,config_sha)
+            if not migration and state['teacher_sha256']!=teacher_sha:raise ValueError('Teacher changed on resume')
+            if production and not migration and state.get('production',{}).get('policy_sha256')!=identity(production):raise ValueError('Production migration required')
         if a.evaluation_root:
             if not a.resume or not state['evaluation_pending']:raise ValueError('No pending checkpoint evaluation')
             result=read(Path(a.evaluation_root)/'scores.json')
             from arcus3.evaluation import sha
             state=accept_evaluation(state,result,digest(Path(a.resume)/'manifest.json'),sha('/app/evaluation/arcus3/baseline-v1.json'),sha('/app/configs/arcus3/evaluation.json'),cfg['nll_regression_limit'])
             state['evaluation_completed'][-1]['scores_sha256']=digest(Path(a.evaluation_root)/'scores.json')
+            if production:
+                from arcus3.production import accept_donor_receipt
+                accepted=accept_donor_receipt(read(Path(a.evaluation_root)/'donor-scores.json'),digest(Path(a.resume)/'manifest.json'),result.get('tier','full'),production)
+                state.setdefault('donor_evaluations',[]).append(accepted)
+        if a.resume and migration:
+            if not production:raise ValueError('Transition requires production policy')
+            receipt=read(migration)
+            if not state.get('production'):
+                from arcus3.production import accept_donor_receipt
+                accept_donor_receipt(receipt['baseline_donor'],'donor','light',production)
+                accept_donor_receipt(receipt['baseline_arcus'],digest(Path(a.resume)/'manifest.json'),'light',production)
+            state=transition(state,receipt,digest(Path(a.resume)/'manifest.json'),stream.sha,teacher_sha,production,
+                             same_data=old_manifest['data_sha256']==stream.sha)
+        if a.resume:stream=CorpusStream(a.data,state['stream'],repeat=not bool(production))
         # Full evaluations are explicit durable work items; do not silently train past them.
         if not a.qualification and not state['evaluation_completed']:
             state['evaluation_pending']=['baseline-full'];report['reason']='evaluation_required'
         else:
-            while state['input_tokens']<cfg['stage_input_tokens']:
+            limit=production['review_input_tokens'] if production else cfg['stage_input_tokens']
+            while state['input_tokens']<limit:
                 try:live()
                 except RuntimeError as e:report['reason']=str(e);break
                 if a.qualification and state['updates']>=cfg['qualification_max_updates']:report['reason']='qualification_update_limit';break
                 import shutil
                 required=sum(p.numel()*p.element_size() for p in model.parameters() if p.requires_grad)*3+64*1024*1024
                 # Reserve one final save before accepting another optimizer update.
-                if shutil.disk_usage(out).free<2*required+2*1024**3:report['reason']='checkpoint_storage_pause';break
+                if shutil.disk_usage(checkpoint_root).free<required+2*1024**3:report['reason']='checkpoint_storage_pause';break
                 if state['evaluation_pending']:report['reason']='evaluation_required';break
-                previous=stream.snapshot();row=stream.next()
+                previous=stream.snapshot()
+                try:row=stream.next()
+                except StopIteration:
+                    state['stream']=stream.snapshot();state['batch_complete']=True;report['reason']='batch_complete';break
                 if len(row['input_ids'])>cfg['max_length'] or (not a.qualification and len(row['input_ids'])>qualified['max_input_tokens_tested']):
                     raise ValueError('Sequence exceeds measured qualification; requalify before increasing length')
-                if state['input_tokens']+len(row['input_ids'])>cfg['stage_input_tokens']:
-                    stream=CorpusStream(a.data,previous);report['reason']='stage_boundary_no_overshoot'
+                if state['input_tokens']+len(row['input_ids'])>limit:
+                    stream=CorpusStream(a.data,previous,repeat=not bool(production));report['reason']='stage_boundary_no_overshoot'
                     if not state.get('stage_end_pending'):
                         state['stage_end_pending']=True;state['evaluation_pending']=['full']
                     elif not state['evaluation_pending']:report['complete']=True
                     break
-                metrics=update(model,optimizer,row,target(row),cfg)
+                before=state['input_tokens'];metrics=update(model,optimizer,row,target(row),cfg)
                 state['updates']+=1;state['cursor']+=1;state['input_tokens']+=metrics['input_tokens'];state['target_tokens']+=metrics['target_tokens'];state['stream']=stream.snapshot()
                 state['teacher_target_positions']=state.get('teacher_target_positions',0)+len(row['input_ids'])-1
                 report['records'].append({'update':state['updates'],**metrics})
                 with (out/'metrics.jsonl').open('a') as f:f.write(json.dumps(report['records'][-1])+'\n')
                 print(json.dumps(report['records'][-1]),flush=True)
                 report['records']=report['records'][-64:]
-                if not a.qualification:state['evaluation_pending']=due(state['updates'],schedule)
+                if not a.qualification:
+                    state['evaluation_pending']=token_due(before,state['input_tokens'],production['evaluation']) if production else due(state['updates'],schedule)
+                    if production:
+                        state['production']['next_evaluation']=thresholds(state['input_tokens'],production['evaluation'])
+                        category=row.get('source','unknown');exposure=state.setdefault('source_exposure',{})
+                        exposure[category]=exposure.get(category,0)+metrics['input_tokens']
                 if state['updates']%cfg['save_every']==0 or state['updates']==1:
-                    cp=save(out/'checkpoints',model,optimizer,state);report['checkpoint']=str(cp)
+                    cp=save(checkpoint_root,model,optimizer,state);report['checkpoint']=str(cp)
                 atomic_json(out/'report.json',report)
-        if not a.qualification and state['input_tokens']==cfg['stage_input_tokens']:
+        if not a.qualification and state['input_tokens']==(production['review_input_tokens'] if production else cfg['stage_input_tokens']):
             if not state.get('stage_end_pending'):state['stage_end_pending']=True;state['evaluation_pending']=['full']
             elif not state['evaluation_pending']:report['complete']=True
-        cp=save(out/'checkpoints',model,optimizer,state);report['checkpoint']=str(cp)
+        cp=save(checkpoint_root,model,optimizer,state);report['checkpoint']=str(cp)
         report['frozen_unchanged']=frozen_digest(model)==frozen
         if not report['frozen_unchanged']:raise RuntimeError('Frozen backbone changed')
         if a.qualification and state['updates']==cfg['qualification_max_updates'] and len(report['records'])>=2:
-            first=read(out/'checkpoints/latest.json') # final checkpoint remains authoritative
-            initial=next(p for p in (out/'checkpoints').iterdir() if p.is_dir() and p.name.startswith('step-1-'))
+            first=read(checkpoint_root/'latest.json') # final checkpoint remains authoritative
+            initial=next(p for p in (checkpoint_root).iterdir() if p.is_dir() and p.name.startswith('step-1-'))
             # Fingerprint final trainables without retaining a second model copy.
             def trained_hash():
                 h=hashlib.sha256()
@@ -130,7 +164,9 @@ def main(a):
             actual_optimizer=[{k:digest_tensor(t) for k,t in v.items()} for v in optimizer.state.values()]
             report['exact_replay']=trained_hash()==expected and expected_optimizer==actual_optimizer and replay.snapshot()==state['stream']
             report['qualified']=report['exact_replay'] and all(sum(r['gradient_groups'][k] for r in report['records'])>0 for k in ('expert','router','gate'))
-        report.update(state=state,seconds=time.monotonic()-start,peak_cuda_bytes=torch.cuda.max_memory_allocated(),checkpoint_manifest_sha256=digest(cp/'manifest.json'))
+        report.update(state=state,seconds=time.monotonic()-start,peak_cuda_bytes=torch.cuda.max_memory_allocated(),checkpoint_manifest_sha256=digest(cp/'manifest.json'),
+                      tokenizer_contract=token_contract,parent_sha256=cfg['parent_sha256'],config_sha256=config_sha,
+                      trainability=cfg['trainability'],max_input_tokens_tested=max((r['input_tokens'] for r in report['records']),default=0))
         atomic_json(out/'report.json',report)
         if a.qualification and state['updates']==cfg['qualification_max_updates'] and not report['qualified']:raise RuntimeError('Qualification failed')
 
@@ -141,7 +177,8 @@ def digest_tensor(t):
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name,default in [('donor','/donor'),('data','/data'),('converted','/converted'),('teacher','/teacher'),('output','/output'),('config','/app/configs/arcus3/backbone_adaptation.json'),('windows','/app/configs/arcus3/training_windows.json')]:p.add_argument('--'+name,default=default)
-    p.add_argument('--deadline',required=True);p.add_argument('--qualification',action='store_true');p.add_argument('--qualification-report');p.add_argument('--resume');p.add_argument('--evaluation-root');p.add_argument('--max-new-tokens',type=int,default=128);a=p.parse_args()
+    p.add_argument('--production-policy');p.add_argument('--transition')
+    p.add_argument('--checkpoint-root');p.add_argument('--deadline',required=True);p.add_argument('--qualification',action='store_true');p.add_argument('--qualification-report');p.add_argument('--resume');p.add_argument('--evaluation-root');p.add_argument('--max-new-tokens',type=int,default=128);a=p.parse_args()
     try:main(a)
     except Exception as e:
         atomic_json(Path(a.output)/'error.json',{'type':type(e).__name__,'message':str(e)});raise

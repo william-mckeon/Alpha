@@ -12,7 +12,10 @@ def request(root):
         child=Path(session['active_run']).resolve()
         workspace=Path(__file__).resolve().parents[1]
         if not child.is_relative_to(workspace/'runs'/'arcus3'):raise ValueError('Invalid owned child run')
-        if session['mode']=='baseline':
+        if session['mode']=='controller':
+            if (child/'session.json').exists():return request(child)
+            return {'pause_requested':True,'pause_verified':False,'stage':'controller-startup'}
+        if session['mode'] in ('baseline','donor-baseline','teacher-production'):
             (child/'pause-inference').write_text('User requested session pause\n')
             return {'pause_requested':True,'pause_verified':False,'stage':'evaluation'}
         return request(child)

@@ -30,7 +30,13 @@ class SelectiveExperts(nn.Module):
             positions = torch.where(choices == index)[0]
             counts.append(positions.numel())
             if positions.numel():
-                values = expert(flat.index_select(0, positions).to(expert.gate_proj.weight.dtype) if hasattr(expert.gate_proj,'weight') else flat.index_select(0,positions)).to(flat.dtype)
+                if index==1 and getattr(self,'expert_chunk_size',0):
+                    from torch.utils.checkpoint import checkpoint
+                    def run_expert(part,selected_expert=expert):
+                        return selected_expert(part.to(selected_expert.gate_proj.weight.dtype)).to(flat.dtype)
+                    values=torch.cat([checkpoint(run_expert,flat.index_select(0,p),use_reentrant=False) for p in positions.split(self.expert_chunk_size)])
+                else:
+                    values = expert(flat.index_select(0, positions).to(expert.gate_proj.weight.dtype) if hasattr(expert.gate_proj,'weight') else flat.index_select(0,positions)).to(flat.dtype)
                 # Exactly one in the forward pass. Explicit surrogate gradient;
                 # this is not the derivative of the hard argmax decision.
                 p = probabilities[positions, index]
@@ -41,6 +47,23 @@ class SelectiveExperts(nn.Module):
             fractions = torch.tensor(counts,device=flat.device,dtype=torch.float32) / flat.shape[0]
             self.last_aux = 2 * (fractions.detach() * probabilities.mean(0)).sum()
         if self.collect_teaching:
+            if getattr(self,'teaching_chunk_size',0):
+                from torch.utils.checkpoint import checkpoint
+                def teach(part):
+                    with torch.no_grad():
+                        reference=self.experts[0](part.to(self.experts[0].gate_proj.weight.dtype)).float()
+                        energy=reference.square().mean(-1).sqrt()
+                        baseline=part.float().square().mean(-1).sqrt()
+                        target=(energy/(energy+baseline+1e-6)).clamp(.01,.99)
+                    student=self.experts[1](part.float()).float()
+                    error=(student-reference).square().sum()
+                    logits=torch.nn.functional.linear(part.float(),self.depth_gate.weight,self.depth_gate.bias).squeeze(-1)
+                    gate=torch.nn.functional.binary_cross_entropy_with_logits(logits,target,reduction='sum')
+                    return torch.stack([error,reference.square().sum(),gate])
+                pieces=[checkpoint(teach,part,use_reentrant=False) for part in flat.detach().split(self.teaching_chunk_size)]
+                error,denominator,gate=torch.stack(pieces).sum(0)
+                self.last_teaching=(error/denominator.clamp_min(1e-6*flat.numel()),gate/flat.shape[0])
+                return output.reshape(shape)
             # Local frozen-donor FFN teaching, not an assertion of global teacher parity.
             with torch.no_grad():
                 reference = self.experts[0](flat.detach().to(self.experts[0].gate_proj.weight.dtype)).float()

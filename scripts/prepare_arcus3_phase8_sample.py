@@ -18,15 +18,20 @@ def local_eligible(row):
         isinstance(m.get('content'),str) and (not m.get('train',False) or m.get('target_kind','text')=='text')
         for m in row.get('messages',[]))
 
-def prepare(root,donor,limit=100000):
+def prepare(root,donor,limit=100000,max_length=512,stage=False):
     from dotenv import load_dotenv
     from huggingface_hub import HfFileSystem
-    from transformers import AutoTokenizer
+    from arcus3.tokenizer_contract import load_tokenizer
     import pyarrow.parquet as pq
     load_dotenv('.env',override=True)
     root=Path(root);root.mkdir(parents=True,exist_ok=False)
-    fs=HfFileSystem(token=os.getenv('HF_TOKEN'));tok=AutoTokenizer.from_pretrained(Path(donor)/'files',local_files_only=True)
-    cfg=read('configs/arcus3/phase8_sample.json');targets=quotas(limit)
+    fs=HfFileSystem(token=os.getenv('HF_TOKEN'));tok=load_tokenizer(donor)
+    cfg=read('configs/arcus3/phase8_sample.json')
+    if not 2<=max_length<=8192:raise ValueError('Sequence exceeds donor context')
+    if stage:
+        if not 100000<=limit<=10000000:raise ValueError('Initial stage preparation budget')
+        targets={k:int(limit*v) for k,v in SHARES.items()}
+    else:targets=quotas(limit)
     forbidden=[]
     for line in Path('evaluation/alpha_developmental/prompts-v1.jsonl').read_text(encoding='utf-8').splitlines():
         r=json.loads(line);forbidden+=[r['prompt']]+r.get('answers',[])
@@ -58,14 +63,15 @@ def prepare(root,donor,limit=100000):
                 scanned+=1
                 if scanned>20000:break
                 if category=='local' and not local_eligible(record):continue
-                if category=='code' and not set(record.get('licenses',[])) & {'MIT','Apache-2.0','BSD-3-Clause','BSD-2-Clause','ISC'}:continue
+                if category=='code' and not set(record.get('max_stars_repo_licenses',[])) & {'MIT','Apache-2.0','BSD-3-Clause','BSD-2-Clause','ISC'}:continue
                 normalized=record if 'messages' in record else {'text':record.get('text',record.get('content'))}
-                try:encoded=encode_record(tok,normalized,512,forbidden)
+                try:encoded=encode_record(tok,normalized,max_length,forbidden)
                 except ValueError:continue
                 for row in encoded:
                     n=len(row['input_ids'])
                     if row['sha256'] in seen or counts[category]+n>targets[category]:continue
                     row.update(source=category,upstream_row=scanned-1)
+                    if category=='code':row['attribution']={k:record.get(k) for k in ('hexsha','max_stars_repo_name','max_stars_repo_path','max_stars_repo_licenses')}
                     raw=(json.dumps(row)+'\n').encode();written+=len(raw)
                     if written>cap-128*1024*1024:raise ValueError('Sample artifact budget exhausted')
                     seen.add(row['sha256']);counts[category]+=n;accepted+=1;selected.append(row)
@@ -80,13 +86,14 @@ def prepare(root,donor,limit=100000):
     import random
     random.Random(2101).shuffle(selected)
     path=root/'train-00000.jsonl';path.write_text(''.join(json.dumps(r)+'\n' for r in selected),encoding='utf-8')
-    provenance={'reviewed':True,'scope':'bounded-category-sample-not-campaign','tokenizer_sha256':digest(Path(donor)/'files/tokenizer.json'),
+    complete=all(x['status']=='sampled' for x in audit.values())
+    provenance={'reviewed':True,'scope':'combined-phase8' if stage and complete else 'bounded-category-sample-not-campaign','tokenizer_sha256':digest(Path(donor)/'files/tokenizer.json'),
         'sources_sha256':digest('configs/arcus3/phase8_sample.json'),'local_source_sha256':digest(local),'evaluation_exclusions_sha256':digest(root/'exclusions.json'),
         'source_input_tokens':counts,'mixture_requested':SHARES,'limitations':'Ordered source sample; no claim of exact donor corpus or representative quality.'}
     atomic_json(root/'provenance.json',provenance)
     from scripts.prepare_arcus3_phase8_data import seal
-    if selected:seal(root,root/'provenance.json',qualification=True)
-    report={'complete':all(x['status']=='sampled' for x in audit.values()),'campaign_ready':False,'audit':audit,
+    if selected:seal(root,root/'provenance.json',qualification=not(stage and complete))
+    report={'complete':complete,'campaign_ready':False,'prepared_stage':stage,'audit':audit,
             'input_tokens':sum(counts.values()),'records':len(selected),'max_input_tokens':max((len(r['input_ids']) for r in selected),default=0),
             'artifact_bytes':sum(p.stat().st_size for p in root.iterdir()),'teacher_targets_ready':False}
     atomic_json(root/'sample-report.json',report);return report

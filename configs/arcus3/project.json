@@ -2,7 +2,7 @@
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
   "phase": 8,
-  "status": "phase8-qualified-campaign-not-started",
+  "status": "phase8-production-training-active",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -28,7 +28,8 @@
   },
   "context": {
     "initial_configured_tokens": 8192,
-    "later_objective_tokens": 16384,
+    "later_objective_tokens": null,
+    "training_qualified_tokens": 8192,
     "demonstrated_tokens": null
   },
   "authorization": {
@@ -41,7 +42,7 @@
     "expanded_preflight": false,
     "specialization": false
   },
-  "active_run": null,
+  "active_run": "runs/arcus3/adaptation-production-005",
   "deadline": null,
   "policy": {
     "models_docker_cuda_only": true,
@@ -53,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Phase 8 qualification passed; balanced partial sample and teacher cache verified. Chat start/resume requires a deadline. Campaign awaits gated code access, full recipe review, external storage and sequence qualification. No automatic starts.",
+  "note": "User authorized Phase 8 production through the first 100M cumulative input-token review, counting pilot exposures, with no clock cutoff unless requested. Both startup baselines completed; production updates resumed and checkpoint6016 was independently hash-verified at4171588 input tokens. Exact pinned donor context/tokenizer, frozen backbone and existing objective remain. No later-stage advancement or failure retries. Monitoring every30minutes, meaningful notifications only. The legacy dense-training authorization remains disabled; Phase8 uses its qualified adaptation policy.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -85,7 +86,16 @@
     "phase8_initial_baseline": "runs/arcus3/baseline-phase8-initial-001/scores.json",
     "phase8_trained_baseline": "runs/arcus3/baseline-phase8-trained-001/scores.json",
     "phase8_application": "runs/arcus3/application-phase8-trained-001/application-report.json",
-    "phase8_sample_validation": "runs/arcus3/phase8-balanced-sample-003/sample-validation.json"
+    "phase8_sample_validation": "runs/arcus3/phase8-balanced-sample-003/sample-validation.json",
+    "phase8_complete_sample": "runs/arcus3/phase8-balanced-sample-005/sample-report.json",
+    "phase8_context_probe": "runs/arcus3/adaptation-context-probe-006/context-report.json",
+    "phase8_full_context_qualification": "runs/arcus3/adaptation-phase8-8192-qualification-001/report.json",
+    "phase8_full_context_checkpoint_verification": "runs/arcus3/adaptation-phase8-8192-qualification-001/verified-summary.json",
+    "phase8_teacher_cache": "runs/arcus3/teacher-phase8-stage-final-001/independent-verification.json",
+    "phase8_campaign_baseline": "runs/arcus3/baseline-phase8-session-2a00a7f5ae6140d2a8e85cb101b75982/scores.json",
+    "production_qualification": "runs/arcus3/production-qualification-001/receipt.json",
+    "production_rollout": "docs/ARCUS_3_PRODUCTION_ROLLOUT.md",
+    "production_first_checkpoint": "runs/arcus3/adaptation-production-005/first-production-checkpoint-verified.json"
   },
   "training_scope": "dense-control-v1",
   "conversion_scope": "selective-experts-parity-v1",

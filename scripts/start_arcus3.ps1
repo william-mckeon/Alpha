@@ -1,21 +1,22 @@
 param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [Parameter(Mandatory=$true)][string]$Root,
-      [ValidateSet("probe","baseline","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","adaptation")][string]$Mode="probe",
-      [string]$RequestsFile="", [string]$WindowPolicy="", [switch]$PersistMemory, [switch]$Phase8Initialization,
+      [ValidateSet("probe","baseline","donor-baseline","teacher-production","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","adaptation")][string]$Mode="probe",
+      [string]$RuntimeConfig="configs/arcus3/local_runtime.json", [string]$ProductionPolicy="", [string]$TransitionPath="", [string]$BenchmarksPath="", [string]$TeacherOutput="",
+      [string]$RequestsFile="", [string]$WindowPolicy="", [string]$CheckpointRoot="", [string]$AdaptationConfig="configs/arcus3/backbone_adaptation.json", [switch]$PersistMemory, [switch]$Phase8Initialization,
       [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="", [string]$TeacherPath="", [string]$EvaluationRoot="", [ValidateSet('light','developmental','full')][string]$EvaluationTier='full')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $workspace
 $project=Get-Content configs/arcus3/project.json -Raw | ConvertFrom-Json
-$runtime=Get-Content configs/arcus3/local_runtime.json -Raw | ConvertFrom-Json
+$runtime=Get-Content -LiteralPath $RuntimeConfig -Raw | ConvertFrom-Json
 if ($project.authorization.inference -ne $true -or $project.authorization.cloud -or $project.authorization.publication) { throw 'Local inference scope required' }
 if ($Mode -in @('preflight','train') -and ($project.authorization.training -ne $true -or $project.training_scope -ne 'dense-control-v1')) { throw 'Bounded dense training scope required' }
 if ($project.donor.revision -ne '31b70e2e869a7173562077fd711b654946d38674') { throw 'Donor pin mismatch' }
-$maxSessionSeconds=if ($Mode -eq 'adaptation') {86400} else {1800}
+$maxSessionSeconds=if ($Mode -in @('adaptation','donor-baseline','teacher-production')) {86400} else {1800}
 if ($StopAt -le [DateTimeOffset]::Now -or ($StopAt-[DateTimeOffset]::Now).TotalSeconds -gt $maxSessionSeconds) { throw 'Future deadline within allowed session bound required' }
 if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion|expanded-preflight|release|teacher|adaptation)-[a-z0-9-]+$') { throw 'Isolated donor-probe root required' }
 if ($Mode -eq 'adaptation') {
- $adaptation=Get-Content configs/arcus3/backbone_adaptation.json -Raw | ConvertFrom-Json
+ $adaptation=Get-Content -LiteralPath $AdaptationConfig -Raw | ConvertFrom-Json
  $policyPath=if ($WindowPolicy) {$WindowPolicy} else {'configs/arcus3/training_windows.json'}
  $windows=Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json
  $storage=Get-Content configs/arcus3/phase8_storage.json -Raw | ConvertFrom-Json
@@ -51,12 +52,19 @@ if ($Mode -eq 'specialization') { $entryScript='scripts/train_arcus3_specializat
 if ($Mode -eq 'verify-depth') { $entryScript='scripts/verify_arcus3_depth.py' }
 if ($Mode -in @('adaptation','adaptation-qualification')) { $entryScript='scripts/train_arcus3_backbone_adaptation.py' }
 if ($Mode -eq 'teacher-qualification') { $entryScript='scripts/prepare_arcus3_teacher_targets.py' }
+if ($Mode -eq 'teacher-production') { $entryScript='scripts/prepare_arcus3_teacher_targets.py' }
+if ($Mode -eq 'donor-baseline') { $entryScript='scripts/evaluate_arcus3_production.py' }
 $argsDocker=@('run','-d','--name',$name,'--gpus','all','--network','none','--memory',$runtime.memory,'--memory-swap',$runtime.memory,'--cpus',"$($runtime.cpus)",'--pids-limit',"$($runtime.pids)",'--cap-drop','ALL','--security-opt','no-new-privileges',
  '-e','ARCUS3_CONTROLLED_DOCKER=1','-e','ALPHA_JOB_CONTROL=/job-control',
  '--mount',"type=volume,source=$($runtime.gpu_lock_volume),target=/job-control",
  '--mount',"type=bind,source=$donorPath,target=/donor,readonly",
  '--mount',"type=bind,source=$rootPath,target=/output",
  $runtime.image_id,$entryScript,'--deadline',$deadlineUtc,'--max-new-tokens',"$($runtime.max_new_tokens)")
+if ($Mode -eq 'donor-baseline') { $argsDocker=$argsDocker[0..($argsDocker.Length-3)] }
+if ($runtime.cuda_allocator_config) {
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('-e',"PYTORCH_CUDA_ALLOC_CONF=$($runtime.cuda_allocator_config)")+$argsDocker[$imageIndex..($argsDocker.Length-1)]
+}
 if ($RequestsFile -or $PersistMemory) {
  if ($Mode -ne 'application') { throw 'Application options require application mode' }
  if ($RequestsFile) {
@@ -83,7 +91,28 @@ if ($WindowPolicy) {
  $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
  $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$policyFull,target=/session-policy.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--windows','/session-policy.json')
 }
+if ($Mode -in @('adaptation','adaptation-qualification')) {
+ $configFull=(Resolve-Path -LiteralPath $AdaptationConfig).Path
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$configFull,target=/adaptation-config.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--config','/adaptation-config.json')
+}
+if ($CheckpointRoot) {
+ if ($Mode -notin @('adaptation','adaptation-qualification')) { throw 'Checkpoint storage only applies to adaptation' }
+ $checkpointFull=(Resolve-Path -LiteralPath $CheckpointRoot).Path
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$checkpointFull,target=/checkpoints")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--checkpoint-root','/checkpoints')
+}
 if ($Mode -eq 'baseline') { $argsDocker+=@('--tier',$EvaluationTier) }
+foreach ($binding in @(@{source=$ProductionPolicy;target='/production.json';option='--production-policy';writable=$false},@{source=$TransitionPath;target='/transition.json';option='--transition';writable=$false},@{source=$BenchmarksPath;target='/benchmarks';option='--benchmarks';writable=$false},@{source=$TeacherOutput;target='/teacher-out';option='--output';writable=$true})) {
+ if ($binding.source) {
+  $full=(Resolve-Path -LiteralPath $binding.source).Path
+  $access=if ($binding.writable) {''} else {',readonly'}
+  $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+  $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$full,target=$($binding.target)$access")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@($binding.option,$binding.target)
+ }
+}
+if ($Mode -eq 'donor-baseline') { $argsDocker+=@('--tier',$EvaluationTier) }
+if ($Mode -eq 'teacher-production') { $argsDocker+=@('--production','--max-records','10000000') }
 if ($Phase8Initialization) {
  if ($Mode -ne 'baseline' -or !$ConvertedPath -or $ExpandedPath) { throw 'Initial Phase 8 evaluation requires pristine conversion' }
  $argsDocker+='--phase8-initialization'
@@ -110,7 +139,10 @@ try {
  }
 } finally {
  if ((docker inspect $name --format '{{.State.Running}}') -eq 'true') { docker kill $name | Out-Null }
- docker logs $name 2>&1 | Set-Content (Join-Path $rootPath 'worker.log')
+ $savedErrorPreference=$ErrorActionPreference
+ $ErrorActionPreference='Continue'
+ docker logs $name 2>&1 | ForEach-Object { "$_" } | Set-Content (Join-Path $rootPath 'worker.log')
+ $ErrorActionPreference=$savedErrorPreference
  $state=(docker inspect $name | ConvertFrom-Json)[0].State
  $state | ConvertTo-Json | Set-Content (Join-Path $rootPath 'container-state.json')
 }
