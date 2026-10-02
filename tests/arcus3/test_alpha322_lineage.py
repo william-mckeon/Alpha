@@ -13,14 +13,15 @@ from scripts.qualify_arcus3_production import adaptation_for_policy
 
 
 class Alpha322LineageTests(unittest.TestCase):
-    def test_policy_is_4t_and_not_launch_ready(self):
+    def test_policy_is_4t_and_requires_sealed_selection(self):
         policy=validate_policy(read('configs/arcus3/production_alpha322.json'))
         self.assertEqual(policy['ceiling_input_tokens'],4_000_000_000_000)
         self.assertEqual(policy['joint_evaluation_input_tokens'],7_000_000)
         self.assertEqual(policy['evaluation'],{'light':7_000_000,'developmental':7_000_000,'full':7_000_000})
-        self.assertFalse(policy['launch_ready'])
+        self.assertTrue(policy['launch_ready'])
         with self.assertRaisesRegex(ValueError,'calibration receipt'):
-            validate_policy({**policy,'launch_ready':True})
+            validate_policy({**policy,'schedule_selection':{**policy['schedule_selection'],
+                                                          'calibration_receipt_sha256':None}})
         with self.assertRaisesRegex(ValueError,'exact adaptation configuration'):
             adaptation_for_policy(policy,None)
         cfg=adaptation_for_policy(policy,'configs/arcus3/backbone_adaptation_alpha322.json')

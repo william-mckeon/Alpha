@@ -2,7 +2,7 @@
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
   "phase": 8,
-  "status": "alpha321-paused-for-matched-comparison-alpha322-planned",
+  "status": "alpha322-wsd-production-active",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -42,7 +42,7 @@
     "expanded_preflight": false,
     "specialization": false
   },
-  "active_run": null,
+  "active_run": "runs/arcus3/alpha322-production-001",
   "deadline": null,
   "policy": {
     "models_docker_cuda_only": true,
@@ -54,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Alpha 3.2.1 is paused at 11,648 updates and 7,896,336 input tokens for the matched full comparison. Potential bad Alpha 3.2.0 and the failed Alpha 3.2.1 attempt remain preserved. Alpha 3.2.2 is planned as a fresh token-indexed WSD lineage with a 4T input-token ceiling; no Alpha 3.2.2 training has started and no campaign tokens have been consumed.",
+  "note": "Fresh Alpha 3.2.2 production is running from an independently verified zero-update donor-derived parent. The first durable checkpoint has 1 update, 364 input tokens and 226 target tokens. The 1.35M-token warmup schedule, 8,192-token context and frozen backbone passed qualification. Capability evaluation and the preserved three-way comparison are deferred until the Alpha 3.2.2 controller pauses at 7M input tokens. Alpha 3.2.1 and potential bad Alpha 3.2.0 remain preserved.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -113,24 +113,27 @@
     "artifact": "phase5-initialization",
     "training_updates": 0
   },
-  "model_label": "alpha3.2.1",
+  "model_label": "alpha3.2.2",
   "current_model": {
+    "label": "alpha3.2.2",
+    "status": "production-active-first-checkpoint-verified",
+    "observed_at_utc": "2026-10-02T13:58:01Z",
+    "verified_updates": 1,
+    "verified_input_tokens": 364,
+    "verified_target_tokens": 226,
+    "first_manifest_sha256": "f2ccabf0d35cc4c9bd4e4477276f7a6bede470a7de57c2300764e835ba84d2b6",
+    "checkpoint_root": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.2/checkpoints",
+    "latest_pointer": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.2/checkpoints/latest.json",
+    "first_receipt": "runs/arcus3/alpha322-production-001/first-production-checkpoint-verified.json"
+  },
+  "paused_control": {
     "label": "alpha3.2.1",
-    "status": "paused-for-matched-full-comparison",
+    "status": "paused-for-joint-7m-comparison",
     "updates": 11648,
     "input_tokens": 7896336,
     "target_tokens": 6727516,
     "manifest_sha256": "e7efa800dc21e7f00c9e3e0e8c337c6fd024d650340bdacc604918562395b8ed",
     "checkpoint": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.1/checkpoints-restart-001/step-11648-22e3a046d0094871ac4eca9a04a61137"
-  },
-  "planned_model": {
-    "label": "alpha3.2.2",
-    "status": "planned-not-started",
-    "lineage_id": "alpha3.2.2-wsd-001",
-    "schedule": "token-indexed-warmup-stable-decay",
-    "ceiling_input_tokens": 4000000000000,
-    "training_updates": 0,
-    "input_tokens": 0
   },
   "previous_model": {
     "label": "potential bad alpha3.2.0",

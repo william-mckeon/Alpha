@@ -15,9 +15,9 @@
     "peak_learning_rate": 0.00001,
     "warmup_input_tokens": 1350000,
     "selection": {
-      "status": "pending-calibration",
+      "status": "qualified",
       "selected_warmup_input_tokens": 1350000,
-      "receipt_sha256": null
+      "receipt_sha256": "b8ab48759da2d098e543c9ebc96b14072c0f736bcbf20e844f98497d4431b02a"
     },
     "endpoint_authorized": false,
     "decay": {
@@ -65,5 +65,5 @@
   "routing_objective": "paired-output-v2",
   "router_init_std": 0.001,
   "router_layer_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-  "note": "Fresh Alpha 3.2.2 WSD lineage. Campaign stays disabled until a disposable warmup calibration receipt is selected, embedded and requalified. Capability evaluation is deferred to the joint 7M-token checkpoint. No Alpha 3.2.0 or 3.2.1 trained state is inherited."
+  "note": "Fresh Alpha 3.2.2 WSD lineage with a verified 1.35M-token warmup selection. Capability evaluation is deferred to the joint 7M-token checkpoint. No Alpha 3.2.0 or 3.2.1 trained state is inherited."
 }

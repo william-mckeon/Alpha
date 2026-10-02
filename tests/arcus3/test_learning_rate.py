@@ -12,8 +12,13 @@ class LearningRateTests(unittest.TestCase):
 
     def test_pending_schedule_is_qualification_only(self):
         cfg = self.config();validate(cfg)
+        pending=copy.deepcopy(cfg)
+        pending['learning_rate_schedule']['selection']={'status':'pending-calibration',
+            'selected_warmup_input_tokens':1_350_000,'receipt_sha256':None}
+        pending['campaign_enabled']=False
+        validate(pending)
         with self.assertRaisesRegex(ValueError, 'Pending warmup'):
-            validate({**cfg, 'campaign_enabled': True})
+            validate({**pending, 'campaign_enabled': True})
         qualified=copy.deepcopy(cfg);qualified['campaign_enabled']=True
         qualified['learning_rate_schedule']['selection']={'status':'qualified','selected_warmup_input_tokens':1_350_000,
                                                           'receipt_sha256':'a'*64}

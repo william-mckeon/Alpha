@@ -1,7 +1,7 @@
 {
-  "launch_ready": false,
-  "image": "arcus3:alpha322-wsd-v3",
-  "image_id": "sha256:4d24bfbd7e303ba289e65ec97533974b8178600607fa28ca50f9d425346fe771",
+  "launch_ready": true,
+  "image": "arcus3:alpha322-wsd-final-v2",
+  "image_id": "sha256:689e488f0a69c3254c2e35e195d5847b68b0ce2fcb24bf7102516d174953164f",
   "base_image_id": "sha256:a115da27b18c6e0b4c05c389be5ec37d6c8b49e9cb5d0f8e8c0b003dfdce7492",
   "memory": "8g",
   "cpus": 2,
@@ -11,6 +11,6 @@
   "memory_watchdog": false,
   "max_seconds": 1800,
   "max_new_tokens": 128,
-  "mode": "alpha3.2.2-wsd-built-pending-qualification",
+  "mode": "alpha3.2.2-wsd-qualified",
   "cuda_allocator_config": "expandable_segments:True"
 }

@@ -3,11 +3,11 @@
   "campaign_id": "alpha3.2.2-wsd-001-100m-v1",
   "model_label": "alpha3.2.2",
   "lineage_id": "alpha3.2.2-wsd-001",
-  "launch_ready": false,
+  "launch_ready": true,
   "schedule_selection": {
     "warmup_input_tokens": 1350000,
     "calibration_receipt": "runs/arcus3/alpha322-schedule-calibration-001/selection.json",
-    "calibration_receipt_sha256": null
+    "calibration_receipt_sha256": "b8ab48759da2d098e543c9ebc96b14072c0f736bcbf20e844f98497d4431b02a"
   },
   "review_input_tokens": 100000000,
   "ceiling_input_tokens": 4000000000000,
@@ -27,7 +27,7 @@
   "lighteval_revision": "ea46419a93fb390e8f694f7c6c64c1e684487c9d",
   "initial_data": "runs/arcus3/phase8-stage-final-001",
   "initial_teacher": "runs/arcus3/teacher-phase8-stage-final-001",
-  "qualification_report": "runs/arcus3/adaptation-alpha322-qualification-002/report.json",
+  "qualification_report": "runs/arcus3/adaptation-alpha322-final-qualification-001/report.json",
   "checkpoint_subdir": "alpha3.2.2/checkpoints",
-  "note": "Fresh 4T-ceiling WSD lineage. Startup capability evaluation is deferred; the first joint donor/Alpha 3.2.0/Alpha 3.2.1/Alpha 3.2.2 evaluation and pause occur after Alpha 3.2.2 crosses 7M input tokens. This policy cannot launch until the calibration receipt hash is embedded, campaign_enabled is true, and the exact final configuration is requalified."
+  "note": "Fresh 4T-ceiling WSD lineage with a verified 1.35M-token warmup selection. Startup capability evaluation is deferred; the first joint donor/Alpha 3.2.0/Alpha 3.2.1/Alpha 3.2.2 evaluation and pause occur after Alpha 3.2.2 crosses 7M input tokens. Final configuration and image qualification remain required before launch."
 }

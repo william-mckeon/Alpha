@@ -65,10 +65,24 @@ the campaign will run that far and does not authorize automatic stage advancemen
    tokens. Pause at the 7M checkpoint before capability evaluation, then run the
    donor, Alpha 3.2.0, Alpha 3.2.1 and Alpha 3.2.2 comparison sequentially.
 
-The initial checked-in policy is deliberately `launch_ready: false` and the
-adaptation configuration is `campaign_enabled: false`. A pending calibration may
-be qualified mechanically, but it cannot launch production. Alpha 3.2.1 stays as
-the constant-LR control and its checkpoint lineage remains immutable.
+The initial policy blocked production while schedule selection was pending.
+The selected adaptation configuration now enables the campaign and the production
+policy binds the calibration receipt. The runtime remains blocked until the
+final image, full-context replay and zero-update parent are verified. Alpha 3.2.1
+stays as the constant-LR control and its checkpoint lineage remains immutable.
+
+On October 2, the first disposable qualification used two short records and
+reached only 364 input tokens. It is preserved as
+`runs/arcus3/adaptation-alpha322-qualification-001` but does not satisfy the
+full-context gate. The replacement qualification at
+`runs/arcus3/adaptation-alpha322-qualification-002` used two 8,192-token
+records, passed exact replay and frozen-backbone checks, and exited normally.
+The pinned image also passed 38 CUDA integration tests with zero skips in
+`runs/arcus3/alpha322-wsd-core-cuda-tests-001`. The three disposable warmup
+arms completed in `runs/arcus3/alpha322-schedule-calibration-001`; the planned
+1.35M-token horizon passed every frozen gate and was explicitly sealed there.
+Campaign exposure remains zero until the selected configuration is requalified
+and a fresh zero-update checkpoint is independently verified.
 
 The controlled launcher exposes `-Mode alpha322-calibration`. It requires the
 converted parent, sealed data, matching teacher cache and the completed live
