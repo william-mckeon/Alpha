@@ -5,7 +5,7 @@ selects one checkpoint by manifest SHA256; packaging never follows `latest.json`
 
 | Model | Repository | Selected state |
 |---|---|---|
-| Alpha 3.2.0 | `Islanderintel/Alpha-3.2.0` | Archival package locally verified; matched comparison and publication receipt pending |
+| Alpha 3.2.0 | `Islanderintel/Alpha-3.2.0` | Archival package and private immutable publication verified; matched comparison pending |
 | Alpha 3.2.1 | `Islanderintel/Alpha-3.2.1` | Paused checkpoint selected; matched full comparison pending; package/publication locked |
 | Alpha 3.2.2 | `Islanderintel/Alpha-3.2.2` | Planned fresh WSD lineage; zero updates and no checkpoint; calibration and qualification required |
 
@@ -33,13 +33,13 @@ replace local resumable checkpoints.
 
 The Alpha 3.2.0 release spec's `ready` state allowed its selected archival
 checkpoint to be packaged and verified before matched evaluation completed. The
-local package at `runs/arcus3/release-alpha320-002/package` passed exact logits,
+final local package at `runs/arcus3/release-alpha320-003/package` passed exact logits,
 loss, cached-decoding, and generation parity for all recorded probes, with no
 missing, unexpected, or mismatched keys. Evidence:
-`runs/arcus3/release-alpha320-002/package-report.json` and
-`runs/arcus3/release-alpha320-002/package/verification.json`. This establishes
-local package integrity, not matched capability or remote publication. The
-workflow is explicit and sequential:
+`runs/arcus3/release-alpha320-003/package-report.json` and
+`runs/arcus3/release-alpha320-verification-002/verification.json`. This
+establishes local package integrity, not matched capability. The workflow is
+explicit and sequential:
 
 1. Freeze and record the selected checkpoint. For a candidate release, also
    record every required evaluation; an archival control may be locally packaged
@@ -56,8 +56,18 @@ workflow is explicit and sequential:
 5. Record the private URL, immutable revision, manifest SHA256, and receipt here
    only after remote verification succeeds.
 
-As of October 1, 2026, Alpha 3.2.0 has the local package-verification evidence
-linked above. Alpha 3.2.1 and Alpha 3.2.2 have no package-verification receipt,
-and none of the three repositories has an immutable remote-publication receipt.
-Until a receipt is recorded and linked, the corresponding step must not be
-described as complete.
+As of October 1, 2026, Alpha 3.2.0 is privately published at
+[Islanderintel/Alpha-3.2.0](https://huggingface.co/Islanderintel/Alpha-3.2.0)
+at immutable revision `ed3be37cc7efc1410cdf4380d63988cd83fc880f`. The complete
+remote manifest has SHA256
+`96b5c564ce532a29d1bb7db131e86dd8a6dc528284a5539f89ec813f836fbc34`,
+and every immutable remote file hash was independently verified. The uploader
+successfully staged and checked all five LFS shards and committed the metadata,
+but its first final-verification pass hit a local cache `PermissionError` after
+that commit. A read-only verification using a writable workspace cache then
+confirmed repository privacy, the immutable revision, and every manifest hash.
+The receipt is
+`runs/arcus3/release-alpha320-003/independent-publication-verification-ed3be37cc7efc1410cdf4380d63988cd83fc880f.json`.
+This publication preserves the archived control; the matched comparison is
+still pending and no winner or promotion has been selected. Alpha 3.2.1 and
+Alpha 3.2.2 have no package-verification or immutable publication receipt.
