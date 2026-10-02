@@ -60,7 +60,10 @@ the campaign will run that far and does not authorize automatic stage advancemen
 5. Run full 8,192-token CUDA qualification and exact two-update checkpoint replay
    using the final selected configuration.
 6. Create and independently hash-verify a new Alpha 3.2.2 zero-update checkpoint.
-7. Run donor and fresh Alpha startup evaluations before the first production update.
+7. Start production with the independently verified zero-update parent. Preserve
+   all optimizer, RNG and data-cursor state while training to the first 7M input
+   tokens. Pause at the 7M checkpoint before capability evaluation, then run the
+   donor, Alpha 3.2.0, Alpha 3.2.1 and Alpha 3.2.2 comparison sequentially.
 
 The initial checked-in policy is deliberately `launch_ready: false` and the
 adaptation configuration is `campaign_enabled: false`. A pending calibration may
@@ -81,7 +84,7 @@ deadline still need to name the reviewed local artifacts):
   -ConvertedPath runs/arcus3/conversion-phase5-001/converted `
   -DataRoot runs/arcus3/phase8-stage-final-001 `
   -TeacherPath runs/arcus3/teacher-phase8-stage-final-001 `
-  -PreflightReport runs/arcus3/adaptation-alpha322-qualification-001/report.json
+  -PreflightReport runs/arcus3/adaptation-alpha322-qualification-002/report.json
 ```
 
 After inspecting all arm reports, seal the chosen arm explicitly:
@@ -112,7 +115,7 @@ run an optimizer update:
   -ConvertedPath runs/arcus3/conversion-phase5-001/converted `
   -DataRoot runs/arcus3/phase8-stage-final-001 `
   -TeacherPath runs/arcus3/teacher-phase8-stage-final-001 `
-  -PreflightReport runs/arcus3/adaptation-alpha322-qualification-001/report.json `
+  -PreflightReport runs/arcus3/adaptation-alpha322-qualification-002/report.json `
   -CalibrationReceipt runs/arcus3/alpha322-schedule-calibration-001/selection.json `
   -CheckpointRoot '<reviewed Alpha 3.2.2 checkpoint directory>'
 ```
@@ -120,7 +123,7 @@ run an optimizer update:
 Run the independent, model-free recovery verifier against the exact checkpoint
 generation printed in that run's report. It verifies both checkpoint payload
 hashes, the embedded scheduler state, empty optimizer state, zero counters,
-fresh lineage, selected receipt and pending baseline evaluation:
+fresh lineage, selected receipt and the explicit 7M evaluation deferral:
 
 ```powershell
 python scripts/resume_arcus3_training.py `

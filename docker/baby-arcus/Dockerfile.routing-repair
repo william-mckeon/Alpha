@@ -3,5 +3,6 @@
 FROM arcus3:production-evaluation-v5
 COPY arcus3 /app/arcus3
 COPY scripts/*arcus3*.py /app/scripts/
+COPY scripts/package_alpha_3.py scripts/publish_alpha_3.py scripts/verify_alpha_3.py /app/scripts/
 COPY tests/arcus3 /app/tests/arcus3
 COPY configs/arcus3 /app/configs/arcus3

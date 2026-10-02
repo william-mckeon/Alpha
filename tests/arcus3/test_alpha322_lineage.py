@@ -16,6 +16,8 @@ class Alpha322LineageTests(unittest.TestCase):
     def test_policy_is_4t_and_not_launch_ready(self):
         policy=validate_policy(read('configs/arcus3/production_alpha322.json'))
         self.assertEqual(policy['ceiling_input_tokens'],4_000_000_000_000)
+        self.assertEqual(policy['joint_evaluation_input_tokens'],7_000_000)
+        self.assertEqual(policy['evaluation'],{'light':7_000_000,'developmental':7_000_000,'full':7_000_000})
         self.assertFalse(policy['launch_ready'])
         with self.assertRaisesRegex(ValueError,'calibration receipt'):
             validate_policy({**policy,'launch_ready':True})
@@ -64,7 +66,8 @@ class Alpha322LineageTests(unittest.TestCase):
                    'scheduler':scheduler,'optimizer':{'state':{},'param_groups':[]},'python_rng':(),
                    'torch_rng':torch.zeros(1,dtype=torch.uint8),'cuda_rng':[],
                    'stream':{'records':0},'accumulation_position':0,'evaluation_completed':[],
-                   'evaluation_pending':['baseline-full'],'retention_policy':'latest-two-plus-major-evaluations-v1'}
+                   'evaluation_pending':[],'evaluation_deferred_until_input_tokens':7_000_000,
+                   'retention_policy':'latest-two-plus-major-evaluations-v1'}
             torch.save(state,cp/'state.pt');(cp/'delta.safetensors').write_bytes(b'fixture')
             manifest={'schema':'arcus3-expanded-delta-v1','parent_sha256':cfg['parent_sha256'],
                       'config_sha256':identity(cfg),'data_sha256':'data','updates':0,
@@ -92,7 +95,8 @@ class Alpha322LineageTests(unittest.TestCase):
             manifest_sha=digest(cp/'manifest.json')
             report={'checkpoint_manifest_sha256':manifest_sha,'state':{
                 'updates':0,'input_tokens':0,'target_tokens':0,'cursor':0,
-                'evaluation_pending':['baseline-full'],'evaluation_completed':[],
+                'evaluation_pending':[],'evaluation_completed':[],
+                'evaluation_deferred_until_input_tokens':7_000_000,
                 'production':None,'stream':{'records':0},'scheduler':initial_state(cfg)}}
             verification=owned/'independent-verification.json'
             verification.write_text(json.dumps({
@@ -101,7 +105,8 @@ class Alpha322LineageTests(unittest.TestCase):
                 'checkpoint_manifest_sha256':manifest_sha,'config_file_sha256':digest(cfg_path),
                 'config_sha256':identity(cfg),'calibration_receipt_sha256':digest(receipt),
                 'warmup_input_tokens':1_350_000,'optimizer_empty':True,'payload_hashes_verified':True,
-                'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False}))
+                'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False,
+                'evaluation_deferred_until_input_tokens':7_000_000}))
             evidence=bind_alpha322_initialization(workspace,verification,cp,report,cfg,cfg_path)
             self.assertEqual(evidence[str(verification.resolve())],digest(verification))
             bad=copy.deepcopy(report);bad['state']['updates']=1

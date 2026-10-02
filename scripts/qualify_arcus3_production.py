@@ -34,11 +34,15 @@ def qualify(a):
         if report['config_sha256']!=expected:raise ValueError('Qualification objective mismatch')
         if cfg.get('routing_objective')=='paired-output-v2' and tests.get('routing_repair_suite') is not True:
             raise ValueError('Routing repair CUDA tests required')
-    files=['scripts/run_arcus3_production.py','scripts/start_arcus3.ps1','arcus3/production.py','arcus3/production_data.py','arcus3/production_cache.py','scripts/prepare_arcus3_production.py','arcus3/learning_rate.py']
+    files=['scripts/run_arcus3_production.py','scripts/start_arcus3.ps1','scripts/train_arcus3_backbone_adaptation.py','arcus3/campaign.py','arcus3/production.py','arcus3/production_data.py','arcus3/production_cache.py','scripts/prepare_arcus3_production.py','arcus3/learning_rate.py']
     files+=['arcus3/checkpoint_retention.py','arcus3/checkpoint_recovery.py','arcus3/expanded_checkpoint.py','scripts/resume_arcus3_training.py']
+    deferred=policy.get('model_label')=='alpha3.2.2' and policy.get('defer_startup_evaluation') is True
     result={'qualified':True,'image_id':runtime['image_id'],'policy_sha256':identity(policy),'context_report_sha256':digest(Path(a.context_run)/'report.json'),
             'test_receipt_sha256':digest(a.test_receipt),'host_files':{f:digest(f) for f in files},'context':report['tokenizer_contract'],
-            'peak_cuda_bytes':report['peak_cuda_bytes'],'campaign_updates':0,'note':'Disposable CUDA qualification only; startup donor evaluations still gate production updates.'}
+            'peak_cuda_bytes':report['peak_cuda_bytes'],'campaign_updates':0,
+            'joint_evaluation_input_tokens':policy['joint_evaluation_input_tokens'] if deferred else None,
+            'note':('Disposable CUDA qualification only; capability evaluation is deferred to the joint 7M-token checkpoint.' if deferred
+                    else 'Disposable CUDA qualification only; startup donor evaluations still gate production updates.')}
     if adaptation:result['adaptation_config_file_sha256']=digest(adaptation)
     atomic_json(a.output,result);return result
 

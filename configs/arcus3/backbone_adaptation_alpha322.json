@@ -6,6 +6,7 @@
   "depth_capacity": 1.0,
   "ceiling_input_tokens": 4000000000000,
   "stage_input_tokens": 10000000,
+  "evaluation_deferred_until_input_tokens": 7000000,
   "max_length": 8192,
   "learning_rate": 0.00001,
   "learning_rate_schedule": {
@@ -64,5 +65,5 @@
   "routing_objective": "paired-output-v2",
   "router_init_std": 0.001,
   "router_layer_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-  "note": "Fresh Alpha 3.2.2 WSD lineage. Campaign stays disabled until a disposable warmup calibration receipt is selected, embedded and requalified. No Alpha 3.2.0 or 3.2.1 trained state is inherited."
+  "note": "Fresh Alpha 3.2.2 WSD lineage. Campaign stays disabled until a disposable warmup calibration receipt is selected, embedded and requalified. Capability evaluation is deferred to the joint 7M-token checkpoint. No Alpha 3.2.0 or 3.2.1 trained state is inherited."
 }

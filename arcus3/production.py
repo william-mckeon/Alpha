@@ -26,13 +26,19 @@ def validate_policy(policy):
         raise ValueError('Unapproved production ceiling/batch')
     if policy['cache_limit_bytes']>50*1024**3 or policy['mixture']!={'general':.4,'code':.2,'math':.1,'instruction_tools':.2,'local':.1}:
         raise ValueError('Unapproved cache/mixture')
-    if policy['evaluation']!={'light':1_000_000,'developmental':10_000_000,'full':100_000_000} or policy['retention']!={'recovery':2,'milestones':2}:
+    expected_evaluation=({'light':7_000_000,'developmental':7_000_000,'full':7_000_000}
+                         if policy.get('model_label')=='alpha3.2.2' else
+                         {'light':1_000_000,'developmental':10_000_000,'full':100_000_000})
+    if policy['evaluation']!=expected_evaluation or policy['retention']!={'recovery':2,'milestones':2}:
         raise ValueError('Unapproved evaluation/retention policy')
     if policy['nll_regression_limit']!=.2 or not policy['local_reuse'] or not policy['inbox_auto_admit']:
         raise ValueError('Unapproved production behavior')
     if policy.get('model_label')=='alpha3.2.2':
         if policy.get('lineage_id')!='alpha3.2.2-wsd-001':
             raise ValueError('Alpha 3.2.2 production lineage mismatch')
+        if (policy.get('defer_startup_evaluation') is not True
+                or policy.get('joint_evaluation_input_tokens')!=7_000_000):
+            raise ValueError('Alpha 3.2.2 joint 7M evaluation policy mismatch')
         selection=policy.get('schedule_selection',{})
         if selection.get('warmup_input_tokens') not in (1_000_000,1_350_000,2_000_000):
             raise ValueError('Alpha 3.2.2 warmup selection mismatch')

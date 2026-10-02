@@ -81,6 +81,8 @@ def validate(cfg):
     if weights is not None and (len(weights)!=len(cfg['layers']) or any(not math.isfinite(w) or not 0<=w<=1 for w in weights)):
         raise ValueError('Invalid per-layer router weights')
     if not 0<=cfg.get('router_init_std',0)<=.01:raise ValueError('Invalid router initialization')
+    if cfg.get('model_label')=='alpha3.2.2' and cfg.get('evaluation_deferred_until_input_tokens')!=7_000_000:
+        raise ValueError('Alpha 3.2.2 evaluation deferral mismatch')
     from arcus3.learning_rate import validate_config
     validate_config(cfg)
     return cfg

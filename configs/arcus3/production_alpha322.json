@@ -11,11 +11,13 @@
   },
   "review_input_tokens": 100000000,
   "ceiling_input_tokens": 4000000000000,
+  "defer_startup_evaluation": true,
+  "joint_evaluation_input_tokens": 7000000,
   "batch_input_tokens": 10000000,
   "cache_limit_bytes": 53687091200,
   "minimum_free_bytes": 12884901888,
   "mixture": {"general": 0.4, "code": 0.2, "math": 0.1, "instruction_tools": 0.2, "local": 0.1},
-  "evaluation": {"light": 1000000, "developmental": 10000000, "full": 100000000},
+  "evaluation": {"light": 7000000, "developmental": 7000000, "full": 7000000},
   "retention": {"recovery": 2, "milestones": 2},
   "local_reuse": true,
   "inbox_auto_admit": true,
@@ -25,7 +27,7 @@
   "lighteval_revision": "ea46419a93fb390e8f694f7c6c64c1e684487c9d",
   "initial_data": "runs/arcus3/phase8-stage-final-001",
   "initial_teacher": "runs/arcus3/teacher-phase8-stage-final-001",
-  "qualification_report": "runs/arcus3/adaptation-alpha322-qualification-001/report.json",
+  "qualification_report": "runs/arcus3/adaptation-alpha322-qualification-002/report.json",
   "checkpoint_subdir": "alpha3.2.2/checkpoints",
-  "note": "Fresh 4T-ceiling WSD lineage. This policy cannot launch until the calibration receipt hash is embedded, campaign_enabled is true, and the exact final configuration is requalified."
+  "note": "Fresh 4T-ceiling WSD lineage. Startup capability evaluation is deferred; the first joint donor/Alpha 3.2.0/Alpha 3.2.1/Alpha 3.2.2 evaluation and pause occur after Alpha 3.2.2 crosses 7M input tokens. This policy cannot launch until the calibration receipt hash is embedded, campaign_enabled is true, and the exact final configuration is requalified."
 }

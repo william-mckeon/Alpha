@@ -27,6 +27,7 @@ def bind_alpha322_initialization(workspace,path,checkpoint,report,adaptation,ada
         'warmup_input_tokens':adaptation['learning_rate_schedule']['warmup_input_tokens'],
         'optimizer_empty':True,'payload_hashes_verified':True,
         'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False,
+        'evaluation_deferred_until_input_tokens':adaptation.get('evaluation_deferred_until_input_tokens'),
     }
     for key,value in expected.items():
         if proof.get(key)!=value:raise ValueError('Initialization verification mismatch: '+key)
@@ -34,8 +35,9 @@ def bind_alpha322_initialization(workspace,path,checkpoint,report,adaptation,ada
         raise ValueError('Initialization verification selects a different checkpoint')
     if (report.get('checkpoint_manifest_sha256')!=manifest_sha
             or any(state.get(key)!=0 for key in ('updates','input_tokens','target_tokens','cursor'))
-            or state.get('evaluation_pending')!=['baseline-full'] or state.get('evaluation_completed')
+            or state.get('evaluation_pending') or state.get('evaluation_completed')
             or state.get('production') or state.get('stream',{}).get('records')!=0
+            or state.get('evaluation_deferred_until_input_tokens')!=adaptation.get('evaluation_deferred_until_input_tokens')
             or state.get('scheduler',{}).get('committed_input_tokens')!=0
             or state.get('scheduler',{}).get('last_applied_input_tokens')!=0):
         raise ValueError('Alpha 3.2.2 production parent is not an untouched step-zero checkpoint')
@@ -153,11 +155,20 @@ def run(a):
     try:
         if not saved['state'].get('production') and not saved.get('transition'):
             receipt=batch_receipt(checkpoint,saved['data'],saved['teacher'],policy,'pilot-migration')
-            receipt['baseline_donor']=donor_eval(None,'light')
-            receipt['baseline_arcus']=donor_eval(checkpoint,'light')
+            if policy.get('defer_startup_evaluation'):
+                receipt['baseline_deferred_to_input_tokens']=policy['joint_evaluation_input_tokens']
+            else:
+                receipt['baseline_donor']=donor_eval(None,'light')
+                receipt['baseline_arcus']=donor_eval(checkpoint,'light')
             path=root/'migration.json';atomic_json(path,receipt);saved['transition']=str(path);persist()
         while not stopped():
             checkpoint=Path(saved['checkpoint']);state=saved['state']
+            if (state['evaluation_pending'] and policy.get('defer_startup_evaluation')
+                    and state['input_tokens']>=policy['joint_evaluation_input_tokens']):
+                atomic_json(root/'session-result.json',{'stopped':True,'reason':'joint_7m_evaluation_required',
+                    'checkpoint':str(checkpoint),'updates':state['updates'],'input_tokens':state['input_tokens'],
+                    'target_tokens':state['target_tokens'],'evaluation_pending':state['evaluation_pending']})
+                return
             if state['evaluation_pending'] and not saved.get('evaluation'):
                 saved['evaluation']=evaluate(checkpoint,state['evaluation_pending']);persist()
             if state.get('batch_complete') and not state['evaluation_pending'] and not saved.get('transition'):

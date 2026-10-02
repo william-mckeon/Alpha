@@ -64,9 +64,12 @@ def verify_fresh_alpha322_initialization(checkpoint, adaptation_path, calibratio
         raise ValueError('Calibration receipt does not select this fresh schedule')
     verified = inspect_state(checkpoint, cfg['parent_sha256'], identity(cfg), restart=True)
     state = verified['state'];scheduler = state['scheduler']
-    if (not verified['optimizer_empty'] or state.get('evaluation_pending') != ['baseline-full']
+    deferred=cfg.get('evaluation_deferred_until_input_tokens')
+    expected_pending=[] if deferred else ['baseline-full']
+    if (not verified['optimizer_empty'] or state.get('evaluation_pending') != expected_pending
             or state.get('evaluation_completed') or state.get('production')
             or state.get('stream', {}).get('records') != 0
+            or state.get('evaluation_deferred_until_input_tokens')!=deferred
             or scheduler.get('base_learning_rate') != 0.0
             or any(scheduler.get('group_learning_rates', {}).values())):
         raise ValueError('Alpha 3.2.2 initialization is not an untouched baseline parent')
@@ -78,6 +81,7 @@ def verify_fresh_alpha322_initialization(checkpoint, adaptation_path, calibratio
               'config_sha256':identity(cfg),
               'calibration_receipt_sha256':digest(receipt_path),
               'warmup_input_tokens':schedule['warmup_input_tokens'],
+              'evaluation_deferred_until_input_tokens':deferred,
               'optimizer_empty':True,'payload_hashes_verified':True,
               'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False}
     if output:
@@ -112,11 +116,18 @@ def prepare(source, checkpoint, policy_path, adaptation_path, output, restart=Fa
         prior = read(old['transition'])
         if prior['checkpoint_sha256'] != verified['checkpoint_manifest_sha256']:
             raise ValueError('Startup transition belongs to another checkpoint')
-        accept_donor_receipt(prior['baseline_donor'], 'donor', 'light', policy)
-        accept_donor_receipt(prior['baseline_arcus'], verified['checkpoint_manifest_sha256'], 'light', policy)
-        check_benchmark(prior['baseline_donor']);check_benchmark(prior['baseline_arcus'])
+        if policy.get('defer_startup_evaluation'):
+            if prior.get('baseline_deferred_to_input_tokens')!=policy['joint_evaluation_input_tokens']:
+                raise ValueError('Deferred startup evaluation receipt mismatch')
+        else:
+            accept_donor_receipt(prior['baseline_donor'], 'donor', 'light', policy)
+            accept_donor_receipt(prior['baseline_arcus'], verified['checkpoint_manifest_sha256'], 'light', policy)
+            check_benchmark(prior['baseline_donor']);check_benchmark(prior['baseline_arcus'])
         migration = batch_receipt(checkpoint, old['data'], old['teacher'], policy, 'fresh-initialization')
-        migration.update(baseline_donor=prior['baseline_donor'], baseline_arcus=prior['baseline_arcus'])
+        if policy.get('defer_startup_evaluation'):
+            migration['baseline_deferred_to_input_tokens']=policy['joint_evaluation_input_tokens']
+        else:
+            migration.update(baseline_donor=prior['baseline_donor'], baseline_arcus=prior['baseline_arcus'])
         evidence[str(Path(old['transition']).resolve())] = digest(old['transition'])
     if state['evaluation_pending']:
         if not old.get('evaluation'):

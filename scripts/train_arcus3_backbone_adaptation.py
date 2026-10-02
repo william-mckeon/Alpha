@@ -130,16 +130,27 @@ def main(a):
             if not production:raise ValueError('Transition requires production policy')
             receipt=read(migration)
             if not state.get('production'):
-                from arcus3.production import accept_donor_receipt
-                accept_donor_receipt(receipt['baseline_donor'],'donor','light',production)
-                accept_donor_receipt(receipt['baseline_arcus'],digest(Path(a.resume)/'manifest.json'),'light',production)
+                if production.get('defer_startup_evaluation'):
+                    if receipt.get('baseline_deferred_to_input_tokens')!=production['joint_evaluation_input_tokens']:
+                        raise ValueError('Deferred startup evaluation receipt mismatch')
+                else:
+                    from arcus3.production import accept_donor_receipt
+                    accept_donor_receipt(receipt['baseline_donor'],'donor','light',production)
+                    accept_donor_receipt(receipt['baseline_arcus'],digest(Path(a.resume)/'manifest.json'),'light',production)
             state=transition(state,receipt,digest(Path(a.resume)/'manifest.json'),stream.sha,teacher_sha,production,
                              same_data=old_manifest['data_sha256']==stream.sha)
         if a.resume:stream=CorpusStream(a.data,state['stream'],repeat=not bool(production))
         # Full evaluations are explicit durable work items; do not silently train past them.
         if initialize_only:
-            state['evaluation_pending']=['baseline-full'];report['reason']='fresh_initialization_created'
-        elif not a.qualification and not state['evaluation_completed']:
+            deferred=cfg.get('evaluation_deferred_until_input_tokens')
+            if deferred:
+                state['evaluation_pending']=[]
+                state['evaluation_deferred_until_input_tokens']=deferred
+            else:
+                state['evaluation_pending']=['baseline-full']
+            report['reason']='fresh_initialization_created'
+        elif (not a.qualification and not state['evaluation_completed']
+              and not cfg.get('evaluation_deferred_until_input_tokens')):
             state['evaluation_pending']=['baseline-full'];report['reason']='evaluation_required'
         else:
             limit=production['review_input_tokens'] if production else cfg['stage_input_tokens']
@@ -208,7 +219,11 @@ def main(a):
             update(model,optimizer,row,target(row),cfg)
             actual_optimizer=[{k:digest_tensor(t) for k,t in v.items()} for v in optimizer.state.values()]
             report['exact_replay']=trained_hash()==expected and expected_optimizer==actual_optimizer and replay.snapshot()==state['stream']
-            report['qualified']=report['exact_replay'] and all(sum(r['gradient_groups'][k] for r in report['records'])>0 for k in ('expert','router','gate'))
+            full_context=(cfg.get('model_label')!='alpha3.2.2'
+                          or max(r['input_tokens'] for r in report['records'])==cfg['max_length'])
+            report['qualified']=(report['exact_replay'] and full_context
+                                 and all(sum(r['gradient_groups'][k] for r in report['records'])>0
+                                         for k in ('expert','router','gate')))
         if initialize_only:
             verify_delta(cp,cfg['parent_sha256'],stream.sha,config_sha)
             from arcus3.checkpoint_retention import protect_initialization
