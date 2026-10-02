@@ -1,5 +1,5 @@
 """Seal evidence from completed live checks; never substitutes for executing tests."""
-import argparse,json,sys
+import argparse,json,sys,hashlib
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import read
@@ -14,15 +14,25 @@ def qualify(a):
         raise ValueError('Full-context live replay failed or incomplete')
     if actual['image_id']!=runtime['image_id'] or exit_state['Running'] or exit_state['ExitCode']!=0:raise ValueError('Image/exit mismatch')
     tests=read(a.test_receipt)
-    if tests['image_id']!=runtime['image_id'] or tests['exit_code']!=0 or tests['tests_run']!=3:raise ValueError('CUDA integration tests incomplete')
+    if tests['image_id']!=runtime['image_id'] or tests['exit_code']!=0 or tests['tests_run']<3 or tests.get('skipped',0):raise ValueError('CUDA integration tests incomplete')
+    if tests.get('checkpoint_recovery_suite') is not True:raise ValueError('Checkpoint retention/recovery integration required')
+    adaptation=getattr(a,'adaptation_config',None)
+    if adaptation:
+        cfg=read(adaptation)
+        expected=hashlib.sha256(json.dumps({**cfg,'campaign_enabled':False},sort_keys=True).encode()).hexdigest()
+        if report['config_sha256']!=expected:raise ValueError('Qualification objective mismatch')
+        if cfg.get('routing_objective')=='paired-output-v2' and tests.get('routing_repair_suite') is not True:
+            raise ValueError('Routing repair CUDA tests required')
     policy=validate_policy(read(a.policy))
     files=['scripts/run_arcus3_production.py','scripts/start_arcus3.ps1','arcus3/production.py','arcus3/production_data.py','arcus3/production_cache.py','scripts/prepare_arcus3_production.py']
+    files+=['arcus3/checkpoint_retention.py','arcus3/checkpoint_recovery.py','arcus3/expanded_checkpoint.py','scripts/resume_arcus3_training.py']
     result={'qualified':True,'image_id':runtime['image_id'],'policy_sha256':identity(policy),'context_report_sha256':digest(Path(a.context_run)/'report.json'),
             'test_receipt_sha256':digest(a.test_receipt),'host_files':{f:digest(f) for f in files},'context':report['tokenizer_contract'],
             'peak_cuda_bytes':report['peak_cuda_bytes'],'campaign_updates':0,'note':'Disposable CUDA qualification only; startup donor evaluations still gate production updates.'}
+    if adaptation:result['adaptation_config_file_sha256']=digest(adaptation)
     atomic_json(a.output,result);return result
 
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for n in ('context-run','runtime','test-receipt','output'):p.add_argument('--'+n,required=True)
-    p.add_argument('--policy',default='configs/arcus3/production.json');a=p.parse_args();print(json.dumps(qualify(a)))
+    p.add_argument('--policy',default='configs/arcus3/production.json');p.add_argument('--adaptation-config');a=p.parse_args();print(json.dumps(qualify(a)))

@@ -1,0 +1,36 @@
+{
+  "schema": "arcus3-production-v1",
+  "campaign_id": "alpha3.2.1-restart-001-100m-v1",
+  "review_input_tokens": 100000000,
+  "ceiling_input_tokens": 12000000000000,
+  "batch_input_tokens": 10000000,
+  "cache_limit_bytes": 53687091200,
+  "minimum_free_bytes": 12884901888,
+  "mixture": {
+    "general": 0.4,
+    "code": 0.2,
+    "math": 0.1,
+    "instruction_tools": 0.2,
+    "local": 0.1
+  },
+  "evaluation": {
+    "light": 1000000,
+    "developmental": 10000000,
+    "full": 100000000
+  },
+  "retention": {
+    "recovery": 2,
+    "milestones": 2
+  },
+  "local_reuse": true,
+  "inbox_auto_admit": true,
+  "seed": 2101,
+  "nll_regression_limit": 0.2,
+  "donor_evaluation_revision": "f54818907404ec3d6bb150357b7d0dea333f1aea",
+  "lighteval_revision": "ea46419a93fb390e8f694f7c6c64c1e684487c9d",
+  "initial_data": "runs/arcus3/phase8-stage-final-001",
+  "initial_teacher": "runs/arcus3/teacher-phase8-stage-final-001",
+  "qualification_report": "runs/arcus3/adaptation-alpha321-retention-qualification-001/report.json",
+  "note": "User-authorized restart from verified zero-update alpha3.2.1 initialization after retention repair. Failed attempt preserved separately. First review 100M new input tokens; 1M/10M/100M evaluations.",
+  "checkpoint_subdir": "alpha3.2.1/checkpoints-restart-001"
+}

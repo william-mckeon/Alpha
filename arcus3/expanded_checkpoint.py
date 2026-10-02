@@ -7,9 +7,18 @@ from pathlib import Path
 from arcus3.checkpoint import digest
 from baby_arcus.language_stream import atomic_json
 
+class CheckpointRetentionError(RuntimeError):
+    """Payloads committed successfully, but retention failed; callers must stop."""
+    def __init__(self, checkpoint, error):
+        self.checkpoint = Path(checkpoint)
+        super().__init__('Checkpoint saved; retention failed: ' + str(error))
+
 def save(root,model,optimizer,state):
     import torch
     from safetensors.torch import save_file
+    if state.get('retention_policy')=='latest-two-plus-major-evaluations-v1':
+        from arcus3.checkpoint_retention import preflight
+        preflight(root,2 if state.get('production') else None,state['parent_sha256'],state['config_sha256'])
     if state.get('campaign')=='backbone-adaptation-v1':
         import shutil
         Path(root).mkdir(parents=True,exist_ok=True)
@@ -24,6 +33,8 @@ def save(root,model,optimizer,state):
     atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
         'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
         'campaign':state.get('campaign'),
+        'model_label':state.get('config',{}).get('model_label'),
+        'routing_objective':state.get('config',{}).get('routing_objective','selected-probability-v1'),
         'retention_policy':state.get('retention_policy'),
         'retention_milestone_limit':2 if state.get('production') else None,
         'production':state.get('production'),
@@ -31,9 +42,17 @@ def save(root,model,optimizer,state):
         'trainable_names':[n for n,p in model.named_parameters() if p.requires_grad],
         'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
     atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
+    status={'checkpoint':str(path),'manifest_sha256':digest(path/'manifest.json'),'updates':state['updates'],
+            'input_tokens':state.get('input_tokens'),'target_tokens':state.get('target_tokens'),'committed':True,'retention_complete':False}
+    atomic_json(Path(root)/'last-save.json',status)
     if state.get('retention_policy')=='latest-two-plus-major-evaluations-v1':
         from arcus3.checkpoint_retention import register_and_prune
-        register_and_prune(root,path,milestone_limit=2 if state.get('production') else None)
+        try:
+            register_and_prune(root,path,milestone_limit=2 if state.get('production') else None)
+        except Exception as error:
+            atomic_json(Path(root)/'last-save.json',{**status,'error':str(error)})
+            raise CheckpointRetentionError(path,error) from error
+    atomic_json(Path(root)/'last-save.json',{**status,'retention_complete':True})
     return path
 
 def verify(path,parent,data=None,config=None):

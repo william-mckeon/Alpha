@@ -24,11 +24,19 @@ def report(root,replay=None,checkpoint_root=None):
                 'peak_cuda_bytes':proof['peak_cuda_bytes'],'exact_replay':True,'frozen_unchanged':proof['frozen_unchanged'],
                 'qualification_report_sha256':digest(root/'report.json'),'replay_report_sha256':digest(replay),
                 'note':'Original post-save fingerprint error repaired; separate read-only checkpoint replay passed. Two-update qualification only.'}
+    if 'checkpoint' not in r and (base/'last-save.json').exists():
+        status=read(base/'last-save.json')
+        return {'campaign_complete':False,'reason':r.get('reason','worker_report_incomplete'),
+                'saved_checkpoint_candidate':status,'updates':None,'input_tokens':None,'frozen_unchanged':None,
+                'note':'Candidate only; explicit recovery verification required before associating this root with the worker.'}
     if 'checkpoint' in r:
         cp=base/Path(r['checkpoint']).name
         verify(cp,r['state']['parent_sha256'],r['state']['data_sha256'],r['state']['config_sha256'])
         if digest(cp/'manifest.json')!=r['checkpoint_manifest_sha256']:raise ValueError('Report checkpoint mismatch')
     return {'qualified':r.get('qualified',False),'campaign_complete':r.get('complete',False),'reason':r.get('reason'),
+            'model_label':r.get('state',{}).get('config',{}).get('model_label'),
+            'routing_objective':r.get('state',{}).get('config',{}).get('routing_objective','selected-probability-v1'),
+            'latest_routing_layers':r.get('records',[{}])[-1].get('routing_layers') if r.get('records') else None,
             'updates':r.get('state',{}).get('updates'),'input_tokens':r.get('state',{}).get('input_tokens'),
             'target_tokens':r.get('state',{}).get('target_tokens'),'trainable_parameters':r.get('trainable_parameters'),
             'exact_replay':r.get('exact_replay'),'frozen_unchanged':r.get('frozen_unchanged'),

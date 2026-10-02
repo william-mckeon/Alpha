@@ -1,13 +1,21 @@
 # arcus
 
-Current production work (September 30, 2026): Phase 8's frozen-backbone pipeline
-is implemented and has passed full donor-context training qualification. Both
-startup benchmarks completed, production updates resumed, and the new checkpoint
-at 6,016 cumulative updates passed independent payload hash verification.
+Current work (October 1, 2026): the old Phase 8 model is paused at 11,008
+updates and preserved as **potential bad alpha3.2.0**. The user authorized a
+fresh **alpha3.2.1** restart with revised router training. Its 38 focused tests
+and actual-model 8,192-token exact-replay/frozen-backbone qualification passed.
+Alpha3.2.1's first attempt stopped after one update on a retention metadata
+mismatch. The user authorized a fresh restart from its verified zero-update
+initialization. The retention/recovery repair passed 38 Docker tests and live
+8,192-token exact replay/frozen-backbone qualification. The restart is training:
+its first checkpoint, both payload hashes, successful retention, and unchanged
+frozen backbone were verified on October 1 at 09:56 UTC. New checkpoints are
+under Desktop `alpha V3.0/alpha3.2.1/checkpoints-restart-001`.
+See [routing repair and restart evidence](docs/ARCUS_3_ROUTING_REPAIR.md).
 See the [live rollout evidence](docs/ARCUS_3_PRODUCTION_ROLLOUT.md),
 [production contract](docs/ARCUS_3_PRODUCTION.md), and
 [file inventory](docs/ARCUS_3_PRODUCTION_FILE_INVENTORY.md). The first production
-review is at 100M cumulative input tokens; 12T remains a later ceiling.
+review is at 100M input tokens in the new lineage; 12T remains a later ceiling.
 
 Historical direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
 starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B

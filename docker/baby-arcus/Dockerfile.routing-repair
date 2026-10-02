@@ -1,0 +1,7 @@
+# Verify this local base ID before building:
+# sha256:a115da27b18c6e0b4c05c389be5ec37d6c8b49e9cb5d0f8e8c0b003dfdce7492
+FROM arcus3:production-evaluation-v5
+COPY arcus3 /app/arcus3
+COPY scripts/*arcus3*.py /app/scripts/
+COPY tests/arcus3 /app/tests/arcus3
+COPY configs/arcus3 /app/configs/arcus3

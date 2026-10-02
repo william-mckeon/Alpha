@@ -3,6 +3,8 @@ def update(model, optimizer, row, teacher, cfg):
     import torch
     from arcus3.routing import SelectiveExperts
     from arcus3.distillation import loss as teacher_loss
+    from arcus3.routing_objectives import configure, reduce_balance
+    configure(model,cfg)
     blocks=[m for m in model.modules() if isinstance(m,SelectiveExperts)]
     model.train();model.config.use_cache=False
     if cfg.get('activation_checkpointing',False):
@@ -33,10 +35,13 @@ def update(model, optimizer, row, teacher, cfg):
             distill=teacher_loss(out.logits[0,:-1],teacher,mask)
         local=torch.stack([m.last_teaching[0] for m in blocks]).mean()
         gate=torch.stack([m.last_teaching[1] for m in blocks]).mean()
-        route=torch.stack([m.last_aux for m in blocks]).mean()
+        route=reduce_balance([m.last_aux for m in blocks],cfg)
+        routing=[dict(m.last_routing) for m in blocks]  # Snapshot before recomputation.
         total=task+cfg['teacher_coefficient']*distill+cfg['expert_coefficient']*local+cfg['gate_coefficient']*gate+cfg['router_coefficient']*route
         if not torch.isfinite(total):raise RuntimeError('Nonfinite loss')
         total.backward()
+        for record,m in zip(routing,blocks):
+            record['router_gradient_norm']=float(m.router.weight.grad.norm()) if m.router.weight.grad is not None else None
         parameters=[p for p in model.parameters() if p.requires_grad]
         norm=torch.nn.utils.clip_grad_norm_(parameters,1.,error_if_nonfinite=True)
         gradient_groups={kind:sum(float(p.grad.abs().sum()) for n,p in model.named_parameters() if key in n and p.grad is not None)
@@ -45,6 +50,7 @@ def update(model, optimizer, row, teacher, cfg):
         return {'task_nll':float(task.detach()),'teacher_kl':float(distill.detach()),'expert_mse':float(local.detach()),
                 'gate_bce':float(gate.detach()),'router_aux':float(route.detach()),'gradient_norm':float(norm),
                 'gradient_groups':gradient_groups,'routes':[m.last_counts for m in blocks],
+                'routing_layers':routing,'routing_objective':cfg.get('routing_objective','selected-probability-v1'),
                 'input_tokens':len(row['input_ids']),'target_tokens':int(mask.sum())}
     finally:
         for m in blocks:m.collect_aux=False;m.collect_teaching=False;m.last_aux=None;m.last_teaching=None

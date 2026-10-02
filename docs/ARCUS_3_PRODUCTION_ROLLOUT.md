@@ -1,6 +1,11 @@
 # Phase 8 production rollout evidence
 
-Status: the production handoff is **verified and training is active**. At 10:50
+Current status: the original production run is paused at step 11,008 and
+preserved as **potential bad alpha3.2.0**. The user authorized a fresh
+**alpha3.2.1** restart; see [routing repair](ARCUS_3_ROUTING_REPAIR.md) for current
+qualification and rollout evidence. The following records describe the older run.
+
+Historical status: the production handoff was verified. At 10:50
 Eastern on September 30, the first new durable checkpoint passed independent
 manifest and payload hash verification. This does not mean the 100M review stage
 or 12T campaign is complete.

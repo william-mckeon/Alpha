@@ -17,6 +17,8 @@ class SelectiveExperts(nn.Module):
         self.last_aux = None
         self.collect_teaching = False
         self.last_teaching = None
+        self.routing_objective = 'selected-probability-v1'
+        self.last_routing = None
 
     def forward(self, hidden):
         if hasattr(self,'depth_gate'): hidden=self.depth_gate(hidden)
@@ -40,13 +42,42 @@ class SelectiveExperts(nn.Module):
                 # Exactly one in the forward pass. Explicit surrogate gradient;
                 # this is not the derivative of the hard argmax decision.
                 p = probabilities[positions, index]
-                scale = (1 + (p - p.detach())).to(values.dtype)
+                scale = ((1 + (p - p.detach())) if self.routing_objective == 'selected-probability-v1'
+                         else torch.ones_like(p)).to(values.dtype)
                 output.index_copy_(0, positions, values * scale[:, None])
         self.last_counts = counts  # bounded diagnostic; no retained computation graph
         if self.collect_aux:
             fractions = torch.tensor(counts,device=flat.device,dtype=torch.float32) / flat.shape[0]
             self.last_aux = 2 * (fractions.detach() * probabilities.mean(0)).sum()
+            with torch.no_grad():
+                q = probabilities.detach()
+                self.last_routing = {'positions':len(flat), 'counts':counts,
+                    'probability_mean':q.mean(0).cpu().tolist(),
+                    'margin_mean':float((q[:,1]-q[:,0]).mean()),
+                    'entropy_mean':float(-(q*q.clamp_min(1e-9).log()).sum(-1).mean()),
+                    'balance_loss':float(self.last_aux.detach())}
         if self.collect_teaching:
+            if self.routing_objective == 'paired-output-v2':
+                from arcus3.routing_objectives import paired_correction
+                from torch.utils.checkpoint import checkpoint
+                def teach_pair(part, probs):
+                    with torch.no_grad():
+                        reference = self.experts[0](part.to(self.experts[0].gate_proj.weight.dtype)).float()
+                        energy = reference.square().mean(-1).sqrt()
+                        baseline = part.float().square().mean(-1).sqrt()
+                        target = (energy/(energy+baseline+1e-6)).clamp(.01,.99)
+                    student = self.experts[1](part.float()).float()
+                    logits = torch.nn.functional.linear(part.float(),self.depth_gate.weight,self.depth_gate.bias).squeeze(-1)
+                    stats = torch.stack([(student-reference).square().sum(), reference.square().sum(),
+                        torch.nn.functional.binary_cross_entropy_with_logits(logits,target,reduction='sum')])
+                    return stats, paired_correction(probs, reference, student)
+                chunk = getattr(self,'teaching_chunk_size',0) or len(flat)
+                pieces = [checkpoint(teach_pair,part,probs,use_reentrant=False)
+                          for part,probs in zip(flat.detach().split(chunk),probabilities.split(chunk))]
+                error,denominator,gate = torch.stack([piece[0] for piece in pieces]).sum(0)
+                self.last_teaching = (error/denominator.clamp_min(1e-6*flat.numel()),gate/len(flat))
+                correction = torch.cat([piece[1] for piece in pieces]).to(output.dtype)
+                return (output+correction).reshape(shape)
             if getattr(self,'teaching_chunk_size',0):
                 from torch.utils.checkpoint import checkpoint
                 def teach(part):

@@ -1,5 +1,23 @@
 # Arcus Phase 8 production rollout
 
+Checkpoint retention is preflighted before training. Initialization parents require
+explicit protection when sharing a production retention root; their immutable
+manifests must never be rewritten to disguise a policy mismatch. Keep two recovery
+generations, two major evaluation generations, and separately protected parents.
+If saving succeeds and subsequent retention fails, stop and preserve the durable
+save-status record. A stale coordinator must be reconciled through explicit
+hash-verified recovery, never by automatically retrying the failed worker.
+`scripts/resume_arcus3_training.py` can prepare a new controller record without
+launching training or clearing original pause flags. Its `--restart-from-zero`
+option requires an untouched initialization and an isolated checkpoint destination.
+
+For the user-authorized fresh alpha3.2.1 restart, use
+`production_alpha321.json` and `backbone_adaptation_alpha321.json`, with the
+separate qualified runtime and checkpoint directory. The old campaign remains
+paused. New counters start at zero; the old pilot's exposures are not attributed
+to the fresh model. See [routing repair](ARCUS_3_ROUTING_REPAIR.md). The original
+policy described below remains preserved for historical reproducibility.
+
 The production review boundary is **100,000,000 cumulative input tokens**, including
 the current pilot's completed updates. The **12 trillion** token figure remains a
 future ceiling; reaching 100M requires review before any further stage.

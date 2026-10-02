@@ -2,7 +2,7 @@
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
   "phase": 8,
-  "status": "phase8-production-training-active",
+  "status": "alpha321-production-training",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -42,7 +42,7 @@
     "expanded_preflight": false,
     "specialization": false
   },
-  "active_run": "runs/arcus3/adaptation-production-005",
+  "active_run": "runs/arcus3/adaptation-alpha321-production-002",
   "deadline": null,
   "policy": {
     "models_docker_cuda_only": true,
@@ -54,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "User authorized Phase 8 production through the first 100M cumulative input-token review, counting pilot exposures, with no clock cutoff unless requested. Both startup baselines completed; production updates resumed and checkpoint6016 was independently hash-verified at4171588 input tokens. Exact pinned donor context/tokenizer, frozen backbone and existing objective remain. No later-stage advancement or failure retries. Monitoring every30minutes, meaningful notifications only. The legacy dense-training authorization remains disabled; Phase8 uses its qualified adaptation policy.",
+  "note": "User-authorized fresh restart is training from zero initialization. First checkpoint step1:364 input/226 target tokens, all payload hashes verified, retention complete and frozen backbone unchanged. 38 Docker tests plus full8192 exact replay passed. First100M input-token review; no clock cutoff; meaningful-only monitoring every2hours. Failed alpha321 attempt and potential bad alpha3.2.0 preserved.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -95,7 +95,11 @@
     "phase8_campaign_baseline": "runs/arcus3/baseline-phase8-session-2a00a7f5ae6140d2a8e85cb101b75982/scores.json",
     "production_qualification": "runs/arcus3/production-qualification-001/receipt.json",
     "production_rollout": "docs/ARCUS_3_PRODUCTION_ROLLOUT.md",
-    "production_first_checkpoint": "runs/arcus3/adaptation-production-005/first-production-checkpoint-verified.json"
+    "production_first_checkpoint": "runs/arcus3/adaptation-production-005/first-production-checkpoint-verified.json",
+    "alpha321_qualification": "runs/arcus3/production-alpha321-retention-qualification-001/receipt.json",
+    "alpha321_initialization": "runs/arcus3/adaptation-alpha321-initialization-002/independent-verification.json",
+    "alpha321_restart_preparation": "runs/arcus3/adaptation-alpha321-restart-preparation-001/recovery.json",
+    "alpha321_first_production_checkpoint": "runs/arcus3/adaptation-alpha321-production-002/first-production-checkpoint-verified.json"
   },
   "training_scope": "dense-control-v1",
   "conversion_scope": "selective-experts-parity-v1",
@@ -108,5 +112,14 @@
     "status": "verified-private",
     "artifact": "phase5-initialization",
     "training_updates": 0
+  },
+  "model_label": "alpha3.2.1",
+  "previous_model": {
+    "label": "potential bad alpha3.2.0",
+    "status": "preserved-paused",
+    "updates": 11008,
+    "manifest_sha256": "eea89b0d88738fd794170d37cc6e2bd9c1eea8617702af98f208dadeb9e3d688",
+    "checkpoint": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/potential bad alpha3.2.0/checkpoint",
+    "input_tokens": 7450666
   }
 }

@@ -1,7 +1,7 @@
 """Phase 8 full-expert qualification and bounded token stage, with durable pauses."""
 import os
 os.environ['CUBLAS_WORKSPACE_CONFIG']=':4096:8'
-import argparse,hashlib,json,sys,time,gc
+import argparse,hashlib,json,sys,time,gc,copy
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import read,deadline,check_live,safe_child
@@ -11,7 +11,7 @@ from arcus3.corpus_stream import CorpusStream
 from arcus3.donor import load,verify
 from arcus3.adapters import train_added_experts
 from arcus3.backbone_adaptation import update
-from arcus3.expanded_checkpoint import save,restore,verify as verify_delta
+from arcus3.expanded_checkpoint import save,restore,verify as verify_delta,CheckpointRetentionError
 from baby_arcus.language_stream import atomic_json
 from baby_arcus.gpu_job_control import gpu_job
 
@@ -48,6 +48,9 @@ def main(a):
     verify(a.donor)
     if digest(Path(a.donor)/'manifest.json')!=teacher['donor_manifest_sha256']:raise ValueError('Teacher lineage mismatch')
     config_sha=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
+    if not a.qualification:
+        from arcus3.checkpoint_retention import preflight
+        preflight(checkpoint_root,2 if production else None,cfg['parent_sha256'],config_sha)
     teacher_sha=digest(Path(a.teacher)/'manifest.json')
     schedule=read('/app/configs/arcus3/phase8_evaluation.json')
     state={'campaign':'backbone-adaptation-v1','updates':0,'input_tokens':0,'target_tokens':0,'cursor':0,
@@ -71,8 +74,24 @@ def main(a):
     with gpu_job():
         torch.cuda.set_per_process_memory_fraction(.7);torch.cuda.reset_peak_memory_stats();start=time.monotonic()
         model,_=load(a.donor,converted=a.converted);count=train_added_experts(model)
+        from arcus3.routing_objectives import configure
+        configure(model,cfg,initialize=not bool(a.resume))
         optimizer=torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],lr=cfg['learning_rate'],foreach=False)
         frozen=frozen_digest(model);report.update(trainable_parameters=count,total_parameters=sum(p.numel() for p in model.parameters()))
+        def save_progress():
+            report['frozen_unchanged']=frozen_digest(model)==frozen
+            if not report['frozen_unchanged']:raise RuntimeError('Frozen backbone changed')
+            try:
+                checkpoint=save(checkpoint_root,model,optimizer,state)
+            except CheckpointRetentionError as error:
+                checkpoint=error.checkpoint
+                report.update(reason='checkpoint_retention_failure',complete=False,state=copy.deepcopy(state),checkpoint=str(checkpoint),
+                              checkpoint_manifest_sha256=digest(checkpoint/'manifest.json'),error=str(error))
+                atomic_json(out/'report.json',report)
+                raise
+            report.update(state=copy.deepcopy(state),checkpoint=str(checkpoint),checkpoint_manifest_sha256=digest(checkpoint/'manifest.json'))
+            atomic_json(out/'report.json',report)
+            return checkpoint
         if a.resume:
             old_manifest=read(Path(a.resume)/'manifest.json')
             migration=getattr(a,'transition',None)
@@ -139,12 +158,12 @@ def main(a):
                         category=row.get('source','unknown');exposure=state.setdefault('source_exposure',{})
                         exposure[category]=exposure.get(category,0)+metrics['input_tokens']
                 if state['updates']%cfg['save_every']==0 or state['updates']==1:
-                    cp=save(checkpoint_root,model,optimizer,state);report['checkpoint']=str(cp)
+                    cp=save_progress()
                 atomic_json(out/'report.json',report)
         if not a.qualification and state['input_tokens']==(production['review_input_tokens'] if production else cfg['stage_input_tokens']):
             if not state.get('stage_end_pending'):state['stage_end_pending']=True;state['evaluation_pending']=['full']
             elif not state['evaluation_pending']:report['complete']=True
-        cp=save(checkpoint_root,model,optimizer,state);report['checkpoint']=str(cp)
+        cp=save_progress()
         report['frozen_unchanged']=frozen_digest(model)==frozen
         if not report['frozen_unchanged']:raise RuntimeError('Frozen backbone changed')
         if a.qualification and state['updates']==cfg['qualification_max_updates'] and len(report['records'])>=2:

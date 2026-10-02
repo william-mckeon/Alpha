@@ -1,0 +1,65 @@
+{
+  "image": "arcus3:alpha321-retention-v2",
+  "image_id": "sha256:c68db25b47bdc497e4481109308954d7477b860d38468ee58304c91ad00b75ce",
+  "base_image_id": "sha256:a115da27b18c6e0b4c05c389be5ec37d6c8b49e9cb5d0f8e8c0b003dfdce7492",
+  "memory": "8g",
+  "cpus": 2,
+  "pids": 128,
+  "cuda_fraction": 0.7,
+  "gpu_lock_volume": "arcus-alpha-three-stage_alpha-job-control",
+  "memory_watchdog": false,
+  "max_seconds": 1800,
+  "max_new_tokens": 128,
+  "mode": "probe-baseline-application-conversion-package-and-explicitly-authorized-training",
+  "baseline": {
+    "prompts": 36,
+    "language_records": 12,
+    "max_input_tokens": 512,
+    "max_new_tokens": 128,
+    "executor_tasks": 6
+  },
+  "application": {
+    "max_requests": 8,
+    "max_input_tokens": 2048,
+    "max_new_tokens": 128,
+    "max_model_calls_per_turn": 3,
+    "max_tool_calls_per_turn": 2,
+    "persist_memory_default": false
+  },
+  "dense_control": {
+    "max_updates": 64,
+    "max_target_tokens": 32768,
+    "max_train_seconds": 900,
+    "preflight_required": true,
+    "preflight_report": "runs/arcus3/preflight-phase4-001/training-report.json"
+  },
+  "conversion": {
+    "parameters": 2013390848,
+    "artifact": "runs/arcus3/conversion-phase5-001/converted",
+    "training_updates": 0,
+    "depth_enabled": false
+  },
+  "expanded_qualification": {
+    "max_updates": 8,
+    "active": false,
+    "report": "runs/arcus3/expanded-preflight-phase6-002/qualification-report.json"
+  },
+  "specialization": {
+    "depth_capacity": 1.0,
+    "depth_trainable": false,
+    "active": false,
+    "updates_per_arm": 64,
+    "report": "runs/arcus3/dense-control-phase7-matched-001/campaign-report.json"
+  },
+  "backbone_adaptation": {
+    "trainable_parameters": 302026758,
+    "max_measured_sequence_length": 8192,
+    "campaign_enabled": true,
+    "replay_report": "runs/arcus3/adaptation-alpha321-retention-qualification-001/report.json",
+    "active": false,
+    "qualification_updates": 2,
+    "context_memory_report": "runs/arcus3/adaptation-context-probe-006/context-report.json",
+    "full_context_replay_verified": true
+  },
+  "cuda_allocator_config": "expandable_segments:True"
+}

@@ -33,5 +33,13 @@ class CampaignTests(unittest.TestCase):
         self.assertFalse(in_window(cfg,datetime(2026,9,30,4,tzinfo=timezone.utc)))
     def test_ceiling_does_not_authorize_next_stage(self):
         cfg=read('configs/arcus3/backbone_adaptation.json');validate(cfg)
-        self.assertFalse(cfg['campaign_enabled'])
+        # Stage limits apply whether the user has enabled this campaign or not.
+        validate({**cfg,'campaign_enabled':False})
+        validate({**cfg,'campaign_enabled':True})
         with self.assertRaises(ValueError):validate({**cfg,'stage_input_tokens':100000000})
+
+    def test_router_policy_validation(self):
+        cfg=read('configs/arcus3/backbone_adaptation_alpha321.json');validate(cfg)
+        for change in ({'routing_objective':'unknown'},{'router_layer_weights':[1]},
+                       {'router_layer_weights':[float('nan')]*6},{'router_init_std':.5}):
+            with self.assertRaises(ValueError):validate({**cfg,**change})

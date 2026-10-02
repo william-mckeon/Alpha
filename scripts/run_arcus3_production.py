@@ -14,6 +14,9 @@ def run(a):
     proof=read(a.qualification)
     if not proof.get('qualified') or proof.get('image_id')!=runtime['image_id'] or proof.get('policy_sha256')!=identity(policy):
         raise ValueError('Matching production qualification required')
+    adaptation_path=getattr(a,'adaptation_config','configs/arcus3/backbone_adaptation.json')
+    if proof.get('adaptation_config_file_sha256') and digest(adaptation_path)!=proof['adaptation_config_file_sha256']:
+        raise ValueError('Adaptation config differs from qualification')
     for name,expected in proof['host_files'].items():
         if digest(name)!=expected:raise ValueError('Qualified host source changed: '+name)
     if (runtime['memory'],runtime['cpus'],runtime['pids'],runtime['cuda_fraction'],runtime['memory_watchdog'])!=('8g',2,128,.7,False):
@@ -22,8 +25,9 @@ def run(a):
     if root.parent!=workspace/'runs'/'arcus3':raise ValueError('Owned run root required')
     root.mkdir(parents=True,exist_ok=False)
     settings=read('configs/arcus3/phase8_storage.json');base=Path(settings['external_root']).resolve()
-    cache=base/'production-cache-v1';checkpoints=base/'checkpoints-phase8-production-001'
-    checkpoints.mkdir(exist_ok=True);benchmarks=cache/'benchmarks'
+    from arcus3.config import safe_child
+    cache=base/'production-cache-v1';checkpoints=safe_child(base,policy.get('checkpoint_subdir','checkpoints-phase8-production-001'))
+    checkpoints.mkdir(parents=True,exist_ok=True);benchmarks=cache/'benchmarks'
     donor=workspace/'artifacts'/'arcus3'/'donor'/REVISION
     converted=workspace/'runs/arcus3/conversion-phase5-001/converted'
     if a.continue_from:
@@ -35,7 +39,21 @@ def run(a):
                'state':report['state'],'policy_sha256':identity(policy),'transition':None,'evaluation':None,
                'queued_batches':[str(Path(a.first_batch).resolve())] if a.first_batch else []}
         if digest(Path(a.resume)/'manifest.json')!=report['checkpoint_manifest_sha256']:raise ValueError('Resume report mismatch')
-    checkpoint=Path(saved['checkpoint']);verify(checkpoint,saved['state']['parent_sha256'])
+    checkpoint=Path(saved['checkpoint']);verify(checkpoint,saved['state']['parent_sha256'],config=identity(read(adaptation_path)))
+    if a.continue_from and (Path(a.continue_from)/'recovery.json').exists():
+        recovery=read(Path(a.continue_from)/'recovery.json')
+        if recovery['controller_sha256']!=digest(Path(a.continue_from)/'controller-state.json'):
+            raise ValueError('Recovery controller changed')
+        if recovery['checkpoint_manifest_sha256']!=digest(checkpoint/'manifest.json'):
+            raise ValueError('Recovery checkpoint changed')
+    for name,expected in saved.get('recovery_evidence',{}).items():
+        if digest(name)!=expected:raise ValueError('Recovery evidence changed: '+name)
+    from arcus3.checkpoint_retention import preflight
+    preflight(checkpoints,2,saved['state']['parent_sha256'],identity(read(adaptation_path)))
+    if (checkpoints/'latest.json').exists():
+        pointer=read(checkpoints/'latest.json');latest=read(safe_child(checkpoints,pointer['generation'])/'manifest.json')
+        if latest['updates']>saved['state']['updates']:
+            raise ValueError('Coordinator is stale; explicitly verify recovery or use an isolated restart root')
     def persist():atomic_json(root/'controller-state.json',saved)
     persist()
     def stopped():
@@ -49,7 +67,7 @@ def run(a):
         atomic_json(root/'session.json',{'active_run':str(child),'mode':mode,'deadline':a.stop_at})
         cmd=['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File','scripts/start_arcus3.ps1',
              '-Mode',mode,'-Root',str(child.relative_to(workspace)).replace('\\','/'),'-StopAt',end.isoformat(),'-RuntimeConfig',a.evaluation_runtime if mode=='donor-baseline' else a.runtime]+extra
-        if mode=='adaptation':cmd+=['-WindowPolicy',str(window)]
+        if mode=='adaptation':cmd+=['-WindowPolicy',str(window),'-AdaptationConfig',adaptation_path]
         with (root/'launcher.log').open('a') as log:
             result=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT)
         if result.returncode:
@@ -142,4 +160,5 @@ def run(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--runtime',required=True);p.add_argument('--evaluation-runtime',default='configs/arcus3/production_evaluation_runtime.json');p.add_argument('--qualification',required=True)
     p.add_argument('--policy',default='configs/arcus3/production.json');p.add_argument('--resume');p.add_argument('--resume-report');p.add_argument('--continue-from');p.add_argument('--stop-at');p.add_argument('--first-batch')
+    p.add_argument('--adaptation-config',default='configs/arcus3/backbone_adaptation.json')
     run(p.parse_args())

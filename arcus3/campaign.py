@@ -63,6 +63,7 @@ def window_end(settings, now=None):
     return min(ends)
 
 def validate(cfg):
+    import math
     if cfg['schema']!='arcus3-backbone-adaptation-v1' or cfg['trainability']!='added-expert1-full-fp32':raise ValueError('Unsupported adaptation')
     if cfg['ceiling_input_tokens']!=12_000_000_000_000 or not 1<=cfg['stage_input_tokens']<=10_000_000:raise ValueError('Unapproved token stage')
     if cfg['depth_capacity']!=1 or cfg['layers']!=[3,7,11,15,19,23]:raise ValueError('Full-depth architecture required')
@@ -73,4 +74,10 @@ def validate(cfg):
         if not isinstance(cfg.get(key,0),int) or not 0<=cfg.get(key,0)<=8192:raise ValueError('Invalid memory chunk size')
     for key in ('teacher_coefficient','expert_coefficient','gate_coefficient','router_coefficient'):
         if not 0<=cfg[key]<=1:raise ValueError('Invalid objective')
+    if cfg.get('routing_objective','selected-probability-v1') not in ('selected-probability-v1','paired-output-v2'):
+        raise ValueError('Unknown routing objective')
+    weights=cfg.get('router_layer_weights')
+    if weights is not None and (len(weights)!=len(cfg['layers']) or any(not math.isfinite(w) or not 0<=w<=1 for w in weights)):
+        raise ValueError('Invalid per-layer router weights')
+    if not 0<=cfg.get('router_init_std',0)<=.01:raise ValueError('Invalid router initialization')
     return cfg
