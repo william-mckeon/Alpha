@@ -2,7 +2,7 @@
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
   "phase": 8,
-  "status": "alpha321-production-training",
+  "status": "alpha321-paused-for-matched-comparison-alpha322-planned",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -42,7 +42,7 @@
     "expanded_preflight": false,
     "specialization": false
   },
-  "active_run": "runs/arcus3/adaptation-alpha321-production-002",
+  "active_run": null,
   "deadline": null,
   "policy": {
     "models_docker_cuda_only": true,
@@ -54,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "User-authorized fresh restart is training from zero initialization. First checkpoint step1:364 input/226 target tokens, all payload hashes verified, retention complete and frozen backbone unchanged. 38 Docker tests plus full8192 exact replay passed. First100M input-token review; no clock cutoff; meaningful-only monitoring every2hours. Failed alpha321 attempt and potential bad alpha3.2.0 preserved.",
+  "note": "Alpha 3.2.1 is paused at 11,648 updates and 7,896,336 input tokens for the matched full comparison. Potential bad Alpha 3.2.0 and the failed Alpha 3.2.1 attempt remain preserved. Alpha 3.2.2 is planned as a fresh token-indexed WSD lineage with a 4T input-token ceiling; no Alpha 3.2.2 training has started and no campaign tokens have been consumed.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -114,6 +114,24 @@
     "training_updates": 0
   },
   "model_label": "alpha3.2.1",
+  "current_model": {
+    "label": "alpha3.2.1",
+    "status": "paused-for-matched-full-comparison",
+    "updates": 11648,
+    "input_tokens": 7896336,
+    "target_tokens": 6727516,
+    "manifest_sha256": "e7efa800dc21e7f00c9e3e0e8c337c6fd024d650340bdacc604918562395b8ed",
+    "checkpoint": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.1/checkpoints-restart-001/step-11648-22e3a046d0094871ac4eca9a04a61137"
+  },
+  "planned_model": {
+    "label": "alpha3.2.2",
+    "status": "planned-not-started",
+    "lineage_id": "alpha3.2.2-wsd-001",
+    "schedule": "token-indexed-warmup-stable-decay",
+    "ceiling_input_tokens": 4000000000000,
+    "training_updates": 0,
+    "input_tokens": 0
+  },
   "previous_model": {
     "label": "potential bad alpha3.2.0",
     "status": "preserved-paused",

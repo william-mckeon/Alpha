@@ -16,6 +16,7 @@ dist/
 .venv-eval/
 .venv-baby/
 .venv-desktop/
+.python-deps/
 venv/
 env/
 

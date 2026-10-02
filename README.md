@@ -1,21 +1,21 @@
 # arcus
 
-Current work (October 1, 2026): the old Phase 8 model is paused at 11,008
-updates and preserved as **potential bad alpha3.2.0**. The user authorized a
-fresh **alpha3.2.1** restart with revised router training. Its 38 focused tests
-and actual-model 8,192-token exact-replay/frozen-backbone qualification passed.
-Alpha3.2.1's first attempt stopped after one update on a retention metadata
-mismatch. The user authorized a fresh restart from its verified zero-update
-initialization. The retention/recovery repair passed 38 Docker tests and live
-8,192-token exact replay/frozen-backbone qualification. The restart is training:
-its first checkpoint, both payload hashes, successful retention, and unchanged
-frozen backbone were verified on October 1 at 09:56 UTC. New checkpoints are
-under Desktop `alpha V3.0/alpha3.2.1/checkpoints-restart-001`.
-See [routing repair and restart evidence](docs/ARCUS_3_ROUTING_REPAIR.md).
-See the [live rollout evidence](docs/ARCUS_3_PRODUCTION_ROLLOUT.md),
-[production contract](docs/ARCUS_3_PRODUCTION.md), and
-[file inventory](docs/ARCUS_3_PRODUCTION_FILE_INVENTORY.md). The first production
-review is at 100M input tokens in the new lineage; 12T remains a later ceiling.
+Current work (October 1, 2026): **alpha3.2.1** is paused for the matched full
+three-arm comparison at 11,648 optimizer updates, 7,896,336 input tokens and
+6,727,516 target tokens. Its selected checkpoint is under Desktop
+`alpha V3.0/alpha3.2.1/checkpoints-restart-001`; **potential bad alpha3.2.0**
+remains preserved at 11,008 updates. The comparison records the actual unequal
+exposures and does not automatically select or promote a winner. See the
+[full comparison contract](docs/ARCUS_3_2_1_FULL_COMPARISON.md) and
+[routing-repair evidence](docs/ARCUS_3_ROUTING_REPAIR.md).
+
+**Alpha3.2.2** is a planned fresh donor-derived token-indexed
+warmup/stable/decay lineage with a 4 trillion input-token ceiling. Its production
+training has not started and it has consumed zero campaign tokens. Calibration,
+a pinned image build, full-context replay qualification and an independently
+verified zero-update initialization must complete before launch. See the
+[WSD plan](docs/ARCUS_3_2_2_WSD_PLAN.md), [current results](docs/ARCUS_3_2_2_RESULTS.md),
+and [private release status](docs/ALPHA_3_2_RELEASES.md).
 
 Historical direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
 starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B

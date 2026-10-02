@@ -10,7 +10,7 @@ COPY scripts/probe_arcus3_donor.py /app/scripts/probe_arcus3_donor.py
 COPY scripts/publish_alpha_3.py /app/scripts/publish_alpha_3.py
 COPY scripts/verify_alpha_3.py /app/scripts/verify_alpha_3.py
 COPY scripts/package_alpha_3.py /app/scripts/package_alpha_3.py
-COPY docs/ALPHA_3_MODEL_CARD.md /app/docs/ALPHA_3_MODEL_CARD.md
+COPY docs/ALPHA_3_MODEL_CARD.md docs/ALPHA_3_2_0_MODEL_CARD.md docs/ALPHA_3_2_1_MODEL_CARD.md docs/ALPHA_3_2_2_MODEL_CARD.md /app/docs/
 COPY LICENSE NOTICE /app/
 COPY scripts/qualify_arcus3_training.py /app/scripts/qualify_arcus3_training.py
 COPY scripts/train_arcus3_specialization.py /app/scripts/train_arcus3_specialization.py

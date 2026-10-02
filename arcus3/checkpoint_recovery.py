@@ -6,7 +6,7 @@ from arcus3.config import read
 from arcus3.checkpoint import digest
 from arcus3.expanded_checkpoint import verify
 from arcus3.production import identity, validate_policy, accept_donor_receipt, batch_receipt
-from arcus3.campaign import accept_evaluation
+from arcus3.campaign import accept_evaluation, validate as validate_adaptation
 from baby_arcus.language_stream import atomic_json
 
 
@@ -22,6 +22,16 @@ def inspect_state(checkpoint, parent, config, restart=False):
         raise ValueError('Expected adaptation update boundary')
     if identity(state['config']) != config or state['config'].get('model_label') != manifest.get('model_label'):
         raise ValueError('Checkpoint model/config mismatch')
+    from arcus3.learning_rate import validate_state
+    validate_state(state.get('scheduler'), state['config'], state.get('input_tokens', 0))
+    lineage=state['config'].get('lineage')
+    if lineage and manifest.get('lineage_id')!=lineage['id']:
+        raise ValueError('Checkpoint lineage mismatch')
+    if isinstance(state.get('scheduler'),dict):
+        if (manifest.get('learning_rate_schedule_sha256')!=state['scheduler']['schedule_sha256']
+                or manifest.get('learning_rate_input_tokens')!=state['input_tokens']
+                or manifest.get('learning_rate_phase')!=state['scheduler']['phase']):
+            raise ValueError('Checkpoint scheduler manifest mismatch')
     for key in ('optimizer', 'python_rng', 'torch_rng', 'cuda_rng', 'stream', 'evaluation_completed'):
         if key not in state:
             raise ValueError('Incomplete recovery state: '+key)
@@ -33,6 +43,46 @@ def inspect_state(checkpoint, parent, config, restart=False):
     json.dumps(metadata)
     return {'state': metadata, 'checkpoint_manifest_sha256': digest(checkpoint/'manifest.json'),
             'optimizer_empty': not bool(state['optimizer']['state']), 'payload_hashes_verified': True}
+
+
+def verify_fresh_alpha322_initialization(checkpoint, adaptation_path, calibration_receipt, output=None):
+    """Independently verify a selected-schedule, zero-update Alpha 3.2.2 parent."""
+    cfg = validate_adaptation(read(adaptation_path))
+    schedule = cfg.get('learning_rate_schedule', {})
+    selection = schedule.get('selection', {})
+    if (cfg.get('model_label') != 'alpha3.2.2' or not cfg.get('campaign_enabled')
+            or selection.get('status') != 'qualified'):
+        raise ValueError('Final qualified Alpha 3.2.2 configuration required')
+    receipt_path = Path(calibration_receipt)
+    if digest(receipt_path) != selection.get('receipt_sha256'):
+        raise ValueError('Calibration receipt hash mismatch')
+    receipt = read(receipt_path)
+    if (receipt.get('schema') != 'arcus3-alpha322-schedule-selection-v1'
+            or receipt.get('lineage_id') != cfg['lineage']['id']
+            or receipt.get('selected_warmup_input_tokens') != schedule['warmup_input_tokens']
+            or receipt.get('campaign_updates') != 0):
+        raise ValueError('Calibration receipt does not select this fresh schedule')
+    verified = inspect_state(checkpoint, cfg['parent_sha256'], identity(cfg), restart=True)
+    state = verified['state'];scheduler = state['scheduler']
+    if (not verified['optimizer_empty'] or state.get('evaluation_pending') != ['baseline-full']
+            or state.get('evaluation_completed') or state.get('production')
+            or state.get('stream', {}).get('records') != 0
+            or scheduler.get('base_learning_rate') != 0.0
+            or any(scheduler.get('group_learning_rates', {}).values())):
+        raise ValueError('Alpha 3.2.2 initialization is not an untouched baseline parent')
+    result = {'schema':'arcus3-alpha322-initialization-verification-v1',
+              'model_label':'alpha3.2.2','lineage_id':cfg['lineage']['id'],
+              'checkpoint':str(Path(checkpoint).resolve()),
+              'checkpoint_manifest_sha256':verified['checkpoint_manifest_sha256'],
+              'config_file_sha256':digest(adaptation_path),
+              'config_sha256':identity(cfg),
+              'calibration_receipt_sha256':digest(receipt_path),
+              'warmup_input_tokens':schedule['warmup_input_tokens'],
+              'optimizer_empty':True,'payload_hashes_verified':True,
+              'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False}
+    if output:
+        atomic_json(output, result)
+    return result
 
 
 def prepare(source, checkpoint, policy_path, adaptation_path, output, restart=False):

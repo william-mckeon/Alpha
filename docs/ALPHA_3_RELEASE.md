@@ -1,5 +1,10 @@
 # Alpha 3.0 private release
 
+Alpha 3.0 now uses the same version-aware private release contract as the trained
+Alpha 3.2 lineages. Its selected artifact and verified remote revision remain
+unchanged. See `docs/ALPHA_3_2_RELEASES.md` for trained-checkpoint packaging,
+privacy, and immutable-manifest rules.
+
 The user authorized publishing the current model as `Islanderintel/Alpha-3.0`.
 This supersedes Phase 6's earlier no-publication scope only for the explicitly
 selected verified initialization. It does not authorize a longer training run.

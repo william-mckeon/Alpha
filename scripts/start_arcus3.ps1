@@ -1,9 +1,9 @@
 param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [Parameter(Mandatory=$true)][string]$Root,
-      [ValidateSet("probe","baseline","donor-baseline","teacher-production","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","adaptation")][string]$Mode="probe",
+      [ValidateSet("probe","baseline","donor-baseline","teacher-production","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","alpha322-calibration","alpha322-initialization","adaptation")][string]$Mode="probe",
       [string]$RuntimeConfig="configs/arcus3/local_runtime.json", [string]$ProductionPolicy="", [string]$TransitionPath="", [string]$BenchmarksPath="", [string]$TeacherOutput="",
-      [string]$RequestsFile="", [string]$WindowPolicy="", [string]$CheckpointRoot="", [string]$AdaptationConfig="configs/arcus3/backbone_adaptation.json", [switch]$PersistMemory, [switch]$Phase8Initialization,
-      [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="", [string]$TeacherPath="", [string]$EvaluationRoot="", [ValidateSet('light','developmental','full')][string]$EvaluationTier='full')
+      [string]$RequestsFile="", [string]$WindowPolicy="", [string]$CheckpointRoot="", [string]$AdaptationConfig="configs/arcus3/backbone_adaptation.json", [string]$CalibrationReceipt="", [switch]$PersistMemory, [switch]$Phase8Initialization,
+      [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="", [string]$ReleaseSpec="", [string]$TeacherPath="", [string]$EvaluationRoot="", [ValidateSet('light','developmental','full')][string]$EvaluationTier='full')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $workspace
@@ -12,9 +12,9 @@ $runtime=Get-Content -LiteralPath $RuntimeConfig -Raw | ConvertFrom-Json
 if ($project.authorization.inference -ne $true -or $project.authorization.cloud -or $project.authorization.publication) { throw 'Local inference scope required' }
 if ($Mode -in @('preflight','train') -and ($project.authorization.training -ne $true -or $project.training_scope -ne 'dense-control-v1')) { throw 'Bounded dense training scope required' }
 if ($project.donor.revision -ne '31b70e2e869a7173562077fd711b654946d38674') { throw 'Donor pin mismatch' }
-$maxSessionSeconds=if ($Mode -in @('adaptation','donor-baseline','teacher-production')) {86400} else {1800}
+$maxSessionSeconds=if ($Mode -in @('adaptation','donor-baseline','teacher-production','alpha322-calibration')) {86400} elseif ($Mode -in @('package','verify-package')) {7200} else {1800}
 if ($StopAt -le [DateTimeOffset]::Now -or ($StopAt-[DateTimeOffset]::Now).TotalSeconds -gt $maxSessionSeconds) { throw 'Future deadline within allowed session bound required' }
-if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion|expanded-preflight|release|teacher|adaptation)-[a-z0-9-]+$') { throw 'Isolated donor-probe root required' }
+if ($Root -notmatch '^runs/arcus3/(donor-probe|baseline|application|preflight|dense-control|conversion|expanded-preflight|release|teacher|adaptation|alpha322-calibration|alpha322-schedule-calibration|alpha322-initialization)-[a-z0-9-]+$') { throw 'Isolated Arcus run root required' }
 if ($Mode -eq 'adaptation') {
  $adaptation=Get-Content -LiteralPath $AdaptationConfig -Raw | ConvertFrom-Json
  $policyPath=if ($WindowPolicy) {$WindowPolicy} else {'configs/arcus3/training_windows.json'}
@@ -28,6 +28,13 @@ if ($Mode -eq 'adaptation') {
  if (!$adaptation.campaign_enabled -or !$windows.enabled) { throw 'Campaign and training windows are not enabled' }
 }
 if ($Mode -in @('adaptation','adaptation-qualification') -and (!$ConvertedPath -or !$DataRoot -or !$TeacherPath)) { throw 'Adaptation requires parent, data and teacher cache' }
+if ($Mode -eq 'alpha322-calibration' -and (!$ConvertedPath -or !$DataRoot -or !$TeacherPath -or !$PreflightReport)) { throw 'Alpha 3.2.2 calibration requires parent, data, teacher and replay qualification' }
+if ($Mode -eq 'alpha322-initialization') {
+ $adaptation=Get-Content -LiteralPath $AdaptationConfig -Raw | ConvertFrom-Json
+ if (!$ConvertedPath -or !$DataRoot -or !$TeacherPath -or !$PreflightReport -or !$CheckpointRoot -or !$CalibrationReceipt) { throw 'Alpha 3.2.2 initialization requires parent, data, teacher, qualification, checkpoint root and calibration receipt' }
+ if ($adaptation.model_label -ne 'alpha3.2.2' -or !$adaptation.campaign_enabled -or $adaptation.learning_rate_schedule.selection.status -ne 'qualified') { throw 'Final selected Alpha 3.2.2 configuration required' }
+}
+if ($Mode -in @('package','verify-package') -and !$ReleaseSpec) { throw 'Package operations require an explicit release specification' }
 if ($Mode -eq 'conversion' -and (!$project.authorization.conversion -or $project.authorization.training -or $project.conversion_scope -ne 'selective-experts-parity-v1')) { throw 'Construction-only scope required' }
 if ($AdapterPath -and $ConvertedPath) { throw 'Choose one model variant' }
 if ($Mode -eq 'expanded-preflight' -and (!$project.authorization.expanded_preflight -or $project.expanded_scope -ne 'qualification-v1' -or !$ConvertedPath -or !$DataRoot)) { throw 'Bounded expanded qualification scope, parent and data required' }
@@ -51,6 +58,8 @@ $entryScript=if ($Mode -eq 'verify-package') {'scripts/verify_alpha_3.py'} elsei
 if ($Mode -eq 'specialization') { $entryScript='scripts/train_arcus3_specialization.py' }
 if ($Mode -eq 'verify-depth') { $entryScript='scripts/verify_arcus3_depth.py' }
 if ($Mode -in @('adaptation','adaptation-qualification')) { $entryScript='scripts/train_arcus3_backbone_adaptation.py' }
+if ($Mode -eq 'alpha322-calibration') { $entryScript='scripts/run_arcus3_alpha322_calibration.py' }
+if ($Mode -eq 'alpha322-initialization') { $entryScript='scripts/train_arcus3_backbone_adaptation.py' }
 if ($Mode -eq 'teacher-qualification') { $entryScript='scripts/prepare_arcus3_teacher_targets.py' }
 if ($Mode -eq 'teacher-production') { $entryScript='scripts/prepare_arcus3_teacher_targets.py' }
 if ($Mode -eq 'donor-baseline') { $entryScript='scripts/evaluate_arcus3_production.py' }
@@ -76,7 +85,7 @@ if ($RequestsFile -or $PersistMemory) {
 }
 if ($Mode -in @('preflight','train') -and !$DataRoot) { throw 'Reviewed data root required' }
 if ($Mode -eq 'train' -and !$PreflightReport) { throw 'Measured preflight report required' }
-foreach ($mountSpec in @(@{source=$TeacherPath;target='/teacher';option='--teacher'},@{source=$PackagePath;target='/package';option='--package'},@{source=$ExpandedPath;target='/expanded';option='--expanded'},@{source=$ConvertedPath;target='/converted';option='--converted'},@{source=$DataRoot;target='/data';option=''},@{source=$PreflightReport;target='/preflight.json';option=$(if ($Mode -eq 'adaptation') {'--qualification-report'} else {'--preflight-report'})},@{source=$AdapterPath;target='/adapter';option='--adapter'},@{source=$ResumePath;target='/resume';option='--resume'})) {
+foreach ($mountSpec in @(@{source=$TeacherPath;target='/teacher';option='--teacher'},@{source=$PackagePath;target='/package';option='--package'},@{source=$ExpandedPath;target='/expanded';option='--expanded'},@{source=$ConvertedPath;target='/converted';option='--converted'},@{source=$DataRoot;target='/data';option=''},@{source=$PreflightReport;target=$(if ($Mode -eq 'alpha322-calibration') {'/qualification.json'} else {'/preflight.json'});option=$(if ($Mode -in @('adaptation','alpha322-calibration','alpha322-initialization')) {'--qualification-report'} else {'--preflight-report'})},@{source=$AdapterPath;target='/adapter';option='--adapter'},@{source=$ResumePath;target='/resume';option='--resume'})) {
  if ($mountSpec.source) {
   $mountPath=(Resolve-Path -LiteralPath $mountSpec.source).Path
   $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
@@ -91,16 +100,27 @@ if ($WindowPolicy) {
  $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
  $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$policyFull,target=/session-policy.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--windows','/session-policy.json')
 }
-if ($Mode -in @('adaptation','adaptation-qualification')) {
+if ($ReleaseSpec) {
+ if ($Mode -notin @('package','verify-package')) { throw 'Release specification only applies to package operations' }
+ $releaseFull=(Resolve-Path -LiteralPath $ReleaseSpec).Path
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$releaseFull,target=/release-spec.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--release-spec','/release-spec.json')
+}
+if ($Mode -in @('adaptation','adaptation-qualification','alpha322-initialization')) {
  $configFull=(Resolve-Path -LiteralPath $AdaptationConfig).Path
  $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
  $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$configFull,target=/adaptation-config.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--config','/adaptation-config.json')
 }
 if ($CheckpointRoot) {
- if ($Mode -notin @('adaptation','adaptation-qualification')) { throw 'Checkpoint storage only applies to adaptation' }
+ if ($Mode -notin @('adaptation','adaptation-qualification','alpha322-initialization')) { throw 'Checkpoint storage only applies to adaptation' }
  $checkpointFull=(Resolve-Path -LiteralPath $CheckpointRoot).Path
  $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
  $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$checkpointFull,target=/checkpoints")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--checkpoint-root','/checkpoints')
+}
+if ($Mode -eq 'alpha322-initialization') {
+ $receiptFull=(Resolve-Path -LiteralPath $CalibrationReceipt).Path
+ $imageIndex=[Array]::IndexOf($argsDocker,$runtime.image_id)
+ $argsDocker=$argsDocker[0..($imageIndex-1)]+@('--mount',"type=bind,source=$receiptFull,target=/calibration-receipt.json,readonly")+$argsDocker[$imageIndex..($argsDocker.Length-1)]+@('--initialize-only','--calibration-receipt','/calibration-receipt.json')
 }
 if ($Mode -eq 'baseline') { $argsDocker+=@('--tier',$EvaluationTier) }
 foreach ($binding in @(@{source=$ProductionPolicy;target='/production.json';option='--production-policy';writable=$false},@{source=$TransitionPath;target='/transition.json';option='--transition';writable=$false},@{source=$BenchmarksPath;target='/benchmarks';option='--benchmarks';writable=$false},@{source=$TeacherOutput;target='/teacher-out';option='--output';writable=$true})) {

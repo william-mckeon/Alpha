@@ -1,0 +1,10 @@
+{
+  "schema": "arcus3-release-registry-v1",
+  "private_only": true,
+  "releases": {
+    "alpha3.0": "configs/arcus3/alpha_3_release.json",
+    "alpha3.2.0": "configs/arcus3/alpha_3_2_0_release.json",
+    "alpha3.2.1": "configs/arcus3/alpha_3_2_1_release.json",
+    "alpha3.2.2": "configs/arcus3/alpha_3_2_2_release.json"
+  }
+}

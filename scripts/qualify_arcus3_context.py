@@ -9,6 +9,7 @@ def main(a):
     from arcus3.donor import load,verify
     from arcus3.adapters import train_added_experts
     from arcus3.backbone_adaptation import update
+    from arcus3.learning_rate import build_optimizer,initial_state,apply_for_update
     from arcus3.distillation import targets
     from arcus3.config import read,deadline,check_live
     from arcus3.campaign import validate
@@ -33,7 +34,7 @@ def main(a):
     with gpu_job():
         torch.cuda.set_per_process_memory_fraction(.7)
         model,tok=load(a.donor,converted=a.converted);result['trainable_parameters']=train_added_experts(model)
-        optimizer=torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],lr=cfg['learning_rate'],foreach=False)
+        optimizer=build_optimizer(model,cfg);scheduler=initial_state(cfg);input_tokens=0
         fragment=tok('This is a temporary memory qualification sequence. Python loops repeat operations. ',add_special_tokens=False)['input_ids']
         for length in a.lengths:
             check_live(end,out)
@@ -45,7 +46,10 @@ def main(a):
                 # Same token positions and target format; disposable capacity probe only.
                 with torch.no_grad():
                     teacher=targets(model(torch.tensor([ids],device='cuda'),use_cache=False).logits[0,:-1],cfg['teacher_top_k'])
+                next_scheduler=apply_for_update(optimizer,cfg,scheduler,input_tokens,len(ids))
                 metrics=update(model,optimizer,{'input_ids':ids,'labels':ids},teacher,cfg)
+                input_tokens+=len(ids)
+                if next_scheduler is not None:scheduler=next_scheduler
                 torch.cuda.synchronize()
                 item={'length':length,'passed':True,'seconds':time.monotonic()-start,'peak_cuda_bytes':torch.cuda.max_memory_allocated(),'gradients':metrics['gradient_groups']}
             except torch.OutOfMemoryError as error:

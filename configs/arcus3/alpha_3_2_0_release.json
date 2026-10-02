@@ -1,0 +1,22 @@
+{
+  "schema": "arcus3-private-release-v2",
+  "model_label": "alpha3.2.0",
+  "repo_id": "Islanderintel/Alpha-3.2.0",
+  "private": true,
+  "authorization": "user-requested-alpha-3-family-private-publication",
+  "status": "ready",
+  "release_kind": "archived-potential-bad-constant-lr-control",
+  "package_kind": "inference-only",
+  "unique_parameters": 2013403142,
+  "context_tokens": 8192,
+  "model_card": "docs/ALPHA_3_2_0_MODEL_CARD.md",
+  "allow_legacy_missing_model_label": true,
+  "source": {
+    "kind": "expanded-checkpoint",
+    "parent_manifest_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+    "checkpoint_manifest_sha256": "eea89b0d88738fd794170d37cc6e2bd9c1eea8617702af98f208dadeb9e3d688",
+    "training_updates": 11008,
+    "input_tokens": 7450666,
+    "target_tokens": 6341263
+  }
+}

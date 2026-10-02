@@ -1,0 +1,30 @@
+{
+  "schema": "arcus3-alpha322-schedule-calibration-v1",
+  "model_label": "alpha3.2.2",
+  "lineage_id": "alpha3.2.2-wsd-001",
+  "sealed_stage_input_tokens": 9999757,
+  "sealed_stage_records": 14813,
+  "mean_input_tokens_per_update": 675.077499493688,
+  "upstream_global_batch_reference": {
+    "warmup_updates": 2000,
+    "tokens_per_update": 2097152,
+    "warmup_input_tokens": 4194304000,
+    "use_as_local_selection": false
+  },
+  "arms": [
+    {"id": "warmup-1m", "warmup_input_tokens": 1000000},
+    {"id": "warmup-1m350k", "warmup_input_tokens": 1350000},
+    {"id": "warmup-2m", "warmup_input_tokens": 2000000}
+  ],
+  "provisional_selection_input_tokens": 1350000,
+  "peak_learning_rate": 0.00001,
+  "tokens_per_arm": 250000,
+  "fresh_initialization_required": true,
+  "same_records_and_order_required": true,
+  "scheduler_replay_qualification_required": true,
+  "frozen_backbone_required": true,
+  "maximum_nll_regression": 0.02,
+  "all_gradient_groups_required": true,
+  "selection_mode": "explicit-human-or-user-authorized-review",
+  "note": "Disposable arms only. The donor's 4.194304B-token global-batch warmup is context, not a local selection. No arm checkpoint becomes Alpha 3.2.2 production state."
+}

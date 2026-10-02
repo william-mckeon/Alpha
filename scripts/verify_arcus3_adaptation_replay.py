@@ -11,6 +11,7 @@ from arcus3.donor import load,verify
 from arcus3.adapters import train_added_experts
 from arcus3.corpus_stream import CorpusStream
 from arcus3.backbone_adaptation import update
+from arcus3.learning_rate import build_optimizer,validate_state,apply_for_update
 from scripts.train_arcus3_backbone_adaptation import digest_tensor
 from scripts.qualify_arcus3_training import frozen_digest
 from baby_arcus.gpu_job_control import gpu_job
@@ -20,7 +21,7 @@ def main(a):
     if not Path('/.dockerenv').exists() or os.environ.get('ARCUS3_CONTROLLED_DOCKER')!='1':raise RuntimeError('Controlled Docker required')
     import torch
     from safetensors.torch import load_file
-    end=deadline(a.deadline);cfg=read('/app/configs/arcus3/backbone_adaptation.json');config_sha=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
+    end=deadline(a.deadline);cfg=read(a.config);config_sha=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
     data_sha=digest(Path(a.data)/'manifest.json');verify(a.donor)
     roots=Path(a.previous)/'checkpoints';first=next(p for p in roots.iterdir() if p.is_dir() and p.name.startswith('step-1-'))
     pointer=read(roots/'latest.json');last=safe_child(roots,pointer['generation'])
@@ -28,15 +29,18 @@ def main(a):
     torch.set_num_threads(2);torch.use_deterministic_algorithms(True);torch.backends.cuda.enable_flash_sdp(False);torch.backends.cuda.enable_mem_efficient_sdp(False);torch.backends.cuda.enable_math_sdp(True)
     with gpu_job():
         torch.cuda.set_per_process_memory_fraction(.7);model,_=load(a.donor,converted=a.converted);train_added_experts(model)
-        opt=torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],lr=cfg['learning_rate'],foreach=False)
+        opt=build_optimizer(model,cfg)
         final=restore(last,model,opt,cfg['parent_sha256'],data_sha,config_sha)
+        validate_state(final.get('scheduler'),cfg,final['input_tokens'])
         def weights():return {n:digest_tensor(p) for n,p in model.named_parameters() if p.requires_grad}
         def optim():return [{k:digest_tensor(t) for k,t in v.items()} for v in opt.state.values()]
         expected=weights();expected_opt=optim();before=frozen_digest(model)
         saved=restore(first,model,opt,cfg['parent_sha256'],data_sha,config_sha);stream=CorpusStream(a.data,saved['stream']);row=stream.next()
         teacher=read(Path(a.teacher)/'manifest.json');name=row['sha256']+'.safetensors'
         if saved['teacher_sha256']!=digest(Path(a.teacher)/'manifest.json') or digest(Path(a.teacher)/name)!=teacher['files'][name]:raise ValueError('Teacher mismatch')
-        check_live(end,a.output);metrics=update(model,opt,row,load_file(str(Path(a.teacher)/name)),cfg)
+        check_live(end,a.output)
+        apply_for_update(opt,cfg,saved.get('scheduler'),saved['input_tokens'],len(row['input_ids']))
+        metrics=update(model,opt,row,load_file(str(Path(a.teacher)/name)),cfg)
         result={'schema':'arcus3-phase8-replay-v1','exact_weights':weights()==expected,'exact_optimizer':optim()==expected_opt,
                 'exact_data_cursor':stream.snapshot()==final['stream'],'frozen_unchanged':frozen_digest(model)==before,
                 'checkpoint_manifest_sha256':digest(last/'manifest.json'),'updates':final['updates'],'input_tokens':final['input_tokens'],
@@ -51,4 +55,5 @@ def main(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name in ('donor','converted','data','teacher','previous','output'):p.add_argument('--'+name,default='/'+name)
+    p.add_argument('--config',default='/app/configs/arcus3/backbone_adaptation.json')
     p.add_argument('--deadline',required=True);main(p.parse_args())

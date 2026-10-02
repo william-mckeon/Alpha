@@ -30,6 +30,7 @@ def save(root,model,optimizer,state):
                 'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state_all()},path/'state.pt')
     for name in ('delta.safetensors','state.pt'):
         with (path/name).open('rb') as f:os.fsync(f.fileno())
+    from arcus3.learning_rate import checkpoint_metadata
     atomic_json(path/'manifest.json',{'schema':'arcus3-expanded-delta-v1','parent_sha256':state['parent_sha256'],
         'data_sha256':state['data_sha256'],'config_sha256':state['config_sha256'],'updates':state['updates'],
         'campaign':state.get('campaign'),
@@ -40,7 +41,8 @@ def save(root,model,optimizer,state):
         'production':state.get('production'),
         'retention_pinned':bool(set(state.get('evaluation_pending',[])) & {'baseline-full','full','developmental'}),
         'trainable_names':[n for n,p in model.named_parameters() if p.requires_grad],
-        'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')}})
+        'files':{n:digest(path/n) for n in ('delta.safetensors','state.pt')},
+        **checkpoint_metadata(state)})
     atomic_json(Path(root)/'latest.json',{'generation':path.name,'manifest_sha256':digest(path/'manifest.json')})
     status={'checkpoint':str(path),'manifest_sha256':digest(path/'manifest.json'),'updates':state['updates'],
             'input_tokens':state.get('input_tokens'),'target_tokens':state.get('target_tokens'),'committed':True,'retention_complete':False}

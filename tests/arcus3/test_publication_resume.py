@@ -6,7 +6,8 @@ from scripts.publish_alpha_3 import staged_weights,upload_metadata
 class PublicationResumeTests(unittest.TestCase):
     def test_metadata_matches_installed_api(self):
         import inspect
-        from huggingface_hub import HfApi
+        try:from huggingface_hub import HfApi
+        except ImportError:self.skipTest('huggingface_hub is not installed in this CPU test environment')
         class API:
             def upload_folder(self,**kwargs):
                 inspect.signature(HfApi.upload_folder).bind(None,**kwargs)

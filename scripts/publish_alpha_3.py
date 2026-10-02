@@ -1,94 +1,143 @@
-"""Upload an explicitly selected inference manifest, then verify private immutable revision."""
+"""Publish one verified Alpha 3 package and verify its private immutable revision."""
 import argparse
-import hashlib
 import json
-import os
 import logging
+import os
 from pathlib import Path
-os.environ['HF_HUB_DISABLE_XET']='1'
-os.environ['HF_HUB_DISABLE_PROGRESS_BARS']='1'
-# Transport retry warnings can contain presigned URLs. Emit only our sanitized status.
-logging.getLogger('huggingface_hub').setLevel(logging.CRITICAL)
-logging.getLogger('httpx').setLevel(logging.CRITICAL)
+import sys
 
-def upload_metadata(api,repo,package,names):
-    return api.upload_folder(repo_id=repo,folder_path=str(package),allow_patterns=names,
-                             commit_message='Complete verified Alpha 3.0 expert initialization')
+os.environ["HF_HUB_DISABLE_XET"] = "1"
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+logging.getLogger("huggingface_hub").setLevel(logging.CRITICAL)
+logging.getLogger("httpx").setLevel(logging.CRITICAL)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from arcus3.release import digest, verify_package
 
-def staged_weights(api,repo,package,names,expected):
-    """One durable shard commit at a time; metadata/manifest remain the final commit."""
-    info=api.model_info(repo,files_metadata=True)
-    if not info.private:raise ValueError('Repository must remain private')
-    remote={f.rfilename:f for f in info.siblings}
+
+def upload_metadata(api, repo, package, names):
+    return api.upload_folder(
+        repo_id=repo, folder_path=str(package), allow_patterns=names,
+        commit_message="Complete verified private Alpha inference release",
+    )
+
+
+def staged_weights(api, repo, package, names, expected):
+    """Commit and hash-verify one LFS shard at a time before final metadata."""
+    info = api.model_info(repo, files_metadata=True)
+    if not info.private:
+        raise ValueError("Repository must remain private")
+    remote = {item.rfilename: item for item in info.siblings}
     for name in names:
-        if not name.endswith('.safetensors'):continue
-        found=remote.get(name)
-        if found is not None and found.lfs and found.lfs.sha256==expected[name]['sha256']:
-            print(json.dumps({'stage':'shard_already_verified','file':name}),flush=True);continue
-        if not api.model_info(repo).private:raise ValueError('Repository must remain private')
-        print(json.dumps({'stage':'uploading_shard','file':name}),flush=True)
-        commit=api.upload_file(repo_id=repo,path_or_fileobj=str(package/name),path_in_repo=name,
-                               commit_message='Stage Alpha 3.0 weight shard (release incomplete)')
-        current=api.model_info(repo,revision=commit.oid,files_metadata=True)
-        match=next(f for f in current.siblings if f.rfilename==name)
-        if not current.private or not match.lfs or match.lfs.sha256!=expected[name]['sha256']:
-            raise ValueError('Staged shard verification failed')
-        print(json.dumps({'stage':'shard_verified','file':name,'revision':commit.oid}),flush=True)
+        if not name.endswith(".safetensors"):
+            continue
+        found = remote.get(name)
+        if found is not None and found.lfs and found.lfs.sha256 == expected[name]["sha256"]:
+            print(json.dumps({"stage": "shard_already_verified", "file": name}), flush=True)
+            continue
+        if not api.model_info(repo).private:
+            raise ValueError("Repository must remain private")
+        print(json.dumps({"stage": "uploading_shard", "file": name}), flush=True)
+        commit = api.upload_file(
+            repo_id=repo, path_or_fileobj=str(package / name), path_in_repo=name,
+            commit_message="Stage private Alpha weight shard (release incomplete)",
+        )
+        current = api.model_info(repo, revision=commit.oid, files_metadata=True)
+        match = next(item for item in current.siblings if item.rfilename == name)
+        if not current.private or not match.lfs or match.lfs.sha256 != expected[name]["sha256"]:
+            raise ValueError("Staged shard verification failed")
+        print(json.dumps({"stage": "shard_verified", "file": name,
+                          "revision": commit.oid}), flush=True)
 
-def digest(p):
-    h=hashlib.sha256()
-    with Path(p).open('rb') as f:
-        for chunk in iter(lambda:f.read(8*1024*1024),b''):h.update(chunk)
-    return h.hexdigest()
+
+def verify_remote(api, repo, package, manifest, revision, download):
+    info = api.model_info(repo, revision=revision, files_metadata=True)
+    if not info.private:
+        raise ValueError("Privacy verification failed")
+    siblings = {item.rfilename: item for item in info.siblings}
+    names = sorted(manifest["files"]) + ["manifest.json"]
+    unexpected = set(siblings) - set(names) - {".gitattributes"}
+    if unexpected:
+        raise ValueError("Remote repository contains files outside the inference manifest")
+    verified = {}
+    for name in names:
+        if name not in siblings:
+            raise ValueError("Remote file missing: " + name)
+        expected = digest(package / name)
+        item = siblings[name]
+        actual = item.lfs.sha256 if item.lfs else digest(download(repo, name, revision=revision))
+        if actual != expected:
+            raise ValueError("Remote hash mismatch: " + name)
+        verified[name] = actual
+    return {"repo_id": repo, "revision": revision, "private": True,
+            "model_label": manifest["release"]["model_label"],
+            "manifest_sha256": verified["manifest.json"], "files": verified,
+            "verification": "LFS server SHA256 for LFS objects; downloaded immutable bytes for Git objects"}
+
 
 def main(package):
-    p=Path(package);m=json.loads((p/'manifest.json').read_text());s=m['release']
-    if s['repo_id']!='Islanderintel/Alpha-3.0' or s['private'] is not True or s['authorization']!='user-requested-alpha-3-publication':raise ValueError('Release scope mismatch')
-    v=json.loads((p/'verification.json').read_text())
-    if not v['complete'] or not all(r['exact'] for r in v['parity'].values()):raise ValueError('Unverified package')
-    for n,item in m['files'].items():
-        if Path(n).name!=n or digest(p/n)!=item['sha256']:raise ValueError('Package tamper')
-    if s.get('training_updates')!=0 or s.get('unique_parameters')!=2013390848 or v['release']!=s:
-        raise ValueError('Release identity mismatch')
+    package = Path(package)
+    manifest = verify_package(package)
+    spec = manifest["release"]
+    repo = spec["repo_id"]
     from dotenv import load_dotenv
-    load_dotenv('.env',override=True)
-    from huggingface_hub import HfApi,hf_hub_download
+    load_dotenv(".env", override=True)
+    from huggingface_hub import HfApi, hf_hub_download
     from huggingface_hub.errors import RepositoryNotFoundError
-    api=HfApi();repo=s['repo_id']
-    try:info=api.model_info(repo)
-    except RepositoryNotFoundError:
-        api.create_repo(repo,private=True,repo_type='model');info=api.model_info(repo)
-    if not info.private:raise ValueError('Repository must be private before upload')
-    names=sorted(m['files'])+['manifest.json']
-    staged_weights(api,repo,p,names,m['files'])
-    metadata=[n for n in names if not n.endswith('.safetensors')]
-    commit=upload_metadata(api,repo,p,metadata)
-    revision=commit.oid;info=api.model_info(repo,revision=revision,files_metadata=True)
-    if not info.private:raise ValueError('Privacy verification failed')
-    siblings={f.rfilename:f for f in info.siblings}
-    verified={}
-    for n in names:
-        expected=digest(p/n);f=siblings[n]
-        if f.lfs:
-            actual=f.lfs.sha256
-        else:
-            actual=digest(hf_hub_download(repo,n,revision=revision))
-        if actual!=expected:raise ValueError('Remote hash mismatch: '+n)
-        verified[n]=actual
-    receipt={'repo_id':repo,'revision':revision,'private':True,'files':verified,'verification':'LFS server SHA256 for large objects; downloaded immutable bytes for Git objects'}
-    target=p.parent/('publication-'+revision+'.json');target.write_text(json.dumps(receipt,indent=2))
-    print(json.dumps({'verified':True,'revision':revision,'private':True,'receipt':str(target)}),flush=True)
 
-if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--package',required=True);args=p.parse_args()
-    try:main(args.package)
-    except Exception as exc:
-        chain=[];seen=set();error=exc
-        while error is not None and id(error) not in seen:
-            seen.add(id(error));response=getattr(error,'response',None)
-            chain.append({'type':type(error).__name__,'http_status':getattr(response,'status_code',None)})
-            error=error.__cause__ or error.__context__
-        # Never emit signed URLs, authorization headers or credential-bearing tracebacks.
-        result={'verified':False,'error_chain':chain}
-        (Path(args.package).parent/'upload-error.json').write_text(json.dumps(result,indent=2))
-        print(json.dumps(result),flush=True);raise SystemExit(1)
+    api = HfApi()
+    try:
+        info = api.model_info(repo)
+    except RepositoryNotFoundError:
+        api.create_repo(repo, private=True, repo_type="model")
+        info = api.model_info(repo)
+    if not info.private:
+        raise ValueError("Repository must be private before upload")
+    names = sorted(manifest["files"]) + ["manifest.json"]
+    unexpected = {item.rfilename for item in info.siblings} - set(names) - {".gitattributes"}
+    if unexpected:
+        raise ValueError("Remote repository contains files outside the inference manifest")
+    staged_weights(api, repo, package, names, manifest["files"])
+    if not api.model_info(repo).private:
+        raise ValueError("Repository privacy changed during upload")
+    metadata = [name for name in names if not name.endswith(".safetensors")]
+    commit = upload_metadata(api, repo, package, metadata)
+    receipt = verify_remote(api, repo, package, manifest, commit.oid, hf_hub_download)
+    target = package.parent / ("publication-" + commit.oid + ".json")
+    target.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"verified": True, "repo_id": repo, "revision": commit.oid,
+                      "private": True, "receipt": str(target)}), flush=True)
+    return receipt
+
+
+def sanitized_failure(package, error):
+    """Record exception types/status only; never serialize signed request URLs."""
+    chain = []
+    seen = set()
+    current = error
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        response = getattr(current, "response", None)
+        chain.append({"type": type(current).__name__,
+                      "http_status": getattr(response, "status_code", None)})
+        current = current.__cause__ or current.__context__
+    result = {"verified": False, "error_chain": chain}
+    (Path(package).parent / "upload-error.json").write_text(
+        json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(result), flush=True)
+    return result
+
+
+def cli(package):
+    try:
+        main(package)
+        return 0
+    except Exception as error:
+        sanitized_failure(package, error)
+        return 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--package", required=True)
+    arguments = parser.parse_args()
+    raise SystemExit(cli(arguments.package))

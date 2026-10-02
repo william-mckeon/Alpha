@@ -1,16 +1,33 @@
-# Phase 8 current readiness — September 29, 2026
+# Phase 8 readiness record — current through October 1, 2026
 
-September 30 production update: see
-[production rollout evidence](ARCUS_3_PRODUCTION_ROLLOUT.md) and the
-[production contract](ARCUS_3_PRODUCTION.md). Those documents supersede the
-initial 10M-stage controller and time-window status below. The historical pilot
-was preserved at 5,952 updates; both production startup baselines completed and
-the new checkpoint at 6,016 updates was independently hash-verified. The 100M
-review stage is now training. The exact donor context/tokenizer remains unchanged.
+October 1 status: Alpha 3.2.1 is paused at **11,648 optimizer updates**,
+**7,896,336 input tokens**, and **6,727,516 target tokens**, with its surviving
+restart checkpoint under `alpha V3.0/alpha3.2.1/checkpoints-restart-001`. Its
+matched full three-arm comparison is pending; no result automatically selects or
+promotes a winner. See [the comparison contract](ARCUS_3_2_1_FULL_COMPARISON.md),
+[production rollout evidence](ARCUS_3_PRODUCTION_ROLLOUT.md), and the
+[production contract](ARCUS_3_PRODUCTION.md).
 
-The user authorized implementation, live testing and training. Implementation is
-not campaign completion. The initial reviewed stage is up to 10 million student
-input tokens; 12 trillion remains a long-term ceiling with intervening reviews.
+Alpha 3.2.2 is planned as a fresh donor-derived, token-indexed
+warmup/stable/decay lineage with zero optimizer updates, zero campaign token
+exposure, and a **4,000,000,000,000 input-token ceiling**. It must pass disposable
+schedule calibration, explicit selection, pinned-image full-context replay
+qualification, and independent zero-update-checkpoint verification before
+production. See [the WSD plan](ARCUS_3_2_2_WSD_PLAN.md) and
+[current results](ARCUS_3_2_2_RESULTS.md).
+
+The sections below retain the September 29–30 readiness and launch record. The
+historical pilot was preserved at 5,952 updates, both production startup
+baselines completed, and the then-new checkpoint at 6,016 updates was
+independently hash-verified. Those facts do not mean the 100M review is still
+training. The exact donor context and tokenizer remain unchanged.
+
+## Historical September 29 readiness
+
+The user authorized implementation, live testing and training. Implementation was
+not campaign completion. The initial reviewed stage was up to 10 million student
+input tokens; 12 trillion was the long-term ceiling for that historical contract,
+with intervening reviews.
 
 ## Exact backbone interface
 
@@ -85,14 +102,15 @@ remain pending review; no claim of completed repository-wide cleanup is made.
 All probes retain Docker 8GiB, two CPUs, PID limit128 and the 70% CUDA allocator.
 The disabled memory watchdog remains disabled. No other GPU work runs concurrently.
 
-## Active campaign
+## Historical active campaign
 
 The first real campaign optimizer update was confirmed at approximately 19:00
 Eastern on September 29 in
 `runs/arcus3/adaptation-session-d606c375924e4003b34ceb8364a3f298/metrics.jsonl`.
-Expert, router and gate gradients were nonzero. The campaign is running; its
-initial stage and final evaluation are not complete. Chat pause/stop applies to
-`runs/arcus3/adaptation-phase8-session-001` and preserves its durable resume state.
+Expert, router and gate gradients were nonzero. At that timestamp the campaign
+was running; its initial stage and final evaluation were not complete. Chat
+pause/stop applied to `runs/arcus3/adaptation-phase8-session-001` and preserved
+its durable resume state.
 
 The session's full initial baseline completed generation and restricted execution:
 `runs/arcus3/baseline-phase8-session-2a00a7f5ae6140d2a8e85cb101b75982/report.md`.

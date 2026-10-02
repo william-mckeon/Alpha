@@ -1,0 +1,108 @@
+{
+  "schema": "arcus3-three-model-comparison-v1",
+  "comparison_id": "alpha321-surviving-post-7m-v1",
+  "requested_boundary_input_tokens": 7000000,
+  "exact_boundary_checkpoint_available": false,
+  "execution": "strictly-sequential",
+  "automatic_promotion": false,
+  "storage_config": "configs/arcus3/phase8_storage.json",
+  "evaluation_runtime": "configs/arcus3/production_evaluation_runtime.json",
+  "evaluation_runtime_sha256": "c073b97af7441dc9e7d89c9d379c07fbe1ccd24b0850b611d2887ce32de2fc1f",
+  "converted_relative": "runs/arcus3/conversion-phase5-001/converted",
+  "converted_manifest_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+  "benchmark_data_relative": "production-cache-v1/benchmarks",
+  "supplemental_evidence": {
+    "pure_donor_developmental": {
+      "label": "Frozen 1.711B donor developmental baseline",
+      "output_relative": "runs/arcus3/baseline-phase2-001",
+      "result_sha256": "728f261322760777f8a841198b068da427e04605d747fcb49761014505f0c592",
+      "unique_parameters": 1711376384,
+      "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5"
+    }
+  },
+  "protocols": {
+    "developmental": {
+      "mode": "baseline",
+      "tier": "full",
+      "max_minutes": 29,
+      "suite_sha256": "c847b0a6325509313d6662886067b3467cea5b2eb2cc2c19f014dc21490eb448",
+      "settings_sha256": "241e0e208b00b95c960ee26033da5477a4b43159b67d8661516849c65be79460",
+      "tokenizer_revision": "31b70e2e869a7173562077fd711b654946d38674",
+      "orchestration": "langchain-runnable-in-langgraph",
+      "language_target_tokens": 309,
+      "categories": ["conversation", "comprehension", "instructions", "reasoning", "python", "tools"]
+    },
+    "benchmark": {
+      "mode": "donor-baseline",
+      "tier": "full",
+      "max_minutes": 1380,
+      "model_context": 8192,
+      "benchmark_context": 2048,
+      "lighteval_revision": "ea46419a93fb390e8f694f7c6c64c1e684487c9d",
+      "benchmark_manifest_sha256": "5749ace4ef5e30eabc6c64ec2166cfb5eacd234386c06b0dcf6f633f552c5684",
+      "required_task_prefixes": ["extended:ifeval:", "custom:hellaswag:", "custom:arc:", "custom:piqa:", "custom:mmlu_pro:", "custom:bbh:", "custom:gsm8k:"]
+    }
+  },
+  "arms": [
+    {
+      "id": "donor",
+      "label": "Donor-derived zero-update Alpha 3.2.1 initialization control",
+      "control_kind": "donor-derived-zero-update-initialization",
+      "state_model_label": "alpha3.2.1",
+      "donor_revision": "31b70e2e869a7173562077fd711b654946d38674",
+      "donor_manifest_relative": "artifacts/arcus3/donor/31b70e2e869a7173562077fd711b654946d38674/manifest.json",
+      "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
+      "checkpoint_relative": "alpha3.2.1/checkpoints/step-0-2d531121b7da4962b97f87a9060cc55c",
+      "evidence_scope": "workspace",
+      "evidence_relative": "runs/arcus3/adaptation-alpha321-initialization-002/independent-verification.json",
+      "checkpoint_manifest_sha256": "c1098ec203340573dd6038c92122375525793af0703216e1eca15c2d486bf112",
+      "evidence_sha256": "87f2a2fdda096757ace5cca4e8d8048acce289e5a6eeaae3c4bb62931d6118ed",
+      "parent_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+      "updates": 0,
+      "input_tokens": 0,
+      "target_tokens": 0,
+      "boundary_relation": "not-applicable",
+      "reuse": {
+        "developmental": {
+          "output_relative": "runs/arcus3/adaptation-production-2a5f3e49b45242a0bb9579f9f1db25fe",
+          "result_sha256": "3640582e1e407edc16983a19ade948074986aa4e6b7d77a440cdded9bc5577bc"
+        },
+        "benchmark": {
+          "output_relative": "runs/arcus3/adaptation-production-73b0baee1e57429d951cd179d367fd4e",
+          "result_sha256": "c7a337ec54dc7541a9a3982dd9e82b4e3b1469c05a548429b5a013056408858e"
+        }
+      }
+    },
+    {
+      "id": "alpha3.2.0",
+      "label": "potential bad Alpha 3.2.0 preserved control",
+      "checkpoint_relative": "potential bad alpha3.2.0/checkpoint",
+      "evidence_relative": "potential bad alpha3.2.0/label.json",
+      "checkpoint_manifest_sha256": "eea89b0d88738fd794170d37cc6e2bd9c1eea8617702af98f208dadeb9e3d688",
+      "evidence_sha256": "4a20771baa07e61e8be514e367177770381a86ff4554eea9a86523dcf753f511",
+      "parent_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+      "updates": 11008,
+      "input_tokens": 7450666,
+      "target_tokens": 6341263,
+      "boundary_relation": "after",
+      "claimed_exact_boundary": false,
+      "state_model_label": "alpha3.2.0",
+      "allow_legacy_missing_model_label": true
+    },
+    {
+      "id": "alpha3.2.1",
+      "label": "Alpha 3.2.1 surviving pause checkpoint",
+      "checkpoint_relative": "alpha3.2.1/checkpoints-restart-001/step-11648-22e3a046d0094871ac4eca9a04a61137",
+      "evidence_relative": "alpha3.2.1/checkpoints-restart-001/last-save.json",
+      "checkpoint_manifest_sha256": "e7efa800dc21e7f00c9e3e0e8c337c6fd024d650340bdacc604918562395b8ed",
+      "evidence_sha256": "e1f5442969e0054fe57bb95ced60a960c9fa89ea153cdccffe8c7ba1fe2f7592",
+      "parent_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+      "updates": 11648,
+      "input_tokens": 7896336,
+      "target_tokens": 6727516,
+      "boundary_relation": "after",
+      "claimed_exact_boundary": false,
+      "state_model_label": "alpha3.2.1"
+    }
+  ]
+}

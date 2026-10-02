@@ -4,24 +4,78 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from arcus3.config import read,REVISION
+from arcus3.campaign import validate as validate_adaptation
 from arcus3.checkpoint import digest
 from arcus3.expanded_checkpoint import verify
 from arcus3.production import validate_policy,identity,batch_receipt,accept_donor_receipt,disk_budget
 from baby_arcus.language_stream import atomic_json
 
+def bind_alpha322_initialization(workspace,path,checkpoint,report,adaptation,adaptation_path):
+    """Bind a new production controller to one independently verified step-zero parent."""
+    if not path:raise ValueError('Alpha 3.2.2 requires an independent initialization verification')
+    path=Path(path).resolve();owned=(Path(workspace)/'runs'/'arcus3').resolve()
+    if not path.is_relative_to(owned):raise ValueError('Initialization verification must be an owned run artifact')
+    proof=read(path);manifest_sha=digest(Path(checkpoint)/'manifest.json')
+    state=report.get('state',{});selection=adaptation['learning_rate_schedule']['selection']
+    expected={
+        'schema':'arcus3-alpha322-initialization-verification-v1',
+        'model_label':'alpha3.2.2','lineage_id':adaptation['lineage']['id'],
+        'checkpoint_manifest_sha256':manifest_sha,
+        'config_file_sha256':digest(adaptation_path),
+        'config_sha256':identity(adaptation),
+        'calibration_receipt_sha256':selection['receipt_sha256'],
+        'warmup_input_tokens':adaptation['learning_rate_schedule']['warmup_input_tokens'],
+        'optimizer_empty':True,'payload_hashes_verified':True,
+        'updates':0,'input_tokens':0,'target_tokens':0,'launch_started':False,
+    }
+    for key,value in expected.items():
+        if proof.get(key)!=value:raise ValueError('Initialization verification mismatch: '+key)
+    if Path(proof.get('checkpoint','')).resolve()!=Path(checkpoint).resolve():
+        raise ValueError('Initialization verification selects a different checkpoint')
+    if (report.get('checkpoint_manifest_sha256')!=manifest_sha
+            or any(state.get(key)!=0 for key in ('updates','input_tokens','target_tokens','cursor'))
+            or state.get('evaluation_pending')!=['baseline-full'] or state.get('evaluation_completed')
+            or state.get('production') or state.get('stream',{}).get('records')!=0
+            or state.get('scheduler',{}).get('committed_input_tokens')!=0
+            or state.get('scheduler',{}).get('last_applied_input_tokens')!=0):
+        raise ValueError('Alpha 3.2.2 production parent is not an untouched step-zero checkpoint')
+    return {str(path):digest(path)}
+
 def run(a):
+    workspace=Path(__file__).resolve().parents[1]
     policy=validate_policy(read(a.policy));runtime=read(a.runtime)
+    if runtime.get('launch_ready') is False or policy.get('launch_ready') is False:
+        raise ValueError('Production configuration awaits calibration/build/qualification')
     proof=read(a.qualification)
     if not proof.get('qualified') or proof.get('image_id')!=runtime['image_id'] or proof.get('policy_sha256')!=identity(policy):
         raise ValueError('Matching production qualification required')
     adaptation_path=getattr(a,'adaptation_config','configs/arcus3/backbone_adaptation.json')
-    if proof.get('adaptation_config_file_sha256') and digest(adaptation_path)!=proof['adaptation_config_file_sha256']:
+    adaptation=validate_adaptation(read(adaptation_path))
+    if policy.get('model_label') and (adaptation.get('model_label')!=policy['model_label'] or adaptation.get('lineage',{}).get('id')!=policy.get('lineage_id')):
+        raise ValueError('Production policy/adaptation lineage mismatch')
+    if policy.get('model_label')=='alpha3.2.2':
+        selection=adaptation['learning_rate_schedule']['selection']
+        if (adaptation['learning_rate_schedule']['warmup_input_tokens']!=policy['schedule_selection']['warmup_input_tokens']
+                or selection.get('receipt_sha256')!=policy['schedule_selection'].get('calibration_receipt_sha256')):
+            raise ValueError('Production policy and qualified scheduler selection differ')
+        receipt_path=(workspace/policy['schedule_selection']['calibration_receipt']).resolve()
+        if not receipt_path.is_relative_to((workspace/'runs'/'arcus3').resolve()) or digest(receipt_path)!=selection['receipt_sha256']:
+            raise ValueError('Alpha 3.2.2 calibration receipt missing or changed')
+        receipt=read(receipt_path)
+        if (receipt.get('schema')!='arcus3-alpha322-schedule-selection-v1'
+                or receipt.get('lineage_id')!=adaptation['lineage']['id']
+                or receipt.get('selected_warmup_input_tokens')!=adaptation['learning_rate_schedule']['warmup_input_tokens']):
+            raise ValueError('Alpha 3.2.2 calibration receipt does not select this schedule')
+    qualified_adaptation=proof.get('adaptation_config_file_sha256')
+    if policy.get('model_label')=='alpha3.2.2' and not qualified_adaptation:
+        raise ValueError('Alpha 3.2.2 qualification did not bind its adaptation configuration')
+    if qualified_adaptation and digest(adaptation_path)!=qualified_adaptation:
         raise ValueError('Adaptation config differs from qualification')
     for name,expected in proof['host_files'].items():
         if digest(name)!=expected:raise ValueError('Qualified host source changed: '+name)
     if (runtime['memory'],runtime['cpus'],runtime['pids'],runtime['cuda_fraction'],runtime['memory_watchdog'])!=('8g',2,128,.7,False):
         raise ValueError('Production runtime limits changed')
-    root=Path(a.root).resolve();workspace=Path(__file__).resolve().parents[1]
+    root=Path(a.root).resolve()
     if root.parent!=workspace/'runs'/'arcus3':raise ValueError('Owned run root required')
     root.mkdir(parents=True,exist_ok=False)
     settings=read('configs/arcus3/phase8_storage.json');base=Path(settings['external_root']).resolve()
@@ -39,7 +93,17 @@ def run(a):
                'state':report['state'],'policy_sha256':identity(policy),'transition':None,'evaluation':None,
                'queued_batches':[str(Path(a.first_batch).resolve())] if a.first_batch else []}
         if digest(Path(a.resume)/'manifest.json')!=report['checkpoint_manifest_sha256']:raise ValueError('Resume report mismatch')
-    checkpoint=Path(saved['checkpoint']);verify(checkpoint,saved['state']['parent_sha256'],config=identity(read(adaptation_path)))
+        if policy.get('model_label')=='alpha3.2.2':
+            saved['recovery_evidence']=bind_alpha322_initialization(
+                workspace,a.initialization_verification,a.resume,report,adaptation,adaptation_path)
+            saved['initialization_verification']=str(Path(a.initialization_verification).resolve())
+        elif a.initialization_verification:
+            raise ValueError('Initialization verification only applies to Alpha 3.2.2')
+    checkpoint=Path(saved['checkpoint']);verify(checkpoint,saved['state']['parent_sha256'],config=identity(adaptation))
+    if saved['state'].get('config',{}).get('model_label')!=adaptation.get('model_label'):
+        raise ValueError('Checkpoint belongs to a different model label')
+    if adaptation.get('lineage') and saved['state']['config'].get('lineage',{}).get('id')!=adaptation['lineage']['id']:
+        raise ValueError('Checkpoint belongs to a different fresh lineage')
     if a.continue_from and (Path(a.continue_from)/'recovery.json').exists():
         recovery=read(Path(a.continue_from)/'recovery.json')
         if recovery['controller_sha256']!=digest(Path(a.continue_from)/'controller-state.json'):
@@ -49,7 +113,7 @@ def run(a):
     for name,expected in saved.get('recovery_evidence',{}).items():
         if digest(name)!=expected:raise ValueError('Recovery evidence changed: '+name)
     from arcus3.checkpoint_retention import preflight
-    preflight(checkpoints,2,saved['state']['parent_sha256'],identity(read(adaptation_path)))
+    preflight(checkpoints,2,saved['state']['parent_sha256'],identity(adaptation))
     if (checkpoints/'latest.json').exists():
         pointer=read(checkpoints/'latest.json');latest=read(safe_child(checkpoints,pointer['generation'])/'manifest.json')
         if latest['updates']>saved['state']['updates']:
@@ -160,5 +224,5 @@ def run(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--runtime',required=True);p.add_argument('--evaluation-runtime',default='configs/arcus3/production_evaluation_runtime.json');p.add_argument('--qualification',required=True)
     p.add_argument('--policy',default='configs/arcus3/production.json');p.add_argument('--resume');p.add_argument('--resume-report');p.add_argument('--continue-from');p.add_argument('--stop-at');p.add_argument('--first-batch')
-    p.add_argument('--adaptation-config',default='configs/arcus3/backbone_adaptation.json')
+    p.add_argument('--adaptation-config',default='configs/arcus3/backbone_adaptation.json');p.add_argument('--initialization-verification')
     run(p.parse_args())

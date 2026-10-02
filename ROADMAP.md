@@ -1,9 +1,34 @@
 # Arcus — Roadmap
 
-## Active direction — September 28, 2026
+## Active direction — October 1, 2026
 
-The [Arcus 3.0 local-first plan](docs/ARCUS_3_LOCAL_FIRST_PLAN.md) is the current
-phase sequence: 0 preservation/isolation; 1 pinned donor; 2 baseline; 3 application
+Alpha 3.2.1 is paused at **11,648 optimizer updates**, **7,896,336 input
+tokens**, and **6,727,516 target tokens**. Its surviving restart checkpoint is
+under `alpha V3.0/alpha3.2.1/checkpoints-restart-001`, and the requested matched
+full three-arm comparison remains pending. The comparison records actual unequal
+exposures and does not automatically select or promote a winner. See the
+[comparison contract](docs/ARCUS_3_2_1_FULL_COMPARISON.md) and
+[routing-repair record](docs/ARCUS_3_ROUTING_REPAIR.md).
+
+Alpha 3.2.2 is the planned fresh donor-derived, token-indexed
+warmup/stable/decay lineage. It has zero optimizer updates and zero campaign
+token exposure, with a **4,000,000,000,000 input-token ceiling**. Disposable
+schedule calibration, explicit selection, a pinned image build, full 8,192-token
+replay qualification, and an independently verified zero-update initialization
+must pass before production starts. See the
+[WSD plan](docs/ARCUS_3_2_2_WSD_PLAN.md) and
+[current results](docs/ARCUS_3_2_2_RESULTS.md).
+
+The Alpha 3.2.0 archival control has a selected immutable checkpoint and a
+locally verified inference package. Its matched comparison and immutable remote
+publication receipt remain pending; package verification alone is not publication
+or evidence of capability. See
+[private release status](docs/ALPHA_3_2_RELEASES.md).
+
+## Historical Arcus 3 direction — September 28, 2026
+
+The [Arcus 3.0 local-first plan](docs/ARCUS_3_LOCAL_FIRST_PLAN.md) was the
+then-current phase sequence: 0 preservation/isolation; 1 pinned donor; 2 baseline; 3 application
 integration; 4 dense LoRA control; 5 approximately 2B conversion; 6 local training
 qualification; 7 expert specialization; 8 depth routing; 9 context extension;
 10 validation and separate private release.
@@ -14,8 +39,9 @@ SmolLM2-1.7B-Instruct; donor incorporation has not started. Alpha 2.0 is preserv
 and privately published at 53,192 updates. Its training stays paused. The random
 128M foundation pilot is historical evidence, not the next campaign.
 
-Everything below is a retained historical roadmap. Its priorities, locked decisions
-and donor-selection statements do not override this dated direction or authorize runs.
+This September 28 snapshot and everything below it are a retained historical
+roadmap. Their priorities, locked decisions and donor-selection statements do not
+override the October 1 direction or authorize runs.
 
 ## Baby Arcus branch plan
 
@@ -43,7 +69,7 @@ not evidence of Baby cooperative mastery.
 > The committed build order and source of truth for what's built and next. No
 > CHANGELOG; history lives here + [docs/DATASHEET.md](docs/DATASHEET.md) § version history.
 
-**Maintainer:** William McKeon · **Status:** v0.9 qualification — Track A Stage 0 + Stage 1 done: 0.5B trained to fluency and grown to a 991M 1B (`val_ppl` 15.32). Track B's pinned control layer is implemented and its five-candidate native tool parser smoke passed; Docker-backed benchmarks remain pending. No donor is selected and no donor conversion has started. Apache 2.0 © 2026 William McKeon
+**Maintainer:** William McKeon · **Historical status:** v0.9 qualification — Track A Stage 0 + Stage 1 done: 0.5B trained to fluency and grown to a 991M 1B (`val_ppl` 15.32). Track B's pinned control layer is implemented and its five-candidate native tool parser smoke passed; Docker-backed benchmarks remain pending. No donor was selected and no donor conversion had started. Apache 2.0 © 2026 William McKeon
 
 ---
 
@@ -83,7 +109,7 @@ not a cluster requirement.
 1. **Documentation gate — DONE FOR PHASE 1.** The strategy and [specs/0015](specs/0015-donor-foundation-selection.md)
    plus [0016](specs/0016-foundation-evaluation.md) are accepted for implementation. Later-stage
    specifications remain their own gates.
-2. **Qualification — CURRENT.** The control plane, deterministic subset policy, fixed providers,
+2. **Qualification — CURRENT IN THIS HISTORICAL SNAPSHOT.** The control plane, deterministic subset policy, fixed providers,
    approved $48 budget ledger, audits, normalization, and scoring are implemented and locally
    tested. The native tool parser smoke passed for all five candidates for $0.00135487 total. Start
    Docker, resolve the upstream task IDs, then run the
@@ -215,4 +241,4 @@ under-trained bench runs.
 
 ---
 
-*Status: Track A Stage 0 + Stage 1 DONE — grown 1B `val_ppl` 15.32; Track B Phase 1 control plane and native parser smoke complete, Docker-backed qualification pending. No donor selected. arcus — part of the OpenAgent family*
+*Historical status: Track A Stage 0 + Stage 1 DONE — grown 1B `val_ppl` 15.32; Track B Phase 1 control plane and native parser smoke complete, Docker-backed qualification pending. No donor selected at that time. arcus — part of the OpenAgent family*

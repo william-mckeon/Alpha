@@ -1,1 +1,20 @@
-{"repo_id":"Islanderintel/Alpha-3.0","private":true,"authorization":"user-requested-alpha-3-publication","release_kind":"verified-untrained-expert-initialization","parent_manifest_sha256":"983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072","unique_parameters":2013390848,"training_updates":0}
+{
+  "schema": "arcus3-private-release-v2",
+  "model_label": "alpha3.0",
+  "repo_id": "Islanderintel/Alpha-3.0",
+  "private": true,
+  "authorization": "user-requested-alpha-3-family-private-publication",
+  "status": "ready",
+  "release_kind": "verified-untrained-expert-initialization",
+  "package_kind": "inference-only",
+  "unique_parameters": 2013390848,
+  "context_tokens": 8192,
+  "model_card": "docs/ALPHA_3_MODEL_CARD.md",
+  "source": {
+    "kind": "conversion-initialization",
+    "parent_manifest_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+    "training_updates": 0,
+    "input_tokens": 0,
+    "target_tokens": 0
+  }
+}

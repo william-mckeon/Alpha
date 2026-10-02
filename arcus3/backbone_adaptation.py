@@ -43,7 +43,7 @@ def update(model, optimizer, row, teacher, cfg):
         for record,m in zip(routing,blocks):
             record['router_gradient_norm']=float(m.router.weight.grad.norm()) if m.router.weight.grad is not None else None
         parameters=[p for p in model.parameters() if p.requires_grad]
-        norm=torch.nn.utils.clip_grad_norm_(parameters,1.,error_if_nonfinite=True)
+        norm=torch.nn.utils.clip_grad_norm_(parameters,cfg.get('optimizer',{}).get('gradient_clip',1.),error_if_nonfinite=True)
         gradient_groups={kind:sum(float(p.grad.abs().sum()) for n,p in model.named_parameters() if key in n and p.grad is not None)
                          for kind,key in [('expert','.experts.1.'),('router','.router.'),('gate','.depth_gate.')]}
         optimizer.step()
@@ -51,6 +51,7 @@ def update(model, optimizer, row, teacher, cfg):
                 'gate_bce':float(gate.detach()),'router_aux':float(route.detach()),'gradient_norm':float(norm),
                 'gradient_groups':gradient_groups,'routes':[m.last_counts for m in blocks],
                 'routing_layers':routing,'routing_objective':cfg.get('routing_objective','selected-probability-v1'),
-                'input_tokens':len(row['input_ids']),'target_tokens':int(mask.sum())}
+                'input_tokens':len(row['input_ids']),'target_tokens':int(mask.sum()),
+                'learning_rates':{g.get('group_name','legacy'):g['lr'] for g in optimizer.param_groups}}
     finally:
         for m in blocks:m.collect_aux=False;m.collect_teaching=False;m.last_aux=None;m.last_teaching=None

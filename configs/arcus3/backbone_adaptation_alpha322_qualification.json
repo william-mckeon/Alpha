@@ -1,0 +1,68 @@
+{
+  "schema": "arcus3-backbone-adaptation-v1",
+  "parent_sha256": "983c7b1df0049804cb124fb5268c8346b1878870350c83defded92e11a44c072",
+  "trainability": "added-expert1-full-fp32",
+  "layers": [3, 7, 11, 15, 19, 23],
+  "depth_capacity": 1.0,
+  "ceiling_input_tokens": 4000000000000,
+  "stage_input_tokens": 10000000,
+  "max_length": 8192,
+  "learning_rate": 0.00001,
+  "learning_rate_schedule": {
+    "schema": "arcus3-token-wsd-v1",
+    "clock": "cumulative-input-tokens-after-update",
+    "peak_learning_rate": 0.00001,
+    "warmup_input_tokens": 1350000,
+    "selection": {
+      "status": "pending-calibration",
+      "selected_warmup_input_tokens": 1350000,
+      "receipt_sha256": null
+    },
+    "endpoint_authorized": false,
+    "decay": {
+      "enabled": false,
+      "style": "linear",
+      "start_input_tokens": null,
+      "input_tokens": null,
+      "minimum_learning_rate": null
+    }
+  },
+  "optimizer": {
+    "schema": "arcus3-adamw-v1",
+    "betas": [0.9, 0.95],
+    "epsilon": 1E-08,
+    "weight_decay": 0.01,
+    "gradient_clip": 1.0,
+    "group_multipliers": {"expert": 1.0, "router": 1.0, "gate": 1.0}
+  },
+  "lineage": {
+    "schema": "arcus3-fresh-lineage-v1",
+    "id": "alpha3.2.2-wsd-001",
+    "model_label": "alpha3.2.2",
+    "initialized_from": "verified-phase5-donor-derived-zero-update",
+    "inherited_training_updates": 0,
+    "inherited_optimizer_state": false
+  },
+  "accumulation": 1,
+  "save_every": 64,
+  "seed": 2101,
+  "teacher_coefficient": 0.5,
+  "expert_coefficient": 0.1,
+  "gate_coefficient": 0.01,
+  "router_coefficient": 0.01,
+  "teacher_top_k": 32,
+  "nll_regression_limit": 0.2,
+  "qualification_max_updates": 2,
+  "campaign_enabled": false,
+  "gate_target": "frozen-local-ffn-relative-rms-energy",
+  "activation_checkpointing": true,
+  "attention_backend": "flash",
+  "loss_chunk_size": 256,
+  "teaching_chunk_size": 256,
+  "expert_chunk_size": 256,
+  "model_label": "alpha3.2.2",
+  "routing_objective": "paired-output-v2",
+  "router_init_std": 0.001,
+  "router_layer_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+  "note": "Fresh Alpha 3.2.2 WSD lineage. Campaign stays disabled until a disposable warmup calibration receipt is selected, embedded and requalified. No Alpha 3.2.0 or 3.2.1 trained state is inherited."
+}

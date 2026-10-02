@@ -21,7 +21,8 @@ def token_due(previous, current, schedule, final=False):
 def validate_policy(policy):
     if policy['schema']!='arcus3-production-v1' or policy['review_input_tokens']!=100_000_000:
         raise ValueError('Unapproved production review budget')
-    if policy['ceiling_input_tokens']!=12_000_000_000_000 or not 2<=policy['batch_input_tokens']<=10_000_000:
+    expected_ceiling=4_000_000_000_000 if policy.get('model_label')=='alpha3.2.2' else 12_000_000_000_000
+    if policy['ceiling_input_tokens']!=expected_ceiling or not 2<=policy['batch_input_tokens']<=10_000_000:
         raise ValueError('Unapproved production ceiling/batch')
     if policy['cache_limit_bytes']>50*1024**3 or policy['mixture']!={'general':.4,'code':.2,'math':.1,'instruction_tools':.2,'local':.1}:
         raise ValueError('Unapproved cache/mixture')
@@ -29,6 +30,15 @@ def validate_policy(policy):
         raise ValueError('Unapproved evaluation/retention policy')
     if policy['nll_regression_limit']!=.2 or not policy['local_reuse'] or not policy['inbox_auto_admit']:
         raise ValueError('Unapproved production behavior')
+    if policy.get('model_label')=='alpha3.2.2':
+        if policy.get('lineage_id')!='alpha3.2.2-wsd-001':
+            raise ValueError('Alpha 3.2.2 production lineage mismatch')
+        selection=policy.get('schedule_selection',{})
+        if selection.get('warmup_input_tokens') not in (1_000_000,1_350_000,2_000_000):
+            raise ValueError('Alpha 3.2.2 warmup selection mismatch')
+        receipt=selection.get('calibration_receipt_sha256')
+        if policy.get('launch_ready') and (not isinstance(receipt,str) or len(receipt)!=64 or any(c not in '0123456789abcdef' for c in receipt)):
+            raise ValueError('Launch-ready Alpha 3.2.2 needs a calibration receipt')
     return policy
 
 def accept_donor_receipt(result, checkpoint_sha, tier, policy):

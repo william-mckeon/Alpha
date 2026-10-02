@@ -1,5 +1,24 @@
 # Arcus Phase 8 production rollout
 
+## Current status — October 1, 2026
+
+Alpha 3.2.1 is paused at **11,648 optimizer updates**, **7,896,336 input
+tokens**, and **6,727,516 target tokens**. Its surviving restart checkpoint is
+under `alpha V3.0/alpha3.2.1/checkpoints-restart-001`; the matched full
+three-arm comparison remains pending. That comparison records actual unequal
+exposures and cannot automatically select or promote a winner. See
+[the comparison contract](ARCUS_3_2_1_FULL_COMPARISON.md).
+
+Alpha 3.2.2 is planned as a fresh donor-derived, token-indexed
+warmup/stable/decay lineage. It has zero optimizer updates and zero campaign
+token exposure. Its ceiling is **4,000,000,000,000 input tokens**, and production
+remains blocked on disposable schedule calibration, explicit selection, a pinned
+image build, full-context replay qualification, and an independently verified
+zero-update initialization. See [the WSD plan](ARCUS_3_2_2_WSD_PLAN.md) and
+[current results](ARCUS_3_2_2_RESULTS.md).
+
+## Retention and recovery contract
+
 Checkpoint retention is preflighted before training. Initialization parents require
 explicit protection when sharing a production retention root; their immutable
 manifests must never be rewritten to disguise a policy mismatch. Keep two recovery
@@ -11,16 +30,18 @@ hash-verified recovery, never by automatically retrying the failed worker.
 launching training or clearing original pause flags. Its `--restart-from-zero`
 option requires an untouched initialization and an isolated checkpoint destination.
 
-For the user-authorized fresh alpha3.2.1 restart, use
-`production_alpha321.json` and `backbone_adaptation_alpha321.json`, with the
-separate qualified runtime and checkpoint directory. The old campaign remains
-paused. New counters start at zero; the old pilot's exposures are not attributed
-to the fresh model. See [routing repair](ARCUS_3_ROUTING_REPAIR.md). The original
-policy described below remains preserved for historical reproducibility.
+The user-authorized fresh Alpha 3.2.1 restart used
+`production_alpha321.json` and `backbone_adaptation_alpha321.json`, with a
+separate qualified runtime and checkpoint directory. Its counters started at
+zero; the older Alpha 3.2.0 pilot's exposures were not attributed to the fresh
+model. See [routing repair](ARCUS_3_ROUTING_REPAIR.md). The original policy
+described below remains preserved for historical reproducibility.
 
-The production review boundary is **100,000,000 cumulative input tokens**, including
-the current pilot's completed updates. The **12 trillion** token figure remains a
-future ceiling; reaching 100M requires review before any further stage.
+For that historical constant-rate contract, the production review boundary was
+**100,000,000 cumulative input tokens**, including the applicable pilot's
+completed updates. **12 trillion** was the Alpha 3.2.0/3.2.1 ceiling; it is not
+the planned Alpha 3.2.2 ceiling. Reaching a review boundary never authorized
+automatic stage advancement.
 
 ## Fixed model contract
 
@@ -123,7 +144,9 @@ require diagnosis; they are not automatically retried.
   previous pause flags remain intact.
 - `--stop-at <timezone-aware-time>` is optional.
 
-Rollout is complete only after CPU checks, Docker CUDA replay/frozen-preservation
-tests, full-context qualification, baseline evaluations and a verified production
-update. Source implementation alone does not establish readiness. See the rollout
-receipt for the actual status.
+Under the historical contract, rollout required CPU checks, Docker CUDA
+replay/frozen-preservation tests, full-context qualification, baseline evaluations,
+and a verified production update. Those checks did not automatically promote a
+model or authorize another stage. Alpha 3.2.1 remains paused and its matched full
+comparison is pending; source implementation or one verified update alone does
+not establish current release readiness.

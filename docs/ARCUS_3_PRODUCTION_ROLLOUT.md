@@ -1,9 +1,24 @@
 # Phase 8 production rollout evidence
 
-Current status: the original production run is paused at step 11,008 and
-preserved as **potential bad alpha3.2.0**. The user authorized a fresh
-**alpha3.2.1** restart; see [routing repair](ARCUS_3_ROUTING_REPAIR.md) for current
-qualification and rollout evidence. The following records describe the older run.
+Current status (October 1, 2026): **Alpha 3.2.1** is paused at **11,648
+optimizer updates**, **7,896,336 input tokens**, and **6,727,516 target
+tokens**. Its surviving checkpoint is under
+`alpha V3.0/alpha3.2.1/checkpoints-restart-001`. The matched full three-arm
+comparison is pending and cannot automatically select or promote a winner. See
+[routing repair](ARCUS_3_ROUTING_REPAIR.md) and
+[the comparison contract](ARCUS_3_2_1_FULL_COMPARISON.md).
+
+**Alpha 3.2.2** is a planned fresh donor-derived, token-indexed
+warmup/stable/decay lineage with zero optimizer updates, zero campaign exposure,
+and a **4,000,000,000,000 input-token ceiling**. Calibration, explicit schedule
+selection, a pinned image build, full-context replay qualification, and verified
+zero-update initialization are required before production. See
+[the WSD plan](ARCUS_3_2_2_WSD_PLAN.md) and
+[current results](ARCUS_3_2_2_RESULTS.md).
+
+The original production run remains preserved at step 11,008 as **potential bad
+Alpha 3.2.0**. The following September 30 records describe that older run and
+its rollout; they are retained as historical evidence.
 
 Historical status: the production handoff was verified. At 10:50
 Eastern on September 30, the first new durable checkpoint passed independent
@@ -75,11 +90,12 @@ All 34 concrete donor evaluation tasks have sealed offline dataset snapshots.
 The pinned source catalog and manifests retain provenance and overlap exclusions.
 The pilot data predates these exclusions and is not claimed benchmark-clean.
 
-## Live rollout
+## Historical live rollout
 
-Current coordinator: `runs/arcus3/adaptation-production-005`.
-Follow `session.json` for the active child/container, `controller-state.json` for
-the accepted durable checkpoint, and `session-result.json` for terminal status.
+Coordinator at the time of this rollout: `runs/arcus3/adaptation-production-005`.
+Its `session.json` tracked the active child/container, `controller-state.json`
+tracked the accepted durable checkpoint, and `session-result.json` recorded
+terminal status.
 
 Earlier attempts 001–004 stopped before production updates. Diagnosed startup
 issues were an unsupported launcher argument, a missing local revision identifier,
@@ -89,7 +105,7 @@ and fixed before a new attempt. Final receipt serialization was also checked wit
 LightEval's own JSON encoder. The evaluator-only fixes preserve the qualified training
 image; runtime differences are disclosed in each benchmark receipt.
 
-Startup runs a donor light baseline and the resumed Arcus light baseline before
+Startup ran a donor light baseline and the resumed Arcus light baseline before
 accepting the migration. Both completed, and real optimizer updates resumed in
 `runs/arcus3/adaptation-production-c63bd7f7340147ac9bf53ef3d7b47d40`.
 The first independently verified new checkpoint has **6,016 cumulative updates**,
@@ -101,15 +117,14 @@ Both `delta.safetensors` and the resumable `state.pt` payload hashes matched.
 Evidence: `runs/arcus3/adaptation-production-005/first-production-checkpoint-verified.json`.
 
 Actual Docker limits were verified as 8GiB, two CPUs and 128 PIDs, with the pinned
-qualified image and disabled memory watchdog. The next light evaluation is at
-5M cumulative input tokens. The monitor checks every 30 minutes and reports
-meaningful results, failures, pause or completion. The coordinator's accepted
-state advances at worker handoffs; during an active worker, read its metrics and
-the checkpoint directory's `latest.json` for newer progress.
+qualified image and disabled memory watchdog. Under that run's policy, the next
+light evaluation was at 5M cumulative input tokens, and the monitor checked every
+30 minutes for meaningful results, failures, pause, or completion. This describes
+the historical coordinator and is not an instruction to treat it as active.
 
 The donor light baseline completed successfully in
 `runs/arcus3/adaptation-production-b57ad53030a341bfb9597270771667d1/donor-scores.json`.
-Arcus's 5,952-update checkpoint completed the matched comparison in
+Arcus's 5,952-update checkpoint completed the paired light diagnostic in
 `runs/arcus3/adaptation-production-44db0df8a8fd414595929981a1f46410/donor-scores.json`.
 Both containers exited successfully and both receipts use benchmark manifest
 `5749ace4ef5e30eabc6c64ec2166cfb5eacd234386c06b0dcf6f633f552c5684`.
@@ -126,13 +141,16 @@ All 34 concrete tasks used 16 examples each.
 | GSM8K quasi-exact match | 8/16 | 10/16 |
 | IFEval strict prompt compliance | 8/16 | 9/16 |
 
-These are small diagnostic subsets, not published full benchmark scores. Mixed
+This historical paired light diagnostic is not the pending matched full
+three-arm comparison for Alpha 3.2.1 release review. These are small diagnostic
+subsets, not published full benchmark scores. Mixed
 one- or two-example differences do not establish broad improvement or regression.
 The remaining pilot data predates the new benchmark exclusions, and donor
 pretraining contamination is unknown. Neither baseline is presented as a proven
 uncontaminated capability measurement. These benchmark scores stay separate from
 the historical 309-token NLL/perplexity diagnostic.
 
-The production contract, limits and evaluation caveats are in
-`docs/ARCUS_3_PRODUCTION.md`. The source inventory and next-review scope are in
-`docs/ARCUS_3_PRODUCTION_FILE_INVENTORY.md`.
+The production contract, limits and evaluation caveats are in the
+[production contract](ARCUS_3_PRODUCTION.md). The source inventory and
+next-review scope are in the
+[production file inventory](ARCUS_3_PRODUCTION_FILE_INVENTORY.md).

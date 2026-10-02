@@ -1,6 +1,27 @@
 # Alpha 3.2.1: fresh routing-repair campaign
 
-## October 1 retention repair and authorized fresh restart
+## Current status — October 1, 2026
+
+Alpha 3.2.1 is paused at **11,648 optimizer updates**, **7,896,336 input
+tokens**, and **6,727,516 target tokens**. Its surviving restart checkpoint is
+`alpha V3.0/alpha3.2.1/checkpoints-restart-001/step-11648-22e3a046d0094871ac4eca9a04a61137`;
+the checkpoint-manifest SHA256 is
+`e7efa800dc21e7f00c9e3e0e8c337c6fd024d650340bdacc604918562395b8ed`.
+The requested matched full three-arm comparison is pending. It will record the
+arms' actual unequal exposures and does not automatically select or promote a
+winner. See [the comparison contract](ARCUS_3_2_1_FULL_COMPARISON.md).
+
+Alpha 3.2.2 is a planned fresh donor-derived, token-indexed
+warmup/stable/decay lineage. It has zero optimizer updates and zero campaign
+token exposure, with a **4,000,000,000,000 input-token ceiling**. Disposable
+schedule calibration, explicit selection, a pinned image build, full 8,192-token
+qualification with exact replay, and an independently verified zero-update
+initialization must pass before production can start. See
+[the WSD plan](ARCUS_3_2_2_WSD_PLAN.md) and
+[current results](ARCUS_3_2_2_RESULTS.md). The dated restart record below remains
+historical evidence and does not mean Alpha 3.2.1 is still running.
+
+## Historical October 1 retention repair and authorized fresh restart
 
 The user requested restarting alpha3.2.1 from zero rather than recovering the
 failed attempt's single update. The original zero-update initialization is
@@ -43,16 +64,16 @@ from zero. At October 1, 09:56:14 UTC, its first production checkpoint was
 independently verified: one update, 364 input tokens, 226 targets. Manifest:
 `79652397dc691c5a30d164783abe221819abf62ef49fefc8de76081afd38d169`.
 Both payload hashes passed, retention registration completed, the worker's frozen
-backbone check passed, and Docker was still running. Receipt:
+backbone check passed, and Docker was still running at that verification time. Receipt:
 `runs/arcus3/adaptation-alpha321-production-002/first-production-checkpoint-verified.json`.
 Host launcher session: 65835. Initial worker:
 `adaptation-production-da85c5ca5bdf48cfaaa45cadcae4427e`, container
 `arcus3-donor-20261001-055203`. Follow coordinator session.json across handoffs.
-The two-hour meaningful-change monitor has been recreated for this attempt.
+At that point, the two-hour meaningful-change monitor had been recreated for the attempt.
 First new light evaluation is at one million input tokens; this start verification
 does not establish improved capability or completion of the 100M review stage.
 
-## Live restart
+## Historical failed restart attempt
 
 The fresh production coordinator was launched September 30, 2026:
 `runs/arcus3/adaptation-alpha321-production-001`. Startup evaluations precede
@@ -118,6 +139,10 @@ before model loading; original pause flags were not cleared.
 
 ## Disposable comparison results
 
+This 30-record mechanism check is separate from the pending matched full
+three-arm comparison of the surviving Alpha 3.2.1 pause checkpoint, Alpha 3.2.0,
+and the zero-update control.
+
 All arms began with identical seeded fresh model behavior, processed the same
 30 records (7,629 input tokens), and preserved frozen backbone hashes. The
 starting NLL was 2.25368988 on 309 language targets.
@@ -154,6 +179,11 @@ The manifest and both payload hashes were independently verified after copying.
 `label.json` is separate from the immutable checkpoint. The label is the user's
 cautionary designation, not proof the model is unusable. Original checkpoints
 and pause flags remain preserved.
+
+That selected archival checkpoint now also has a locally verified inference
+package at `runs/arcus3/release-alpha320-002/package`. Package verification is
+separate from the pending matched full comparison and does not establish remote
+publication; no immutable publication receipt is recorded.
 
 ## Fresh model and objective
 
@@ -198,18 +228,20 @@ The bounded comparison uses the same fresh seed and 30 complete short records
 (six per source) for control, balancing-only, and paired-plus-balancing arms.
 It checks the existing 309-target-token language diagnostic before and after.
 It is a small mechanism/safety check, not a representative benchmark or proof
-that long-term underuse is solved. Production starts with its own full legacy
-baseline and matched donor benchmark subsets before the first campaign update.
+that long-term underuse is solved. The subsequent production restart was
+configured with its own full legacy baseline and matched donor benchmark subsets
+before the first campaign update.
 
-## Operation
+## Historical operation contract
 
 New configuration: `configs/arcus3/backbone_adaptation_alpha321.json`.
 New policy: `configs/arcus3/production_alpha321.json`.
 New runtime: `configs/arcus3/production_runtime_alpha321.json`.
 Recovery checkpoints are isolated under Desktop `alpha V3.0/alpha3.2.1/checkpoints`.
-The existing verified data and donor teacher cache can be reused; model training
-counters and the dataset cursor restart. The user-authorized first review remains
-100M input tokens in this new lineage. 12T remains a later ceiling.
+The existing verified data and donor teacher cache could be reused; model training
+counters and the dataset cursor restarted. The user-authorized first review for
+this constant-rate lineage was 100M input tokens, and 12T was its later ceiling.
+The planned Alpha 3.2.2 lineage instead has the 4T ceiling recorded above.
 
 Docker CUDA remains single-job, RAM 8GiB, 2 CPUs, 128 PIDs, allocator 70%, memory
 termination watchdog disabled. Evaluations remain at 1M/10M/100M input tokens;
