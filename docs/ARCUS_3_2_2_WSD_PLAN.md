@@ -61,9 +61,18 @@ the campaign will run that far and does not authorize automatic stage advancemen
    using the final selected configuration.
 6. Create and independently hash-verify a new Alpha 3.2.2 zero-update checkpoint.
 7. Start production with the independently verified zero-update parent. Preserve
-   all optimizer, RNG and data-cursor state while training to the first 7M input
-   tokens. Pause at the 7M checkpoint before capability evaluation, then run the
-   donor, Alpha 3.2.0, Alpha 3.2.1 and Alpha 3.2.2 comparison sequentially.
+   all optimizer, RNG and data-cursor state. At each 1M through 6M input-token
+   boundary, pause on a durable checkpoint, run the four-prompt light check on
+   Alpha 3.2.2 alone, compare with pinned results for the donor and the two
+   older Alpha lineages, and resume only if the check completes and the NLL gate
+   passes. The controls are not rerun at each interim boundary. At 7M, pause
+   before the full donor, Alpha 3.2.0, Alpha 3.2.1 and Alpha 3.2.2 comparison.
+
+The sealed production policy still schedules its integrated evaluation at 7M.
+The interim checks are a separate, sequential pause/evaluate/resume controller
+that leaves the production policy, model weights, optimizer, RNG and data cursor
+unchanged. Each interim report records actual exposure and the checkpoint hash;
+controls have unequal training exposures and are diagnostic references only.
 
 The initial policy blocked production while schedule selection was pending.
 The selected adaptation configuration now enables the campaign and the production

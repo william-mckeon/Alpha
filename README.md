@@ -368,7 +368,9 @@ warmup horizon is 1.35M input tokens, followed by a stable rate; decay remains
 disabled until a terminal schedule is approved. The donor tokenizer and 8,192-token
 context are unchanged. Final 8,192-token CUDA replay and checkpoint verification
 passed, and the first production update is durably verified at 364 input tokens.
-The production controller will pause at the 7M-input-token checkpoint before the
-joint donor/Alpha 3.2.0/Alpha 3.2.1/Alpha 3.2.2 capability comparison. The 4T
+Separate light safety checks pause Alpha 3.2.2 at each 1M through 6M input-token
+boundary and reuse pinned control results. The production controller will pause
+at the 7M-input-token checkpoint before the full joint donor/Alpha 3.2.0/Alpha
+3.2.1/Alpha 3.2.2 capability comparison. The 4T
 input-token ceiling is a later planning limit, not completed exposure. See the
 [Alpha 3.2.2 results](docs/ARCUS_3_2_2_RESULTS.md).

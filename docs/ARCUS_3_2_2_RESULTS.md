@@ -40,8 +40,15 @@ The checkpoint manifest SHA-256 is
 `f2ccabf0d35cc4c9bd4e4477276f7a6bede470a7de57c2300764e835ba84d2b6`.
 The complete local receipt is
 `runs/arcus3/alpha322-production-001/first-production-checkpoint-verified.json`.
-Training continues toward a required pause at 7M input tokens, where the deferred
-four-way capability comparison can begin sequentially.
+Training continues toward a required pause at 7M input tokens, where the full
+four-way capability comparison can begin sequentially. The user restored the
+original light safety cadence: only Alpha 3.2.2 is evaluated at each 1M through
+6M input-token boundary. A separate interim controller pauses on a verified
+checkpoint, compares the identical language cohort and four light prompts to
+already pinned donor, Alpha 3.2.0 and Alpha 3.2.1 results, and resumes exact
+optimizer/RNG/data-cursor state if the result is complete and within the NLL
+gate. The existing production policy and running training inputs are unchanged.
+Interim state is recorded in `runs/arcus3/alpha322-interim-light-001`.
 
 Alpha 3.2.1 remains the constant-rate comparison. Its measurements must not be
 copied into this fresh lineage or described as Alpha 3.2.2 results.

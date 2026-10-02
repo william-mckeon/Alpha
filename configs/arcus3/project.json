@@ -54,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Fresh Alpha 3.2.2 production is running from an independently verified zero-update donor-derived parent. The first durable checkpoint has 1 update, 364 input tokens and 226 target tokens. The 1.35M-token warmup schedule, 8,192-token context and frozen backbone passed qualification. Capability evaluation and the preserved three-way comparison are deferred until the Alpha 3.2.2 controller pauses at 7M input tokens. Alpha 3.2.1 and potential bad Alpha 3.2.0 remain preserved.",
+  "note": "Fresh Alpha 3.2.2 production is running from an independently verified zero-update donor-derived parent. The first durable checkpoint has 1 update, 364 input tokens and 226 target tokens. The 1.35M-token warmup schedule, 8,192-token context and frozen backbone passed qualification. Separate light safety checks pause Alpha 3.2.2 at each 1M through 6M input tokens and reuse pinned control results; the full four-model comparison remains at the 7M pause. Alpha 3.2.1 and potential bad Alpha 3.2.0 remain preserved.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",

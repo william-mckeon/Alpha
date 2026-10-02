@@ -1,0 +1,39 @@
+{
+  "schema": "arcus3-alpha322-interim-light-v1",
+  "lineage_id": "alpha3.2.2-wsd-001",
+  "model_label": "alpha3.2.2",
+  "milestone_input_tokens": [1000000, 2000000, 3000000, 4000000, 5000000, 6000000],
+  "full_comparison_input_tokens": 7000000,
+  "evaluation_runtime": "configs/arcus3/production_evaluation_runtime.json",
+  "converted": "runs/arcus3/conversion-phase5-001/converted",
+  "suite_sha256": "c847b0a6325509313d6662886067b3467cea5b2eb2cc2c19f014dc21490eb448",
+  "settings_sha256": "241e0e208b00b95c960ee26033da5477a4b43159b67d8661516849c65be79460",
+  "nll_regression_limit": 0.2,
+  "controls": [
+    {
+      "id": "donor",
+      "label": "Frozen 1.711B donor",
+      "output": "runs/arcus3/baseline-phase2-001",
+      "scores_sha256": "728f261322760777f8a841198b068da427e04605d747fcb49761014505f0c592",
+      "transcripts_sha256": "a9373ca739c142b80c837fc2e5cf1ae13415cd68547fe97c5a7d05f64f13a013",
+      "input_tokens": 0
+    },
+    {
+      "id": "alpha3.2.0",
+      "label": "Preserved Alpha 3.2.0 control",
+      "output": "runs/arcus3/baseline-comparison-alpha320-developmental-afb439f171284278865b41f1973e813c",
+      "scores_sha256": "2d932313e2fe08aba41fef5057b9b2c38f25264dd984712edf6a204462a5a0d9",
+      "transcripts_sha256": "15df81b3f84d1b58d0f7a28bcffce4d5bd2c1d31f1b673227d543ee827c397fe",
+      "input_tokens": 7450666
+    },
+    {
+      "id": "alpha3.2.1",
+      "label": "Paused Alpha 3.2.1 control",
+      "output": "runs/arcus3/baseline-comparison-alpha321-developmental-3291fe43d0984caf879ed1eac9109d06",
+      "scores_sha256": "a7e54e3cd4bc4e5024ddc6f5a476451d5d0013f959e8c2452500eec7d2a09844",
+      "transcripts_sha256": "36515dfea5523d5662dbe8238180600fd79c7950608b0856de91b24ed6129330",
+      "input_tokens": 7896336
+    }
+  ],
+  "note": "The 1M through 6M checks run only Alpha 3.2.2. Existing control results use the identical frozen language cohort and the same four light-prompt IDs, filtered from their full transcripts. Unequal training exposures are disclosed. The full sequential four-model comparison remains at 7M."
+}
