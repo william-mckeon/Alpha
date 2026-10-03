@@ -40,15 +40,60 @@ The checkpoint manifest SHA-256 is
 `f2ccabf0d35cc4c9bd4e4477276f7a6bede470a7de57c2300764e835ba84d2b6`.
 The complete local receipt is
 `runs/arcus3/alpha322-production-001/first-production-checkpoint-verified.json`.
-Training continues toward a required pause at 7M input tokens, where the full
-four-way capability comparison can begin sequentially. The user restored the
-original light safety cadence: only Alpha 3.2.2 is evaluated at each 1M through
-6M input-token boundary. A separate interim controller pauses on a verified
-checkpoint, compares the identical language cohort and four light prompts to
-already pinned donor, Alpha 3.2.0 and Alpha 3.2.1 results, and resumes exact
-optimizer/RNG/data-cursor state if the result is complete and within the NLL
-gate. The existing production policy and running training inputs are unchanged.
-Interim state is recorded in `runs/arcus3/alpha322-interim-light-001`.
+The first comparison boundary is complete. Alpha 3.2.2 stopped at update
+**10,344**, with **7,001,336 input tokens** and **5,949,068 target tokens**.
+The checkpoint manifest SHA-256 is
+`add6be8eb972bb95ef2fcfe002aa2c1dc43a5070e41a15548eadf997dddd13c8`;
+both payload hashes were verified and the donor backbone stayed frozen.
+The failed interim controller was not reused. A separate completed light check
+at 1,712,913 input tokens measured overall NLL 2.2078, perplexity 9.0954,
+code perplexity 3.000 and instruction checks 3/4. At the user's direction,
+the remaining pre-7M interim stops were cancelled.
+
+The exact-7M full developmental result is
+`runs/arcus3/baseline-alpha322-exact7m-full-001/scores.json`; the complete
+full benchmark result is
+`runs/arcus3/baseline-comparison-alpha322-exact7m-benchmark-001/donor-scores.json`,
+SHA-256 `9c21c39fad34825ec35edb843e31abf2b045b7acd94c1564290fdc8d4df74fc1`.
+Matched frozen-protocol results are:
+
+| Model | Input exposure | NLL / perplexity, 309 targets | Comprehension | Instructions | Reasoning | Python | Tools |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Donor-derived zero-update control | 0 | 2.2537 / 9.523 | 2/6 | 4/6 | 5/6 | 6/6 | 6/6 |
+| Alpha 3.2.0 | 7,450,666 | 2.2663 / 9.644 | 0/6 | 5/6 | 4/6 | 6/6 | 6/6 |
+| Alpha 3.2.1 | 7,896,336 | 2.2643 / 9.624 | 0/6 | 5/6 | 3/6 | 6/6 | 6/6 |
+| Alpha 3.2.2 | 7,001,336 | 2.2503 / 9.490 | 0/6 | 5/6 | 3/6 | 6/6 | 6/6 |
+
+| Model | ARC-Challenge | HellaSwag | MMLU-Pro | PIQA | GSM8K | IFEval strict | BBH |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Donor-derived zero-update control | 40.27% | 65.59% | 18.29% | 74.76% | 48.90% | 46.58% | 32.61% |
+| Alpha 3.2.0 | 41.98% | 66.34% | 18.62% | 74.65% | 46.85% | 52.68% | 33.03% |
+| Alpha 3.2.1 | 42.15% | 66.53% | 18.75% | 74.97% | 47.61% | 53.79% | 32.63% |
+| Alpha 3.2.2 | 41.55% | 66.19% | 18.34% | 74.81% | 45.94% | 52.13% | 32.04% |
+
+The developmental cohort is small, one Alpha 3.2.2 conversation response
+reached the 128-token *evaluation output* cap, and the trained controls have
+unequal exposure. The full benchmarks are more informative but mixed: Alpha
+3.2.2 has the lowest measured NLL while Alpha 3.2.1 leads several benchmark
+columns. No winner or promotion follows from these results.
+
+The next authorized continuation keeps the same trained state and adds a
+versioned evaluation cadence: light at 15M, 25M, ..., 95M input tokens; full
+developmental and donor-protocol benchmarks at 10M, 20M, ..., 100M. The 100M
+boundary is a review stop. The prior 7M policy remains sealed and unchanged.
+
+The post-7M continuation passed 35 focused CUDA tests with zero skips, an
+exact two-update 8,192-token replay, and frozen-backbone verification. Its
+pinned image ID is
+`sha256:fdf737a33e34877c6bd12f25fb14d7961a6ec5bbf5ef4b015003b1261c4a02b4`.
+The first resumed checkpoint is **update 10,368**, **7,010,367 input tokens**
+and **5,956,113 target tokens**, manifest SHA-256
+`9d7b0dc95eec4336f66daf305baa68a19a8e067128de2ade16b65253b82bb9e2`.
+Both payload hashes, completed retention, the new policy identity and frozen
+backbone were verified independently. The receipt is
+`runs/arcus3/alpha322-post7m-production-001/first-post7m-checkpoint-verified.json`.
+Training is running toward its first 10M full evaluation; neither 100M nor 4T
+has been reached.
 
 Alpha 3.2.1 remains the constant-rate comparison. Its measurements must not be
 copied into this fresh lineage or described as Alpha 3.2.2 results.

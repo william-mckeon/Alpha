@@ -1,5 +1,16 @@
 # Alpha 3.2.2 token-indexed WSD plan
 
+**October 3 continuation update.** The original 7M policy below is preserved
+as historical provenance. Alpha 3.2.2 reached a verified 7,001,336-input-token
+checkpoint, and the four-model full comparison completed. The authorized
+same-lineage continuation keeps its weights, optimizer, scheduler, RNG and data
+cursor. Its separate, versioned policy schedules light evaluations at 15M,
+25M, ..., 95M; full developmental and pinned donor-protocol benchmarks at
+10M, 20M, ..., 100M; and a required review stop at 100M. Full replaces light
+when both fall on a 10M boundary. No 5M backfill is requested. See
+[`production_alpha322_post7m.json`](../configs/arcus3/production_alpha322_post7m.json)
+and [current results](ARCUS_3_2_2_RESULTS.md).
+
 Alpha 3.2.2 is a fresh donor-derived lineage. It does not restore Alpha 3.2.0 or
 Alpha 3.2.1 weights, Adam moments, RNG state, data cursor, update counter or token
 exposure. The verified Phase 5 donor-derived initialization remains the structural

@@ -163,7 +163,9 @@ def run(a):
             path=root/'migration.json';atomic_json(path,receipt);saved['transition']=str(path);persist()
         while not stopped():
             checkpoint=Path(saved['checkpoint']);state=saved['state']
-            if (state['evaluation_pending'] and policy.get('defer_startup_evaluation')
+            if (state['evaluation_pending'] and not saved.get('evaluation')
+                    and policy.get('defer_startup_evaluation')
+                    and not policy.get('prior_policy_sha256')
                     and state['input_tokens']>=policy['joint_evaluation_input_tokens']):
                 atomic_json(root/'session-result.json',{'stopped':True,'reason':'joint_7m_evaluation_required',
                     'checkpoint':str(checkpoint),'updates':state['updates'],'input_tokens':state['input_tokens'],

@@ -26,9 +26,15 @@ def validate_policy(policy):
         raise ValueError('Unapproved production ceiling/batch')
     if policy['cache_limit_bytes']>50*1024**3 or policy['mixture']!={'general':.4,'code':.2,'math':.1,'instruction_tools':.2,'local':.1}:
         raise ValueError('Unapproved cache/mixture')
-    expected_evaluation=({'light':7_000_000,'developmental':7_000_000,'full':7_000_000}
-                         if policy.get('model_label')=='alpha3.2.2' else
-                         {'light':1_000_000,'developmental':10_000_000,'full':100_000_000})
+    if policy.get('model_label')=='alpha3.2.2':
+        old_schedule={'light':7_000_000,'developmental':7_000_000,'full':7_000_000}
+        continuation_schedule={'light':5_000_000,'developmental':10_000_000,'full':10_000_000}
+        expected_evaluation=continuation_schedule if policy.get('prior_policy_sha256') else old_schedule
+        if policy.get('prior_policy_sha256') and (policy.get('continuation_checkpoint_sha256') is None
+                or len(policy['continuation_checkpoint_sha256'])!=64):
+            raise ValueError('Alpha 3.2.2 continuation checkpoint identity required')
+    else:
+        expected_evaluation={'light':1_000_000,'developmental':10_000_000,'full':100_000_000}
     if policy['evaluation']!=expected_evaluation or policy['retention']!={'recovery':2,'milestones':2}:
         raise ValueError('Unapproved evaluation/retention policy')
     if policy['nll_regression_limit']!=.2 or not policy['local_reuse'] or not policy['inbox_auto_admit']:
@@ -64,7 +70,8 @@ def transition(state, receipt, manifest_sha, new_data, new_teacher, policy, same
         raise ValueError('Transition data/teacher mismatch')
     if receipt['policy_sha256']!=identity(policy):raise ValueError('Transition policy mismatch')
     if state.get('production') and state['production']['policy_sha256']!=identity(policy):
-        raise ValueError('Production policy changed')
+        if not _accept_alpha322_schedule_transition(state,receipt,manifest_sha,policy):
+            raise ValueError('Production policy changed')
     if state['accumulation_position']!=0 or state['evaluation_pending']:
         raise ValueError('Transition needs update boundary and accepted evaluation')
     result=copy.deepcopy(state)
@@ -80,6 +87,28 @@ def transition(state, receipt, manifest_sha, new_data, new_teacher, policy, same
     result.pop('stage_end_pending',None);result['batch_complete']=False
     if not same_data:result['stream']=None
     return result
+
+def _accept_alpha322_schedule_transition(state,receipt,manifest_sha,policy):
+    """Allow only the sealed 7M-to-100M evaluation cadence handoff."""
+    if (policy.get('model_label')!='alpha3.2.2' or receipt.get('schema')!='arcus3-alpha322-evaluation-cadence-v1'
+            or receipt.get('prior_policy_sha256')!=state['production']['policy_sha256']
+            or policy.get('prior_policy_sha256')!=receipt['prior_policy_sha256']
+            or policy.get('continuation_checkpoint_sha256')!=manifest_sha
+            or receipt.get('checkpoint_sha256')!=manifest_sha
+            or not 7_000_000<=state['input_tokens']<10_000_000
+            or not state.get('evaluation_completed')):
+        return False
+    last=state['evaluation_completed'][-1]
+    if (last.get('update')!=state['updates'] or last.get('tier')!='full'
+            or last.get('checkpoint_sha256')!=manifest_sha):
+        return False
+    prior=read(receipt['prior_policy_path'])
+    if identity(prior)!=receipt['prior_policy_sha256'] or validate_policy(prior) is not prior:
+        return False
+    expected=dict(prior)
+    expected.update(evaluation={'light':5_000_000,'developmental':10_000_000,'full':10_000_000},
+                    prior_policy_sha256=identity(prior),continuation_checkpoint_sha256=manifest_sha)
+    return policy==expected
 
 def batch_receipt(checkpoint, data, teacher, policy, batch_id):
     from arcus3.expanded_checkpoint import verify

@@ -363,14 +363,12 @@ corpus. No historical checkpoint or evaluation was removed.
 
 Arcus 3 Phase 8 launch readiness and measured context limits are recorded in [the current readiness report](docs/ARCUS_3_PHASE_8_READINESS.md). Training is not complete; the published Alpha 3.0 package remains the verified initialization.
 
-The current fresh Phase 8 lineage is **Alpha 3.2.2**. Its selected token-indexed
-warmup horizon is 1.35M input tokens, followed by a stable rate; decay remains
-disabled until a terminal schedule is approved. The donor tokenizer and 8,192-token
-context are unchanged. Final 8,192-token CUDA replay and checkpoint verification
-passed, and the first production update is durably verified at 364 input tokens.
-Separate light safety checks pause Alpha 3.2.2 at each 1M through 6M input-token
-boundary and reuse pinned control results. The production controller will pause
-at the 7M-input-token checkpoint before the full joint donor/Alpha 3.2.0/Alpha
-3.2.1/Alpha 3.2.2 capability comparison. The 4T
-input-token ceiling is a later planning limit, not completed exposure. See the
-[Alpha 3.2.2 results](docs/ARCUS_3_2_2_RESULTS.md).
+The current fresh Phase 8 lineage is **Alpha 3.2.2**. Its 1.35M-input-token
+warmup is complete; the token-indexed schedule is now stable, with decay
+disabled. The donor tokenizer and 8,192-token context are unchanged. Training
+stopped at a verified **7,001,336-input-token checkpoint** and the four-model
+full developmental and benchmark comparison completed. The same-lineage
+continuation has resumed from a verified **7,010,367-token checkpoint**, using
+light evaluations at the intervening 5M boundaries and full
+evaluations every 10M through the 100M review stop. The 4T ceiling is a later
+planning limit, not completed exposure. See the [Alpha 3.2.2 results](docs/ARCUS_3_2_2_RESULTS.md).

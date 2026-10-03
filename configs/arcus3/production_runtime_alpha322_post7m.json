@@ -1,0 +1,16 @@
+{
+  "launch_ready": true,
+  "image": "arcus3:alpha322-post7m",
+  "image_id": "sha256:fdf737a33e34877c6bd12f25fb14d7961a6ec5bbf5ef4b015003b1261c4a02b4",
+  "base_image_id": "sha256:a115da27b18c6e0b4c05c389be5ec37d6c8b49e9cb5d0f8e8c0b003dfdce7492",
+  "memory": "8g",
+  "cpus": 2,
+  "pids": 128,
+  "cuda_fraction": 0.7,
+  "gpu_lock_volume": "arcus-alpha-three-stage_alpha-job-control",
+  "memory_watchdog": false,
+  "max_seconds": 1800,
+  "max_new_tokens": 128,
+  "mode": "alpha3.2.2-post7m-qualified",
+  "cuda_allocator_config": "expandable_segments:True"
+}

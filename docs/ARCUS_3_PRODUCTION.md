@@ -101,6 +101,14 @@ crossings, choosing the highest tier when thresholds coincide. A record can cros
 a threshold; the receipt reports its actual exposure. Historical diagnostics
 remain a separate track, with the existing baseline-NLL-plus-0.2 review gate.
 
+Alpha 3.2.2 has a lineage-specific, versioned exception after its completed 7M
+four-model comparison. Its post-7M policy schedules light checks at the
+intervening 5M boundaries and full developmental plus donor-protocol benchmarks
+at every 10M boundary through the 100M review. The original 7M policy and
+checkpoint remain immutable; the transition must accept the completed 7M
+evaluation and preserve the optimizer, scheduler, RNG and data cursor. See
+[Alpha 3.2.2 results](ARCUS_3_2_2_RESULTS.md).
+
 The donor suite is pinned from Hugging Face SmolLM revision
 `f54818907404ec3d6bb150357b7d0dea333f1aea`, using LightEval
 `ea46419a93fb390e8f694f7c6c64c1e684487c9d`. It includes IFEval, HellaSwag, ARC,

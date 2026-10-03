@@ -41,7 +41,9 @@ def qualify(a):
             'test_receipt_sha256':digest(a.test_receipt),'host_files':{f:digest(f) for f in files},'context':report['tokenizer_contract'],
             'peak_cuda_bytes':report['peak_cuda_bytes'],'campaign_updates':0,
             'joint_evaluation_input_tokens':policy['joint_evaluation_input_tokens'] if deferred else None,
-            'note':('Disposable CUDA qualification only; capability evaluation is deferred to the joint 7M-token checkpoint.' if deferred
+            'note':('Disposable CUDA qualification only; the completed 7M comparison is accepted by a separate, hash-bound continuation handoff.'
+                    if policy.get('prior_policy_sha256') else
+                    'Disposable CUDA qualification only; capability evaluation is deferred to the joint 7M-token checkpoint.' if deferred
                     else 'Disposable CUDA qualification only; startup donor evaluations still gate production updates.')}
     if adaptation:result['adaptation_config_file_sha256']=digest(adaptation)
     atomic_json(a.output,result);return result
