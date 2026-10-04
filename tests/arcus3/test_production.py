@@ -31,6 +31,10 @@ class ProductionTests(unittest.TestCase):
         self.assertEqual(thresholds(1000300,s)['light'],2000000)
         joint={'light':7000000,'developmental':7000000,'full':7000000}
         self.assertEqual(token_due(6999900,7000100,joint),['full'])
+
+        alpha322=read('configs/arcus3/production_alpha322_post7m.json')['evaluation']
+        self.assertEqual(token_due(9999757,10000121,alpha322),['full'])
+        self.assertEqual(token_due(10000121,10000999,alpha322),[])
     def test_transition_preserves_counters_and_refuses_pending_eval(self):
         p=validate_policy(read('configs/arcus3/production.json'))
         state={'input_tokens':100,'updates':12,'data_sha256':'old','teacher_sha256':'teacher','accumulation_position':0,

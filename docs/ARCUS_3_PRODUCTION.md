@@ -1,5 +1,35 @@
 # Arcus Phase 8 production rollout
 
+## October 3 Alpha 3.2.2 host recovery
+
+The post-7M continuation exhausted its sealed first batch at update 14,813:
+9,999,757 input and 8,516,825 target tokens. The checkpoint manifest SHA-256
+is `cb83377618530a4fb7104f527b3b79adb6831dce7b7ca9f7a6a50e8fdab38347`;
+both payload hashes, completed retention and frozen backbone were verified.
+The training container exited with code 0. The coordinator then failed before
+the next batch could be acquired because its host Python lacked
+`huggingface_hub`. Evaluation was not pending: another record must cross the
+10M boundary before that full evaluation runs.
+
+Production host setup is separate from the pinned Docker CUDA image. Use an
+isolated Python environment with the versions in `requirements-arcus3-host.lock`
+and install the local project without changing the model image. Run
+`scripts/check_arcus3_host.py` before creating a coordinator root; it verifies
+imports and access to each pinned dataset without printing credentials. The
+coordinator also runs this preflight before creating its root. It passes that
+same Python to `scripts/start_arcus3.ps1` for the host-side baseline report,
+instead of relying on the old broken `.venv` interpreter.
+
+The old controller and pause evidence stay unchanged. Prepare a new controller
+with `scripts/resume_arcus3_training.py` using the exact verified checkpoint,
+same production policy and adaptation configuration. This inspects optimizer,
+RNG, data cursor and scheduler state, and preserves the pending batch path.
+Qualify changed host source files in a new receipt, then start a new coordinator
+with `--continue-from` pointing at the prepared recovery root. The next batch
+must commit its acquisition transaction and teacher cache before any further
+optimizer update. Do not claim the 10M evaluation until its complete receipts
+are verified.
+
 ## Current status — October 1, 2026
 
 Alpha 3.2.1 is paused at **11,648 optimizer updates**, **7,896,336 input

@@ -1,21 +1,18 @@
 # arcus
 
-Current work (October 1, 2026): **alpha3.2.1** is paused for the matched full
-three-arm comparison at 11,648 optimizer updates, 7,896,336 input tokens and
-6,727,516 target tokens. Its selected checkpoint is under Desktop
-`alpha V3.0/alpha3.2.1/checkpoints-restart-001`; **potential bad alpha3.2.0**
-remains preserved at 11,008 updates. The comparison records the actual unequal
-exposures and does not automatically select or promote a winner. See the
-[full comparison contract](docs/ARCUS_3_2_1_FULL_COMPARISON.md) and
-[routing-repair evidence](docs/ARCUS_3_ROUTING_REPAIR.md).
+Current work (October 3, 2026): **Alpha 3.2.2** completed its 7M four-model
+comparison, then trained to a hash-verified **14,813 updates / 9,999,757 input
+tokens**. The first batch ended 243 tokens before the 10M evaluation. Its host
+coordinator stopped during next-batch acquisition because the host Python lacked
+`huggingface_hub`; no 10M evaluation had run. A separately qualified host
+environment and hash-verified recovery continue this same lineage without
+resetting optimizer, scheduler, RNG or counters. See [current results](docs/ARCUS_3_2_2_RESULTS.md)
+and the [production runbook](docs/ARCUS_3_PRODUCTION.md).
 
-**Alpha3.2.2** is a planned fresh donor-derived token-indexed
-warmup/stable/decay lineage with a 4 trillion input-token ceiling. Its production
-training has not started and it has consumed zero campaign tokens. Calibration,
-a pinned image build, full-context replay qualification and an independently
-verified zero-update initialization must complete before launch. See the
-[WSD plan](docs/ARCUS_3_2_2_WSD_PLAN.md), [current results](docs/ARCUS_3_2_2_RESULTS.md),
-and [private release status](docs/ALPHA_3_2_RELEASES.md).
+**Alpha 3.2.1** and **potential bad Alpha 3.2.0** remain preserved as completed
+controls. The 7M comparison has unequal training exposures and selected no
+winner. See the [comparison contract](docs/ARCUS_3_2_1_FULL_COMPARISON.md)
+and [routing-repair evidence](docs/ARCUS_3_ROUTING_REPAIR.md).
 
 Historical direction (September 28, 2026): [Arcus 3.0 phases 0–10](docs/ARCUS_3_LOCAL_FIRST_PLAN.md),
 starting from pinned SmolLM2-1.7B-Instruct, with a later proposed approximately 2B

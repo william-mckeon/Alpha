@@ -2,7 +2,7 @@
   "schema": "arcus3-project-v1",
   "project_id": "arcus-3",
   "phase": 8,
-  "status": "alpha322-wsd-production-active",
+  "status": "alpha322-wsd-host-recovery-preparing-batch",
   "donor": {
     "repo_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
     "revision": "31b70e2e869a7173562077fd711b654946d38674",
@@ -42,7 +42,7 @@
     "expanded_preflight": false,
     "specialization": false
   },
-  "active_run": "runs/arcus3/alpha322-production-001",
+  "active_run": "runs/arcus3/alpha322-post7m-production-recovered-001",
   "deadline": null,
   "policy": {
     "models_docker_cuda_only": true,
@@ -54,7 +54,7 @@
     "initial_docker_pids": 128,
     "preserve_historical_pauses": true
   },
-  "note": "Fresh Alpha 3.2.2 production is running from an independently verified zero-update donor-derived parent. The first durable checkpoint has 1 update, 364 input tokens and 226 target tokens. The 1.35M-token warmup schedule, 8,192-token context and frozen backbone passed qualification. Separate light safety checks pause Alpha 3.2.2 at each 1M through 6M input tokens and reuse pinned control results; the full four-model comparison remains at the 7M pause. Alpha 3.2.1 and potential bad Alpha 3.2.0 remain preserved.",
+  "note": "Alpha 3.2.2 completed the 7M four-model comparison and reached a verified 14,813-update checkpoint at 9,999,757 input tokens. The first batch ended 243 tokens before the 10M evaluation. Host dataset acquisition failed due to a missing package; a qualified host environment and verified recovery are preparing the next batch. No 10M evaluation result exists yet. Older lineages remain preserved.",
   "verification": {
     "report": "runs/arcus3/donor-probe-phase1-003/report.json",
     "donor_manifest_sha256": "910a430561a4488acf7bbc371665a9e3895a5bf0c414f6ecc39cd91e606007c5",
@@ -116,11 +116,14 @@
   "model_label": "alpha3.2.2",
   "current_model": {
     "label": "alpha3.2.2",
-    "status": "production-active-first-checkpoint-verified",
-    "observed_at_utc": "2026-10-02T13:58:01Z",
-    "verified_updates": 1,
-    "verified_input_tokens": 364,
-    "verified_target_tokens": 226,
+    "status": "recovery-preparing-next-batch",
+    "observed_at_utc": "2026-10-03T22:01:28Z",
+    "verified_updates": 14813,
+    "verified_input_tokens": 9999757,
+    "verified_target_tokens": 8516825,
+    "latest_manifest_sha256": "cb83377618530a4fb7104f527b3b79adb6831dce7b7ca9f7a6a50e8fdab38347",
+    "recovery_receipt": "runs/arcus3/alpha322-post7m-host-recovery-001/recovery.json",
+    "host_qualification": "runs/arcus3/production-alpha322-post7m-host-recovery-qualification-001/receipt.json",
     "first_manifest_sha256": "f2ccabf0d35cc4c9bd4e4477276f7a6bede470a7de57c2300764e835ba84d2b6",
     "checkpoint_root": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.2/checkpoints",
     "latest_pointer": "C:/Users/willi/OneDrive/Desktop/alpha V3.0/alpha3.2.2/checkpoints/latest.json",
@@ -128,7 +131,7 @@
   },
   "paused_control": {
     "label": "alpha3.2.1",
-    "status": "paused-for-joint-7m-comparison",
+    "status": "preserved-paused-after-7m-comparison",
     "updates": 11648,
     "input_tokens": 7896336,
     "target_tokens": 6727516,

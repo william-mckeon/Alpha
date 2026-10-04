@@ -13,6 +13,7 @@ dist/
 
 # --- Virtual envs ---
 .venv/
+.venv-arcus3-host/
 .venv-eval/
 .venv-baby/
 .venv-desktop/

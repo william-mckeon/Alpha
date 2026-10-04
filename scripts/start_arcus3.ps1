@@ -3,6 +3,7 @@ param([Parameter(Mandatory=$true)][DateTimeOffset]$StopAt,
       [ValidateSet("probe","baseline","donor-baseline","teacher-production","application","preflight","train","conversion","expanded-preflight","specialization","verify-depth","package","verify-package","teacher-qualification","adaptation-qualification","alpha322-calibration","alpha322-initialization","adaptation")][string]$Mode="probe",
       [string]$RuntimeConfig="configs/arcus3/local_runtime.json", [string]$ProductionPolicy="", [string]$TransitionPath="", [string]$BenchmarksPath="", [string]$TeacherOutput="",
       [string]$RequestsFile="", [string]$WindowPolicy="", [string]$CheckpointRoot="", [string]$AdaptationConfig="configs/arcus3/backbone_adaptation.json", [string]$CalibrationReceipt="", [switch]$PersistMemory, [switch]$Phase8Initialization,
+      [string]$HostPython=".venv/Scripts/python.exe",
       [string]$DataRoot="", [string]$PreflightReport="", [string]$AdapterPath="", [string]$ResumePath="", [string]$ConvertedPath="", [string]$ExpandedPath="", [string]$PackagePath="", [string]$ReleaseSpec="", [string]$TeacherPath="", [string]$EvaluationRoot="", [ValidateSet('light','developmental','full')][string]$EvaluationTier='full')
 $ErrorActionPreference='Stop'
 $workspace=Split-Path $PSScriptRoot -Parent
@@ -169,6 +170,6 @@ try {
 if ($state.ExitCode -ne 0) { throw "Probe exited $($state.ExitCode); inspect logs before retry" }
 
 if ($Mode -eq "baseline") {
- & .venv/Scripts/python.exe scripts/report_arcus3.py --root $Root --deadline $deadlineUtc
+ & $HostPython scripts/report_arcus3.py --root $Root --deadline $deadlineUtc
  if ($LASTEXITCODE -ne 0) { throw "Baseline executor/report failed; preserve partial evidence" }
 }

@@ -92,8 +92,25 @@ and **5,956,113 target tokens**, manifest SHA-256
 Both payload hashes, completed retention, the new policy identity and frozen
 backbone were verified independently. The receipt is
 `runs/arcus3/alpha322-post7m-production-001/first-post7m-checkpoint-verified.json`.
-Training is running toward its first 10M full evaluation; neither 100M nor 4T
-has been reached.
+The first post-7M batch then ended at **update 14,813**, **9,999,757 input**
+and **8,516,825 target tokens**. The checkpoint manifest SHA-256 is
+`cb83377618530a4fb7104f527b3b79adb6831dce7b7ca9f7a6a50e8fdab38347`;
+both payload hashes, completed retention and frozen-backbone status were
+independently verified. The training container exited normally. The host
+coordinator failed during the next bounded batch acquisition because its Python
+could not import `huggingface_hub`; no 10M evaluation was pending or run.
+
+A new isolated host Python passed production imports, authenticated access to
+all pinned dataset revisions, a 32-byte bounded read from the gated code
+dataset, and donor tokenizer/context validation at 8,192. The corrected host
+source was sealed in
+`runs/arcus3/production-alpha322-post7m-host-recovery-qualification-001/receipt.json`.
+The hash-verified continuation record is
+`runs/arcus3/alpha322-post7m-host-recovery-001/recovery.json` and keeps the
+same optimizer, scheduler, RNG, counters and pending batch path. The new
+coordinator is `runs/arcus3/alpha322-post7m-production-recovered-001`;
+training progress beyond this checkpoint requires separate verification.
+Neither 100M nor 4T has been reached.
 
 Alpha 3.2.1 remains the constant-rate comparison. Its measurements must not be
 copied into this fresh lineage or described as Alpha 3.2.2 results.

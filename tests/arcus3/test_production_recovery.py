@@ -59,3 +59,37 @@ class RecoveryTests(unittest.TestCase):
             self.assertEqual(saved['state'],state);self.assertEqual(saved['queued_batches'],['queued'])
             self.assertIsNone(saved['transition']);self.assertIsNone(saved['evaluation'])
             self.assertFalse(result['launch_started']);self.assertTrue((source/'pause-training').exists())
+
+    def test_exhausted_alpha322_batch_keeps_pending_acquisition_and_exposure(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);source=root/'failed';source.mkdir()
+            checkpoint=root/'step-14813';checkpoint.mkdir()
+            (checkpoint/'manifest.json').write_text('{}')
+            data=root/'data';teacher=root/'teacher';data.mkdir();teacher.mkdir()
+            for path in (data,teacher):(path/'manifest.json').write_text('{}')
+            policy_path=Path('configs/arcus3/production_alpha322_post7m.json')
+            policy=read(policy_path);policy_sha=identity(policy)
+            cfg_path=Path('configs/arcus3/backbone_adaptation_alpha322.json')
+            state={'updates':14813,'input_tokens':9999757,'target_tokens':8516825,
+                   'data_sha256':digest(data/'manifest.json'),
+                   'teacher_sha256':digest(teacher/'manifest.json'),
+                   'production':{'policy_sha256':policy_sha},
+                   'evaluation_pending':[],'evaluation_completed':[],
+                   'batch_complete':True,'stream':{'records':14813}}
+            pending={'data':str(root/'cache/batch-next'),
+                     'teacher':str(root/'cache/teacher-next')}
+            original={'checkpoint':str(checkpoint),'state':state,'data':str(data),
+                      'teacher':str(teacher),'policy_sha256':policy_sha,
+                      'transition':None,'evaluation':None,'preparing':pending,
+                      'queued_batches':[]}
+            (source/'controller-state.json').write_text(json.dumps(original))
+            verified={'state':state,'checkpoint_manifest_sha256':digest(checkpoint/'manifest.json'),
+                      'optimizer_empty':False,'payload_hashes_verified':True}
+            with patch('arcus3.checkpoint_recovery.inspect_state',return_value=verified):
+                receipt=prepare(source,checkpoint,policy_path,cfg_path,root/'recovered')
+            saved=read(root/'recovered/controller-state.json')
+            self.assertEqual(saved['preparing'],pending)
+            self.assertEqual(saved['state']['updates'],14813)
+            self.assertEqual(saved['state']['input_tokens'],9999757)
+            self.assertTrue(saved['state']['batch_complete'])
+            self.assertFalse(receipt['launch_started'])

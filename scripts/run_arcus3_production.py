@@ -77,6 +77,8 @@ def run(a):
         if digest(name)!=expected:raise ValueError('Qualified host source changed: '+name)
     if (runtime['memory'],runtime['cpus'],runtime['pids'],runtime['cuda_fraction'],runtime['memory_watchdog'])!=('8g',2,128,.7,False):
         raise ValueError('Production runtime limits changed')
+    from scripts.check_arcus3_host import preflight
+    preflight(check_remote=True)
     root=Path(a.root).resolve()
     if root.parent!=workspace/'runs'/'arcus3':raise ValueError('Owned run root required')
     root.mkdir(parents=True,exist_ok=False)
@@ -132,7 +134,7 @@ def run(a):
         window=root/'worker-window.json';atomic_json(window,{'mode':'chat-deadline','enabled':True,'start_at':datetime.now(timezone.utc).isoformat(),'stop_at':end.isoformat()})
         atomic_json(root/'session.json',{'active_run':str(child),'mode':mode,'deadline':a.stop_at})
         cmd=['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File','scripts/start_arcus3.ps1',
-             '-Mode',mode,'-Root',str(child.relative_to(workspace)).replace('\\','/'),'-StopAt',end.isoformat(),'-RuntimeConfig',a.evaluation_runtime if mode=='donor-baseline' else a.runtime]+extra
+             '-Mode',mode,'-Root',str(child.relative_to(workspace)).replace('\\','/'),'-StopAt',end.isoformat(),'-RuntimeConfig',a.evaluation_runtime if mode=='donor-baseline' else a.runtime,'-HostPython',sys.executable]+extra
         if mode=='adaptation':cmd+=['-WindowPolicy',str(window),'-AdaptationConfig',adaptation_path]
         with (root/'launcher.log').open('a') as log:
             result=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT)
