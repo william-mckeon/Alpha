@@ -112,5 +112,38 @@ coordinator is `runs/arcus3/alpha322-post7m-production-recovered-001`;
 training progress beyond this checkpoint requires separate verification.
 Neither 100M nor 4T has been reached.
 
+The repaired coordinator crossed 10M at **update 14,814**, **10,000,402 input**
+and **8,517,469 target tokens**. Its checkpoint manifest SHA-256 is
+`2aa83af83201a09be7068ed8fb447bedcb6a707eca2eb17f601cd6c7ada2670c`;
+the manifest and both payload hashes were verified. The full developmental
+evaluation completed at
+`runs/arcus3/adaptation-production-389f6150afed4413913ba8656a821592/scores.json`:
+NLL **2.259154**, perplexity **9.574983** on 309 target tokens,
+comprehension **0/6**, instructions **5/6**, reasoning **3/6**, Python **6/6**
+and tools **6/6**. One conversation response reached the 128-token evaluation
+output cap. NLL rose by 0.008904 from 7M, below the 0.2 review threshold; this
+small cohort does not establish a broader trend.
+
+The pinned full benchmark completed with exit code 0 at
+`runs/arcus3/adaptation-production-36baa62d5c584a55ba2f2ea310269780/donor-scores.json`,
+SHA-256 `8b2614bce0e86d87ea4748e559b24bd3e79d87b29f7d3d0fc64fa72aa781e21b`.
+It used benchmark manifest
+`5749ace4ef5e30eabc6c64ec2166cfb5eacd234386c06b0dcf6f633f552c5684`
+and the same pinned protocol revision as the 7M evaluation:
+
+| Alpha 3.2.2 boundary | ARC-Challenge | HellaSwag | MMLU-Pro | PIQA | GSM8K | IFEval strict | BBH |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 7M input tokens | 41.55% | 66.19% | 18.34% | 74.81% | 45.94% | 52.13% | 32.04% |
+| 10M input tokens | 42.49% | 66.44% | 18.75% | 74.97% | 46.47% | 52.31% | 32.74% |
+
+All seven measured benchmark columns increased between these two checkpoints,
+but the changes are modest. No winner or promotion follows from this one
+interval. The coordinator resumed the same optimizer, scheduler and data
+cursor afterward. At 2026-10-04 09:04 UTC, a newer checkpoint at **update
+15,680** had **11,121,849 input** and **9,542,620 target tokens**, manifest
+SHA-256 `1b23ad8840fbf32c0434f3751ab47c794761300ad3f27d24fbbd6ad08fb3031c`.
+Both payload hashes matched and the donor backbone remained frozen. The next
+scheduled evaluation is the 15M light check; 100M remains a review stop.
+
 Alpha 3.2.1 remains the constant-rate comparison. Its measurements must not be
 copied into this fresh lineage or described as Alpha 3.2.2 results.
