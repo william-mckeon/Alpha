@@ -1,0 +1,14 @@
+Alpha 3
+Copyright 2026 William McKeon
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Alpha 3 uses the HuggingFaceTB/SmolLM2-1.7B-Instruct architecture and released
+weights as its initialization source. The pinned donor revision used by the
+research line was 31b70e2e869a7173562077fd711b654946d38674. SmolLM2 is
+published by Hugging Face / HuggingFaceTB under Apache-2.0. Alpha is not
+endorsed by or affiliated with Hugging Face.
+
+Transformers is an Apache-2.0 project by Hugging Face. PyTorch is distributed
+under its own BSD-style license. Preserve the license records supplied with
+those dependencies.

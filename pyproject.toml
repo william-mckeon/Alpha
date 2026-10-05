@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alpha3-runtime"
+version = "0.1.0"
+description = "Reviewed inference runtime for Alpha 3 selective-expert models"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "William McKeon" }]
+dependencies = [
+    "torch>=2.4",
+    "transformers>=4.45",
+]
+
+[tool.setuptools]
+packages = ["arcus3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

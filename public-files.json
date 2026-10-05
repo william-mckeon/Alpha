@@ -1,0 +1,26 @@
+{
+  "schema": "alpha-public-files-v1",
+  "files": [
+    ".gitattributes",
+    ".gitignore",
+    "LICENSE",
+    "MODEL_PROVENANCE.md",
+    "NOTICE",
+    "PUBLICATION_BOUNDARY.md",
+    "README.md",
+    "arcus3/__init__.py",
+    "arcus3/depth.py",
+    "arcus3/hf_model.py",
+    "arcus3/routing.py",
+    "docs/ALPHA_3_2_0_MODEL_CARD.md",
+    "docs/ALPHA_3_2_1_MODEL_CARD.md",
+    "docs/ALPHA_3_2_2_MODEL_CARD.md",
+    "docs/RESULTS.md",
+    "pyproject.toml",
+    "public-files.json",
+    "scripts/audit_public_tree.py",
+    "tests/test_publication_boundary.py",
+    "tests/test_runtime.py",
+    "vendor/smollm2/LICENSE"
+  ]
+}

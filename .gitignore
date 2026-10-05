@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv*/
+dist/
+build/
+*.egg-info/
+
+# Private research and training material must never enter this repository.
+runs/
+checkpoints/
+data/
+datasets/
+teacher-cache/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.jsonl
+*.parquet
+*.arrow
+.env*
+credentials*
